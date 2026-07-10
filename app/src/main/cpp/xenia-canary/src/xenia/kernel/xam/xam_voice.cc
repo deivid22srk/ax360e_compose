@@ -49,6 +49,17 @@ dword_result_t XamVoiceGetMicArrayStatus_entry() {
 }
 DECLARE_XAM_EXPORT1(XamVoiceGetMicArrayStatus, kNone, kStub);
 
+// XamVoiceSetMicArrayIdleUsers (ordinal 0x048C)
+//
+// Sets the users considered "idle" for mic array beam-forming. Without a
+// real mic array this is meaningless; we accept and ignore.
+//
+// Reference: ax360e Forza Horizon log lines 3366-3373.
+dword_result_t XamVoiceSetMicArrayIdleUsers_entry(dword_t idle_mask) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamVoiceSetMicArrayIdleUsers, kNone, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

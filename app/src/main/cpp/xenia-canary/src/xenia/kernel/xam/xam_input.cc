@@ -317,6 +317,22 @@ X_HRESULT_result_t XamInputNonControllerSetRaw_entry(dword_t buffer_length,
 }
 DECLARE_XAM_EXPORT1(XamInputNonControllerSetRaw, kInput, kSketchy);
 
+// XamInputGetUserVibrationLevel (ordinal 0x01BA)
+//
+// Returns the user's vibration level preference (0-100). On a real Xbox
+// 360 this is read from the user profile. We return 50 (mid-range) as a
+// safe default so the guest's rumble code path continues to function
+// without triggering "GetProcAddressByOrdinal failed" warnings on every
+// controller poll.
+//
+// Reference: ax360e Forza Horizon log line 1506.
+dword_result_t XamInputGetUserVibrationLevel_entry(dword_t user_index) {
+  // 50 = mid-range rumble level. Games scale their rumble amplitudes by
+  // this value, so 50 produces a moderate rumble rather than full-force.
+  return 50;
+}
+DECLARE_XAM_EXPORT1(XamInputGetUserVibrationLevel, kInput, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

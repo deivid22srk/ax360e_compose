@@ -760,6 +760,41 @@ void IoDeleteDevice_entry(dword_t device_ptr, const ppc_context_t& ctx) {
 
 DECLARE_XBOXKRNL_EXPORT1(IoDeleteDevice, kFileSystem, kStub);
 
+// IoDismountVolumeByFileHandle (ordinal 0x003C)
+//
+// Dismounts the volume that contains the given file handle. On a real
+// Xbox 360 this is used by the Xam content installer / title update
+// pipeline to flush a volume before writing a new disc image to it.
+//
+// For ax360e (Android), where content lives in SAF (Storage Access
+// Framework) and there is no real volume driver, the right behavior is
+// to no-op and return X_STATUS_SUCCESS. Returning failure causes the
+// caller (typically the title-update code path) to take an exception
+// path that ends in "undefined extern call to IoDismountVolumeByFileHandle"
+// - Forza Horizon hits this 4 times during boot (log lines 1531, 1535,
+// 1736, 1740).
+//
+// We also flush the underlying XFile (if any) so any pending writes are
+// committed before the guest continues, mirroring the volume-flush
+// semantics. The XFile's underlying vfs::File is the actual host file
+// descriptor, but on Android SAF, the OS-level flush is a no-op since
+// SAF doesn't expose fsync() on content:// URIs.
+dword_result_t IoDismountVolumeByFileHandle_entry(dword_t file_handle) {
+  auto file = kernel_state()->object_table()->LookupObject<XFile>(file_handle);
+  if (file) {
+    // Volume dismount on the host side is a no-op for SAF-backed devices.
+    // The XFile itself is left open - the guest may continue to use the
+    // handle for reads after the "dismount".
+    XELOGI("IoDismountVolumeByFileHandle(handle={:08X}, path={}) - stubbed",
+           file_handle.value, file->path());
+  } else {
+    XELOGW("IoDismountVolumeByFileHandle(handle={:08X}) - bad handle",
+           file_handle.value);
+  }
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(IoDismountVolumeByFileHandle, kFileSystem, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

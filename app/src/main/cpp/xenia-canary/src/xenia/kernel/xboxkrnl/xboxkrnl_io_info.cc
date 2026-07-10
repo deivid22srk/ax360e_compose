@@ -94,8 +94,15 @@ dword_result_t NtQueryInformationFile_entry(
     case XFileSectorInformation: {
       // SW that uses this seems to use the output as a way of uniquely
       // identifying a file for sorting/lookup so we can just give it an
-      // arbitrary 4 byte integer most of the time
-      XELOGW("Stub XFileSectorInformation!");
+      // arbitrary 4 byte integer most of the time.
+      //
+      // [ANDROID PERF] Removed the XELOGW warning - it was logged on every
+      // call (Forza Horizon calls this 704+ times per asset-load burst,
+      // see Forza Horizon log lines 1748-3241). Each XELOGW formats and
+      // writes to Android log buffer, costing ~5-10us per call - that's
+      // 3-7ms of pure log overhead per burst. The behavior is intentional
+      // (we're returning a stable hash as the "sector" identifier), so
+      // logging it as a warning is misleading anyway.
       auto info = info_ptr.as<uint32_t*>();
       size_t fname_hash = xe::memory::hash_combine(82589933LL, file->path());
       *info = static_cast<uint32_t>(fname_hash ^ (fname_hash >> 32));

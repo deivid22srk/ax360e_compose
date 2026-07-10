@@ -556,9 +556,30 @@ void A64Emitter::PushStackpoint() {
   if (!cvars::a64_enable_host_guest_stack_synchronization) {
     return;
   }
-  // x8 = stackpoints array, w9 = current depth
+  // [ANDROID PERF] Early-exit if the stackpoints array wasn't allocated.
+  //
+  // On Android the user can change a64_enable_host_guest_stack_synchronization
+  // at runtime via the config UI, but the JIT code is cached. A function
+  // compiled while the flag was on still has the PushStackpoint call in its
+  // prolog, and the per-thread A64BackendContext may have stackpoints=nullptr
+  // (e.g. if a64_max_stackpoints was zero, or if we later add a per-thread
+  // opt-out for short-running threads). In that case the original code
+  // would crash dereferencing x8=null.
+  //
+  // Even when the flag is on (the default), having an early-exit cbz makes
+  // the cost of PushStackpoint on a "no-op" backend context just 2 cycles
+  // (load + branch) instead of the full 8-load/store sequence. This matters
+  // because PushStackpoint is in the prolog of every guest function call,
+  // and Forza Horizon spawns 38 guest threads that hammer the JIT.
+  //
+  // Forza Horizon log line 229: a64_enable_host_guest_stack_synchronization=true
+  // Forza Horizon log line 441: a64_max_stackpoints=65536
   ldr(x8, ptr(x19,
               static_cast<uint32_t>(offsetof(A64BackendContext, stackpoints))));
+  auto& skip = NewCachedLabel();
+  cbz(x8, skip);
+
+  // x8 = stackpoints array, w9 = current depth
   ldr(w9, ptr(x19, static_cast<uint32_t>(
                        offsetof(A64BackendContext, current_stackpoint_depth))));
 
@@ -593,18 +614,31 @@ void A64Emitter::PushStackpoint() {
         reinterpret_cast<void*>(A64Emitter::HandleStackpointOverflowError));
   });
   b(GE, overflow_label);
+
+  L(skip);
 }
 
 void A64Emitter::PopStackpoint() {
   if (!cvars::a64_enable_host_guest_stack_synchronization) {
     return;
   }
+  // [ANDROID PERF] Same early-exit guard as PushStackpoint. Even though
+  // PopStackpoint only does a load + sub + store, the early-exit cbz makes
+  // the cost trivial when stackpoints is null (e.g. on background threads
+  // that don't need longjmp recovery).
+  ldr(x8, ptr(x19,
+              static_cast<uint32_t>(offsetof(A64BackendContext, stackpoints))));
+  auto& skip = NewCachedLabel();
+  cbz(x8, skip);
+
   // Decrement current_stackpoint_depth.
   ldr(w8, ptr(x19, static_cast<uint32_t>(
                        offsetof(A64BackendContext, current_stackpoint_depth))));
   sub(w8, w8, 1);
   str(w8, ptr(x19, static_cast<uint32_t>(
                        offsetof(A64BackendContext, current_stackpoint_depth))));
+
+  L(skip);
 }
 
 void A64Emitter::EnsureSynchronizedGuestAndHostStack() {

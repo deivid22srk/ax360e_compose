@@ -28,94 +28,52 @@ void KeEnableFpuExceptions_entry(
   kthread->fpu_exceptions_on = static_cast<uint32_t>(ctx->r[3]) != 0;
 }
 DECLARE_XBOXKRNL_EXPORT1(KeEnableFpuExceptions, kNone, kStub);
-#if 0
-struct __declspec(align(8)) fpucontext_ptr_t {
-  char unknown_data[158];
-  __int16 field_9E;
-  char field_A0[2272];
-  unsigned __int64 saved_FPSCR;
-  double saved_fpu_regs[32];
-};
-#pragma pack(push, 1)
-struct __declspec(align(1)) r13_struct_t {
-  char field_0[6];
-  __int16 field_6;
-  char field_8[2];
-  char field_A;
-  char field_B[5];
-  int field_10;
-  char field_14[315];
-  char field_14F;
-  unsigned int field_150;
-  char field_154[427];
-  char field_2FF;
-  char field_300;
-};
-#pragma pack(pop)
 
-
-static uint64_t Do_mfmsr(ppc_context_t& ctx) {
-  auto frontend = ctx->thread_state->processor()->frontend();
-  cpu::ppc::CheckGlobalLock(
-      ctx, reinterpret_cast<void*>(&xe::global_critical_region::mutex()),
-      reinterpret_cast<void*>(&frontend->builtins()->global_lock_count));
-  return ctx->scratch;
-}
-
-void KeSaveFloatingPointState_entry(ppc_context_t& ctx) {
-  xe::Memory* memory = ctx->thread_state->memory();
-  unsigned int r13 = static_cast<unsigned int>(ctx->r[13]);
-
-
-
-  
-  r13_struct_t* st = memory->TranslateVirtual<r13_struct_t*>(r13);
-  /*
-                 lwz       r10, 0x150(r13)
-                lbz       r11, 0xA(r13)
-                tweqi     r10, 0
-                twnei     r11, 0
-  */
-
-  unsigned int r10 = st->field_150;
-  unsigned char r11 = st->field_A;
-
-  if (r10 == 0 || r11 != 0) {
-	  //trap!
+// KeSaveFloatingPointState / KeRestoreFloatingPointState
+//
+// On Xbox 360 these save/restore the guest FP/Vmx register file to a
+// caller-provided buffer (so kernel-mode code can clobber FP registers
+// without losing guest state). The previous implementation in this file
+// was Microsoft-specific (__declspec, Windows-only bitfields) and was
+// disabled under `#if 0`.
+//
+// For the Android/POSIX port we provide a minimal cross-platform stub:
+//   - KeSaveFloatingPointState: marks the buffer valid and returns success.
+//   - KeRestoreFloatingPointState: returns success.
+//
+// The Xenia JIT already preserves the PPC FP/Vec register file across
+// host function calls (see A64Emitter prolog/epilog saving d8-d15 and
+// the backend context saving v0-v31), so the kernel buffer save/restore
+// is not strictly required for correctness - the guest's "saved" FP
+// state is the PPCContext itself, which the JIT already round-trips.
+//
+// Returning X_STATUS_SUCCESS (0) here prevents Forza Horizon (and other
+// titles that call these on every thread context switch) from taking the
+// error path. Without these stubs, the import is unresolved and every
+// guest call hits "undefined extern" → fatal crash.
+//
+// Reference: ax360e Forza Horizon log lines 975-976:
+//   F 820008EC 832F15E4 090 ( 144) !! KeRestoreFloatingPointState
+//   F 820008F0 832F15F4 095 ( 149) !! KeSaveFloatingPointState
+dword_result_t KeSaveFloatingPointState_entry(pointer_t<uint8_t> save_state) {
+  // Touch the buffer so the guest sees a non-zero SaveState if it later
+  // inspects it for "did we save?" validity checks.
+  if (save_state) {
+    // First DWORD is the "valid" flag in X_FPU_SAVE_STATE on Xbox 360.
+    xe::store_and_swap<uint32_t>(save_state.as<void*>(), 1u);
   }
-
-  //should do mfmsr here
-  
-  unsigned int r3 = xe::load_and_swap<unsigned int>(&st->field_10);
-  
-  //too much work to do the mfmsr/mtmsr stuff right now
-  int to_store = -2049;
-  xe::store_and_swap(&st->field_10, (unsigned int)to_store);
-  xe::store_and_swap(&st->field_6, (short)to_store);
- 
-
-
-  if (r3 != ~0u) {
-    fpucontext_ptr_t* fpucontext =
-        memory->TranslateVirtual<fpucontext_ptr_t*>(r3);
-    xe::store_and_swap<uint64_t>(&fpucontext->saved_FPSCR, ctx->fpscr.value);
-	
-    for (unsigned int i = 0; i < 32; ++i) {
-      xe::store_and_swap(&fpucontext->saved_fpu_regs[i], ctx->f[i]);
-	}
-    xe::store_and_swap<unsigned short>(&fpucontext->field_9E, 0xD7FF);
-  }
-  ctx->processor->backend()->SetGuestRoundingMode(ctx.value(), 0);
-  ctx->fpscr.value = 0;
-  st->field_A = 1;
-
-  xe::store_and_swap(&st->field_10, r13 + 0x300);
-  ctx->r[3] = r3;
-
+  return X_STATUS_SUCCESS;
 }
+DECLARE_XBOXKRNL_EXPORT1(KeSaveFloatingPointState, kNone, kStub);
 
-DECLARE_XBOXKRNL_EXPORT1(KeSaveFloatingPointState, kNone, kImplemented);
-#endif
+dword_result_t KeRestoreFloatingPointState_entry(
+    pointer_t<uint8_t> save_state) {
+  // No-op: PPCContext FP/Vec state is preserved by the JIT across host
+  // calls, so there is nothing to restore here.
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(KeRestoreFloatingPointState, kNone, kStub);
+
 static qword_result_t KeQueryInterruptTime_entry(const ppc_context_t& ctx) {
   auto kstate = ctx->kernel_state;
   uint32_t ts_bundle = kstate->GetKeTimestampBundle();

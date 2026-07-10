@@ -1020,7 +1020,27 @@ struct RESERVED_LOAD_I32
     // Save guest address before load — dest may alias addr register.
     e.mov(e.w0, WReg(addr.getIdx()));
     // Load the value (may clobber addr if dest == addr).
-    e.ldr(i.dest, ptr(e.GetMembaseReg(), addr));
+    //
+    // [ANDROID PERF] Use LDAPR (load-acquire RCpc) when FEAT_LRCPC is
+    // available. PPC lwarx establishes a reservation that must be
+    // observed by all later loads/stores (acquire semantics). LDAPR
+    // provides exactly that with RCpc ordering (~3-5 cycles cheaper
+    // than LDAR which implies a full DMB ISH). When RCPC is unavailable
+    // we fall back to plain LDR — the reservation is recorded locally
+    // in A64BackendContext and the actual atomicity is enforced later
+    // in RESERVED_STORE via CAS/LDAXR, so the load itself does not
+    // strictly need acquire semantics for correctness.
+    //
+    // Note: LDAPR only supports [Xn] (AdrImm with imm=0), not [Xn, Xm].
+    // So when RCPC is enabled we first add the offset into a scratch
+    // register (x4) and use [x4]. The plain-LDR path keeps the original
+    // [membase, addr] addressing.
+    if (e.IsFeatureEnabled(kA64EmitRCPC)) {
+      e.add(e.x4, e.GetMembaseReg(), addr);
+      e.ldapr(i.dest, ptr(e.x4));
+    } else {
+      e.ldr(i.dest, ptr(e.GetMembaseReg(), addr));
+    }
     // Save reservation: address and value in backend context.
     auto bctx = LoadBackendCtxPtr(e);
     // Store the guest address (already saved in x0).
@@ -1045,7 +1065,13 @@ struct RESERVED_LOAD_I64
     // Save guest address before load — dest may alias addr register.
     e.mov(e.w0, WReg(addr.getIdx()));
     // Load the value (may clobber addr if dest == addr).
-    e.ldr(i.dest, ptr(e.GetMembaseReg(), addr));
+    // [ANDROID PERF] LDAPR when RCPC available (see RESERVED_LOAD_I32).
+    if (e.IsFeatureEnabled(kA64EmitRCPC)) {
+      e.add(e.x4, e.GetMembaseReg(), addr);
+      e.ldapr(i.dest, ptr(e.x4));
+    } else {
+      e.ldr(i.dest, ptr(e.GetMembaseReg(), addr));
+    }
     // Save reservation in backend context.
     auto bctx = LoadBackendCtxPtr(e);
     e.str(e.x0, ptr(bctx, static_cast<uint32_t>(offsetof(

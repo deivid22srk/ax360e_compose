@@ -9,7 +9,11 @@
 
 #include "xenia/cpu/cpu_flags.h"
 
-DEFINE_string(cpu, "any", "Does nothing. CPU backend [any, x64].", "CPU");
+DEFINE_string(cpu, "a64", "CPU backend [any, a64]. On Android ARM64 builds "
+                          "both values select the A64 backend; the flag is "
+                          "kept for compatibility with x64-only builds and "
+                          "config files copied from upstream xenia-canary.",
+              "CPU");
 
 DEFINE_string(
     load_module_map, "",
