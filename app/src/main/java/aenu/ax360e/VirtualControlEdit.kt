@@ -93,22 +93,7 @@ class VirtualControlEdit : ComponentActivity() {
                         onVcCreated(vc)
                     }
                 },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        // Detect long-press to open the edit menu
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                val change = event.changes.firstOrNull()
-                                if (change != null && change.pressed != change.previousPressed) {
-                                    if (!change.pressed) {
-                                        // Released: dispatch ACTION_UP through the view's onTouch
-                                    }
-                                }
-                            }
-                        }
-                    }
+                modifier = Modifier.fillMaxSize()
             )
 
             // Floating button to open menu
