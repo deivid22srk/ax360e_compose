@@ -165,7 +165,7 @@ fun MainScreen() {
                                 },
                                 leadingIcon = {
                                     Icon(
-                                        imageVector = Icons.Default.Star,
+                                        imageVector = Icons.Default.Refresh,
                                         contentDescription = null,
                                         tint = if (fpsVisible)
                                             MaterialTheme.colorScheme.primary
