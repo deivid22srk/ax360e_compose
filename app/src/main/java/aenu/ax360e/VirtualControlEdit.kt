@@ -72,6 +72,7 @@ class VirtualControlEdit : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun VirtualControlEditScreen(
         onVcCreated: (VirtualControl) -> Unit,
@@ -129,11 +130,11 @@ class VirtualControlEdit : ComponentActivity() {
         val context = LocalContext.current
         val scaleText = stringResource(R.string.scale_rate) + ": "
 
-        var joystickScale by remember { mutableFloatStateOf(vc?.find_component("joystick_l")?.scale?.toFloat() ?: 1f) }
-        var dpadScale by remember { mutableFloatStateOf(vc?.find_component("dpad")?.scale?.toFloat() ?: 1f) }
-        var abxyScale by remember { mutableFloatStateOf(vc?.find_component("a")?.scale?.toFloat() ?: 1f) }
-        var sbScale by remember { mutableFloatStateOf(vc?.find_component("start")?.scale?.toFloat() ?: 1f) }
-        var lrScale by remember { mutableFloatStateOf(vc?.find_component("shoulder_l")?.scale?.toFloat() ?: 1f) }
+        var joystickScale by remember { mutableFloatStateOf(vc?.find_component("joystick_l")?.get_scale()?.toFloat() ?: 1f) }
+        var dpadScale by remember { mutableFloatStateOf(vc?.find_component("dpad")?.get_scale()?.toFloat() ?: 1f) }
+        var abxyScale by remember { mutableFloatStateOf(vc?.find_component("a")?.get_scale()?.toFloat() ?: 1f) }
+        var sbScale by remember { mutableFloatStateOf(vc?.find_component("start")?.get_scale()?.toFloat() ?: 1f) }
+        var lrScale by remember { mutableFloatStateOf(vc?.find_component("shoulder_l")?.get_scale()?.toFloat() ?: 1f) }
 
         Column(
             modifier = Modifier

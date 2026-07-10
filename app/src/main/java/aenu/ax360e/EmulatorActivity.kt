@@ -263,7 +263,7 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
             val laxisY = event.getAxisValue(MotionEvent.AXIS_Y)
             val raxisX = event.getAxisValue(MotionEvent.AXIS_Z)
             val raxisY = event.getAxisValue(MotionEvent.AXIS_RZ)
-            val _0: Short = 0
+            val _0: Int = 0
 
             // Left joystick
             if (laxisX != 0f) {

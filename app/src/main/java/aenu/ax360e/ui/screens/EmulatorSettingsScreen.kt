@@ -42,9 +42,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import aenu.ax360e.Application
-import aenu.ax360e.Emulator
 import aenu.ax360e.R
 import aenu.ax360e.Utils
+import aenu.emulator.Emulator as NativeEmulator
 import java.io.File
 
 /**
@@ -69,13 +69,13 @@ fun EmulatorSettingsScreen(
     val config = remember(effectivePath) {
         runCatching {
             if (File(effectivePath).exists())
-                Emulator.Config.open_config_file(effectivePath)
+                NativeEmulator.Config.open_config_file(effectivePath)
             else null
         }.getOrNull()
     }
     val originalConfig = remember {
         runCatching {
-            Emulator.Config.open_config_from_string(
+            NativeEmulator.Config.open_config_from_string(
                 Application.load_default_config_str(context)
             )
         }.getOrNull()
@@ -145,20 +145,20 @@ fun EmulatorSettingsScreen(
                     }
                     is SettingsEntry.Bool -> {
                         val value = remember(entry.key) {
-                            config.load_config_entry(entry.key)?.toBooleanStrictOrNull()
+                            config?.load_config_entry(entry.key)?.toBooleanStrictOrNull()
                         }
                         BoolRow(
                             title = entry.title,
                             value = value,
                             modified = originalConfig?.load_config_entry(entry.key) != value?.toString(),
                             onValueChange = { newVal ->
-                                config.save_config_entry(entry.key, newVal.toString())
+                                config?.save_config_entry(entry.key, newVal.toString())
                             }
                         )
                     }
                     is SettingsEntry.Int -> {
                         val value = remember(entry.key) {
-                            config.load_config_entry(entry.key)?.toIntOrNull()
+                            config?.load_config_entry(entry.key)?.toIntOrNull()
                         }
                         IntRow(
                             title = entry.title,
@@ -167,13 +167,13 @@ fun EmulatorSettingsScreen(
                             max = entry.max,
                             modified = originalConfig?.load_config_entry(entry.key) != value?.toString(),
                             onValueChange = { newVal ->
-                                config.save_config_entry(entry.key, newVal.toString())
+                                config?.save_config_entry(entry.key, newVal.toString())
                             }
                         )
                     }
                     is SettingsEntry.StrArr -> {
                         val value = remember(entry.key) {
-                            config.load_config_entry(entry.key)
+                            config?.load_config_entry(entry.key)
                         }
                         StrArrRow(
                             title = entry.title,
@@ -182,7 +182,19 @@ fun EmulatorSettingsScreen(
                             values = entry.values,
                             modified = originalConfig?.load_config_entry(entry.key) != value,
                             onValueChange = { newVal ->
-                                config.save_config_entry(entry.key, newVal)
+                                config?.save_config_entry(entry.key, newVal)
+                            }
+                        )
+                    }
+                    is SettingsEntry.StrLeaf -> {
+                        val value = remember(entry.key) {
+                            config?.load_config_entry(entry.key)
+                        }
+                        StrLeafRow(
+                            title = entry.title,
+                            value = value,
+                            onValueChange = { newVal ->
+                                config?.save_config_entry(entry.key, newVal)
                             }
                         )
                     }
@@ -196,7 +208,7 @@ fun EmulatorSettingsScreen(
                 OutlinedButton(
                     onClick = {
                         // Reset to default config
-                        config.close_config_file()
+                        config?.close_config_file()
                         Utils.copy_file(
                             Application.get_default_config_file(),
                             File(effectivePath)
@@ -212,7 +224,7 @@ fun EmulatorSettingsScreen(
                 if (!isGlobal) {
                     OutlinedButton(
                         onClick = {
-                            config.close_config_file()
+                            config?.close_config_file()
                             File(effectivePath).delete()
                             onBack()
                         },
@@ -413,6 +425,64 @@ private fun StrArrRow(
                 }
             },
             confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun StrLeafRow(
+    title: String,
+    value: String?,
+    onValueChange: (String) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    Surface(
+        onClick = { showDialog = true },
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = value ?: "—",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+    if (showDialog) {
+        var textValue by remember { mutableStateOf(value ?: "") }
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(title) },
+            text = {
+                OutlinedTextField(
+                    value = textValue,
+                    onValueChange = { textValue = it },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onValueChange(textValue)
+                    showDialog = false
+                }) { Text(stringResource(android.R.string.ok)) }
+            },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
                     Text(stringResource(android.R.string.cancel))
