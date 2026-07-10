@@ -11,7 +11,7 @@ import aenu.hardware.ProcessorInfo;
 // Created by aenu on 2025/7/31.
 // SPDX-License-Identifier: WTFPL
 public class Application extends android.app.Application{
-    static File get_app_data_dir(){
+    public static File get_app_data_dir(){
         return ctx.getExternalFilesDir("ax360e");
     }
     public static File get_internal_data_dir()
@@ -49,7 +49,7 @@ public class Application extends android.app.Application{
             return null;
         }
     }
-    static String load_default_config_str(Context ctx){
+    public static String load_default_config_str(Context ctx){
         return new String(Application.load_assets_file(
                 ctx,"config/default_config.toml"));
     }
@@ -61,11 +61,11 @@ public class Application extends android.app.Application{
     public static File get_virtual_control_config_file(){
         return new File(Application.get_app_data_dir(),"virtual_control_config.json");
     }
-    static boolean device_support_vulkan() {
+    public static boolean device_support_vulkan() {
         return gpu_device_name_vk!=null;
     }
 
-    static boolean should_delay_load() {
+    public static boolean should_delay_load() {
         if(gpu_device_name_vk==null)
             throw new RuntimeException("gpu_device_name_vk==null");
         return gpu_device_name_vk.contains("Adreno (TM) 5")

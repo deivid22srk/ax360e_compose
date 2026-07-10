@@ -81,7 +81,7 @@ public class Utils {
         }
     }
 
-    static void copy_file(File src_file,File dst_file){
+    public static void copy_file(File src_file,File dst_file){
         try{
             FileInputStream in=new FileInputStream(src_file);
             FileOutputStream out=new FileOutputStream(dst_file);
@@ -221,7 +221,7 @@ public class Utils {
         }
     }
 
-    static String read_file_as_str(File f) {
+    public static String read_file_as_str(File f) {
         try {
             FileInputStream in=new FileInputStream(f);
             int size=in.available();
