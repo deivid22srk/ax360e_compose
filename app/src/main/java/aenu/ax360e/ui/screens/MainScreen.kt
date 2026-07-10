@@ -54,11 +54,13 @@ import aenu.ax360e.ui.components.EmptyState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
-    viewModel: MainViewModel = viewModel(factory = MainViewModel.Factory)
-) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+fun MainScreen() {
     val context = LocalContext.current
+    val app = context.applicationContext as android.app.Application
+    val viewModel: MainViewModel = viewModel(
+        factory = remember { MainViewModel.factory(app) }
+    )
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     var menuExpanded by remember { mutableStateOf(false) }
 
     val openDirLauncher = rememberLauncherForActivityResult(

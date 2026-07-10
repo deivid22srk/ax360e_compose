@@ -2,9 +2,8 @@ package aenu.ax360e.ui.screens
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,11 +50,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     companion object {
-        val Factory = viewModelFactory {
-            initializer {
-                val app = (this[androidx.lifecycle.viewmodel.compose.APPLICATION_KEY] as Application)
-                MainViewModel(app)
+        fun factory(app: Application): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                    return MainViewModel(app) as T
+                }
             }
-        }
     }
 }
