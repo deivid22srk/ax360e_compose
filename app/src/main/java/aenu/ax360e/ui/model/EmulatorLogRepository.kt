@@ -1,6 +1,7 @@
 package aenu.ax360e.ui.model
 
 import android.content.Context
+import android.net.Uri
 import aenu.ax360e.Application
 import java.io.File
 import java.io.FilenameFilter
@@ -141,6 +142,29 @@ object EmulatorLogRepository {
             if (f.delete()) count++
         }
         return count
+    }
+
+    /**
+     * Exports a log file to a user-chosen destination URI (obtained via
+     * ActivityResultContracts.CreateDocument). This writes the full log
+     * content to the URI using ContentResolver.openOutputStream().
+     *
+     * @param context Android context for ContentResolver access
+     * @param sourceFile the saved log file to export
+     * @param destUri the destination URI returned by the SAF picker
+     * @return true if the export succeeded, false otherwise
+     */
+    fun exportLogToUri(context: Context, sourceFile: File, destUri: Uri): Boolean {
+        return try {
+            val content = readLog(sourceFile, maxBytes = Long.MAX_VALUE)
+            context.contentResolver.openOutputStream(destUri)?.use { output ->
+                output.write(content.toByteArray(Charsets.UTF_8))
+                output.flush()
+            } ?: return false
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     /**

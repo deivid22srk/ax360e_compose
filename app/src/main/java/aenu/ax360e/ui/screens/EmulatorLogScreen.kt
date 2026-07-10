@@ -89,6 +89,35 @@ fun EmulatorLogScreen(
     var showClearDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf<GameLogEntry?>(null) }
 
+    // Pending export: the log entry the user wants to export. When set,
+    // the exportLauncher is launched to pick a destination URI via SAF.
+    var pendingExport by remember { mutableStateOf<GameLogEntry?>(null) }
+
+    // SAF launcher for exporting a log file to a user-chosen location
+    // (Downloads, external SD, cloud drive, etc.). The contract
+    // CreateDocument() opens the system file picker in "save as" mode.
+    val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri ->
+        val entry = pendingExport
+        pendingExport = null
+        if (uri != null && entry != null) {
+            scope.launch(Dispatchers.IO) {
+                val success = EmulatorLogRepository.exportLogToUri(
+                    context, entry.file, uri
+                )
+                withContext(Dispatchers.Main) {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            if (success) "Log exported successfully"
+                            else "Failed to export log"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     // Load log list
     LaunchedEffect(Unit) {
         logs = withContext(Dispatchers.IO) {
@@ -136,19 +165,12 @@ fun EmulatorLogScreen(
     }
 
     fun exportLog(entry: GameLogEntry) {
-        scope.launch(Dispatchers.IO) {
-            // Export to a file in the Downloads directory via SAF
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TITLE, "${entry.gameName}_${entry.formattedTimestamp.replace(":", "_").replace(" ", "_")}.log")
-            }
-            withContext(Dispatchers.Main) {
-                // The Activity must handle this intent via onActivityResult
-                // For now, fall back to share
-                shareLog(entry)
-            }
-        }
+        // Launch the SAF "Save As" picker. The result is handled by
+        // exportLauncher above, which writes the log content to the
+        // chosen URI via EmulatorLogRepository.exportLogToUri().
+        pendingExport = entry
+        val fileName = "${entry.gameName}_${entry.formattedTimestamp.replace(":", "_").replace(" ", "_")}.log"
+        exportLauncher.launch(fileName)
     }
 
     Scaffold(
@@ -169,9 +191,12 @@ fun EmulatorLogScreen(
                 },
                 actions = {
                     if (selectedLog != null) {
-                        // Viewing a single log
+                        // Viewing a single log - copy, export, share
                         IconButton(onClick = { copyToClipboard(logContent) }) {
-                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy")
+                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy to clipboard")
+                        }
+                        IconButton(onClick = { exportLog(selectedLog!!) }) {
+                            Icon(Icons.Default.FolderOpen, contentDescription = "Export to file")
                         }
                         IconButton(onClick = { shareLog(selectedLog!!) }) {
                             Icon(Icons.Default.Share, contentDescription = "Share")
@@ -238,6 +263,7 @@ fun EmulatorLogScreen(
                         LogEntryRow(
                             entry = entry,
                             onClick = { openLog(entry) },
+                            onExport = { exportLog(entry) },
                             onShare = { shareLog(entry) },
                             onDelete = { showDeleteDialog = entry }
                         )
@@ -297,6 +323,7 @@ fun EmulatorLogScreen(
 private fun LogEntryRow(
     entry: GameLogEntry,
     onClick: () -> Unit,
+    onExport: () -> Unit,
     onShare: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -329,6 +356,9 @@ private fun LogEntryRow(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+            IconButton(onClick = onExport) {
+                Icon(Icons.Default.FolderOpen, contentDescription = "Export to file")
             }
             IconButton(onClick = onShare) {
                 Icon(Icons.Default.Share, contentDescription = "Share")
