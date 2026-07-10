@@ -344,6 +344,11 @@ private fun EmulatorScreen(
             },
             modifier = Modifier.fillMaxSize()
         )
+        // FPS overlay - polls GraphicsSystem vblank counter via JNI.
+        // Rendered on top of the surface + virtual control layer.
+        aenu.ax360e.ui.components.FpsOverlay(
+            modifier = Modifier.align(Alignment.TopStart)
+        )
     }
 }
 

@@ -49,6 +49,19 @@ public class Emulator extends aenu.emulator.Emulator{
 
     public native GameInfo meta_info_from_god_game(Context ctx,String uri) throws RuntimeException;
 
+    /**
+     * Returns the current guest frame counter (number of vblanks since the
+     * emulator was launched). Polled by the FPS overlay at ~1Hz to compute
+     * frames-per-second.
+     *
+     * <p>This is a thin JNI bridge to
+     * {@code GraphicsSystem::command_processor()->counter()} in xenia-canary,
+     * which is incremented in {@code GraphicsSystem::MarkVblank()}.
+     *
+     * @return current guest frame count, or 0 if the emulator is not running
+     */
+    public native int get_guest_frame_counter();
+
 
     public static class GameInfo{
 

@@ -49,6 +49,7 @@ import aenu.ax360e.AboutActivity
 import aenu.ax360e.VirtualControlEdit
 import aenu.ax360e.R
 import aenu.ax360e.ui.model.GameListLoader
+import aenu.ax360e.ui.model.UiPreferences
 import aenu.ax360e.ui.components.GameCard
 import aenu.ax360e.ui.components.EmptyState
 
@@ -62,6 +63,7 @@ fun MainScreen() {
     )
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var menuExpanded by remember { mutableStateOf(false) }
+    var fpsVisible by remember { mutableStateOf(UiPreferences.isFpsVisible(context)) }
 
     val openDirLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -145,6 +147,32 @@ fun MainScreen() {
                                     openFileManager()
                                 },
                                 leadingIcon = { Icon(Icons.Default.FolderOpen, contentDescription = null) }
+                            )
+                            // FPS counter toggle - shows a live FPS overlay on
+                            // top of the emulator surface (top-left corner).
+                            // Polls GraphicsSystem vblank counter via JNI.
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = if (fpsVisible) "Hide FPS Counter"
+                                               else "Show FPS Counter"
+                                    )
+                                },
+                                onClick = {
+                                    menuExpanded = false
+                                    fpsVisible = !fpsVisible
+                                    UiPreferences.setFpsVisible(context, fpsVisible)
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = null,
+                                        tint = if (fpsVisible)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.about)) },

@@ -6,8 +6,11 @@
 #include "xenia/emulator.h"
 #include "xenia/apu/nop/nop_audio_system.h"
 #include "xenia/gpu/null/null_graphics_system.h"
+#include "xenia/gpu/graphics_system.h"
+#include "xenia/gpu/command_processor.h"
 #include "xenia/hid/nop/nop_hid.h"
 #include "xenia/base/logging.h"
+#include "xenia/base/clock.h"
 #include "xenia/vfs/devices/stfs_xbox.h"
 #include "xenia/base/mapped_memory.h"
 
@@ -373,37 +376,37 @@ static const std::pair<std::string,entries> gen_list[]={
         {"Kernel|kernel_display_gamma_type",{"linear@0","sRGB(CRT)@1","BT.709(HDTV)@2",/*kernel_display_gamma_power@3*/}},
         {"Logging|log_level",{"error@0","warning@1","info@2","debug@3",}},
         /*
-                                                  	#  0 = PAL-60 Component (SD)
-                                                  	#  1 = Unused
-                                                  	#  2 = PAL-60 SCART
-                                                  	#  3 = 480p Component (HD)
-                                                  	#  4 = HDMI+A
-                                                  	#  5 = PAL-60 Composite/S-Video
-                                                  	#  6 = VGA
-                                                  	#  7 = TV PAL-60
-                                                  	#  8 = HDMI (default)*/
+                                                        #  0 = PAL-60 Component (SD)
+                                                        #  1 = Unused
+                                                        #  2 = PAL-60 SCART
+                                                        #  3 = 480p Component (HD)
+                                                        #  4 = HDMI+A
+                                                        #  5 = PAL-60 Composite/S-Video
+                                                        #  6 = VGA
+                                                        #  7 = TV PAL-60
+                                                        #  8 = HDMI (default)*/
         {"Video|avpack",{"PAL-60 Component (SD)@0", "Unused@1","PAL-60 SCART@2","480p Component (HD)@3","HDMI+A@4","PAL-60 Composite/S-Video@5","VGA@6","TV PAL-60@7","HDMI@8"}},
         /*#    1=NTSC
-                                                  	#    2=NTSC-J
-                                                  	#    3=PAL*/
+                                                        #    2=NTSC-J
+                                                        #    3=PAL*/
         {"Video|video_standard",{ "NTSC@1","NTSC-J@2","PAL-60@3"}},
 /*#    0=640x480
-                                                  	#    1=640x576
-                                                  	#    2=720x480
-                                                  	#    3=720x576
-                                                  	#    4=800x600
-                                                  	#    5=848x480
-                                                  	#    6=1024x768
-                                                  	#    7=1152x864
-                                                  	#    8=1280x720 (Default)
-                                                  	#    9=1280x768
-                                                  	#    10=1280x960
-                                                  	#    11=1280x1024
-                                                  	#    12=1360x768
-                                                  	#    13=1440x900
-                                                  	#    14=1680x1050
-                                                  	#    15=1920x540
-                                                  	#    16=1920x1080*/
+                                                        #    1=640x576
+                                                        #    2=720x480
+                                                        #    3=720x576
+                                                        #    4=800x600
+                                                        #    5=848x480
+                                                        #    6=1024x768
+                                                        #    7=1152x864
+                                                        #    8=1280x720 (Default)
+                                                        #    9=1280x768
+                                                        #    10=1280x960
+                                                        #    11=1280x1024
+                                                        #    12=1360x768
+                                                        #    13=1440x900
+                                                        #    14=1680x1050
+                                                        #    15=1920x540
+                                                        #    16=1920x1080*/
         {"Video|internal_display_resolution",{ "640x480@0","640x576@1","720x480@2","720x576@3","800x600@4","848x480@5","1024x768@6","1152x864@7","1280x720@8"
                                                ,"1280x768@9","1280x960@10","1280x1024@11","1360x768@12","1440x900@13", "1680x1050@14","1920x540@15","1920x1080@16"}},
                                                /*Kernel = 1, Apu = 2, Cpu = 4.*/
@@ -424,6 +427,36 @@ static const std::pair<std::string,range> gen_seekbar[]={
         //{"Video|internal_display_resolution_x",{1,1920}},
         //{"Video|internal_display_resolution_y",{1,1080}},
 };
+
+// =============================================================================
+// FPS counter support
+// =============================================================================
+//
+// The xenia-canary graphics system maintains a vblank counter
+// (CommandProcessor::counter_) that is incremented once per frame in
+// GraphicsSystem::MarkVblank(). We expose this to Java as a lightweight
+// FPS query: the Java side samples counter() twice with a known interval
+// and computes frames/second.
+//
+// Thread safety: counter() is a relaxed load of an uint32_t, safe to call
+// from any thread. We also guard against the emulator not being launched
+// yet (returns 0).
+
+static uint32_t g_fps_last_counter = 0;
+static uint64_t g_fps_last_tick = 0;
+
+// Returns the current guest frame counter (number of vblanks since boot).
+// Java can poll this at ~1Hz to compute FPS.
+static jint j_get_guest_frame_counter(JNIEnv* env, jobject self) {
+    if (!ae::g_windowed_app_ref || !ae::g_windowed_app_ref->emu) {
+        return 0;
+    }
+    xe::gpu::GraphicsSystem* gs = ae::g_windowed_app_ref->emu->graphics_system();
+    if (!gs || !gs->command_processor()) {
+        return 0;
+    }
+    return static_cast<jint>(gs->command_processor()->counter());
+}
 
 #define SEEKBAR_PREF_TAG "aenu.preference.SeekBarPreference"
 #define CHECKBOX_PREF_TAG "aenu.preference.CheckBoxPreference"
@@ -710,6 +743,7 @@ int register_ax360e_Emulator(JNIEnv* env){
             { "setup_uri_info_list_file", "(Ljava/lang/String;)V", (void *) j_setup_uri_info_list_file },
             {"simple_device_info", "()Ljava/lang/String;", (void *) j_simple_device_info}
             ,{"generate_config_xml", "(Ljava/lang/String;)Ljava/lang/String;", (void *) generate_config_xml}
+            ,{"get_guest_frame_counter", "()I", (void *) j_get_guest_frame_counter}
     };
     return env->RegisterNatives(g_class_Emulator,methods, sizeof(methods)/sizeof(methods[0]));
 }

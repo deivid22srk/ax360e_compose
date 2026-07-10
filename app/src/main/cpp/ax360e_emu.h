@@ -162,4 +162,12 @@ public:
     static std::vector<std::unique_ptr<xe::hid::InputDriver>> create_input_drivers(xe::ui::Window* window);
     void emu_thr_main();
 };
+
+// Global emulator app instance, set in ax360e_emu.cpp main(). Used by JNI
+// bridges to access the running Emulator / GraphicsSystem.
+namespace ae {
+extern std::unique_ptr<xe::ui::WindowedApp> g_windowed_app;
+extern EmulatorApp* g_windowed_app_ref;
+}  // namespace ae
+
 #endif //AX360E_AX360E_EMU_H
