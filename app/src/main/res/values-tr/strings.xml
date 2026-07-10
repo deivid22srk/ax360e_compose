@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="es_apu_xma_decoder">Xma Kod Çözücü</string>
+    <string name="es_cpu_disable_context_promotion">Bağlam Tanıtmayı Devre Dışı Bırak</string>
+    <string name="es_cpu_disable_instruction_infocache">Talimat Bilgi Önbelleğini Devre Dışı Bırak</string>
+    <string name="es_cpu_disable_prefetch_and_cachecontrol">Önceden Getirme ve Önbellek Kontrolünü Devre Dışı Bırak</string>
+    <string name="es_cpu_dump_translated_hir_functions">Çevrilmiş HIR Fonksiyonlarını Dök</string>
+    <string name="es_cpu_emit_inline_mmio_checks">Satır İçi MMIO Kontrolleri Yayımla</string>
+    <string name="es_cpu_emit_mmio_aware_stores_for_recorded_exception_addresses">Kayıtlı İstisna Adresleri için MMIO Farkında Depolamalar Yayımla</string>
+    <string name="es_cpu_enable_early_precompilation">Erken Ön Derlemeyi Etkinleştir</string>
+    <string name="es_cpu_full_optimization_even_with_debug">Hata Ayıklamada Bile Tam Optimizasyon</string>
+    <string name="es_cpu_ignore_trap_instructions">Tuzak Talimatlarını Yoksay</string>
+    <string name="es_cpu_no_reserved_ops">Ayrılmış İşlem Yok</string>
+    <string name="es_cpu_permit_float_constant_evaluation">Kayan Nokta Sabit Değerlendirmesine İzin Ver</string>
+    <string name="es_cpu_record_mmio_access_exceptions">MMIO Erişim İstisnalarını Kaydet</string>
+    <string name="es_cpu_writable_code_segments">Yazılabilir Kod Segmentleri</string>
+    <string name="es_gpu_gpu_allow_invalid_upload_range">GPU Geçersiz Yükleme Aralığına İzin Ver</string>
+    <string name="es_gpu_target_trace_file">Hedef İzleme Dosyası</string>
+    <string name="es_gpu_trace_dump_path">İzleme Döküm Yolu</string>
+    <string name="es_general_allow_game_relative_writes">Oyun Göreceli Yazmalara İzin Ver</string>
+    <string name="es_general_controller_hotkeys">Kontrolör Kısayol Tuşları</string>
+    <string name="es_general_disable_doubleclick_fullscreen">Çift Tıkla Tam Ekranı Devre Dışı Bırak</string>
+    <string name="es_hid_guide_button">Kılavuz Düğmesi</string>
+    <string name="es_kernel_allow_avatar_initialization">Avatar Başlatmaya İzin Ver</string>
+    <string name="es_storage_force_mount_devkit">Devkit Bağlamayı Zorla</string>
+    <string name="es_storage_mount_memory_unit">Bellek Birimini Bağla</string>
+    <string name="es_ui_custom_font_path">Özel Yazı Tipi Yolu</string>
+
+    <string name="_default">Varsayılan</string>
+    <string name="driver_library_path_dialog_add_hint">Özel Sürücü Ekle (*.zip)</string>
+    <string name="es_vulkan_vulkan_lib_path">Özel Sürücü Kitaplığı Yolu</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">Özel Sürücü Maksimum Saatleri Zorla</string>
+
+    <string name="create_shortcut">Kısayol Oluştur</string>
+    <string name="disable_virtual_keyboard">Sanal klavyeyi devre dışı bırak</string>
+    <string name="joystick">Joystick</string>
+
+    <string name="dpad">Dpad</string>
+    <string name="abxy">ABXY</string>
+    <string name="lr">LR</string>
+    <string name="start_back">Başlat/Geri</string>
+
+    <string name="save_and_quit">Kaydet ve Çık</string>
+    <string name="scale_rate">Ölçek Oranı</string>
+
+    <string name="refresh_list">Listeyi Yenile</string>
+    <string name="about">Hakkında</string>
+    <string name="gratitude">Minnettarlık</string>
+    <string name="update_log">Güncelleme Günlüğü</string>
+    <string name="device_info">Cihaz Bilgisi</string>
+    <string name="open_source_licenses">Açık Kaynak Lisansları</string>
+
+    <string name="open_file_manager">Dosya Yöneticisini Aç</string>
+    <string name="game_list_loading">Oyun listesi yükleniyor...</string>
+    <string name="quit">Çık</string>
+    <string name="device_unsupport_vulkan_msg">Cihazınız Vulkan desteklemiyor ve bu uygulamayı çalıştırmak için minimum gereksinimleri karşılayamıyor, lütfen çıkın.</string>
+
+    <string name="loading">Yükleniyor...</string>
+    <string name="msg_processing">İşleniyor...</string>
+    <string name="empty_game_list">Oyun listesi boş, lütfen oyun dizinini ayarlayın</string>
+
+    <string name="enable_vibrator">Titreşimi Etkinleştir</string>
+
+    <string name="set_game_dir">Oyun Dizinini Ayarla</string>
+
+    <string name="clear">Temizle</string>
+    <string name="press_a_key">Devam etmek için herhangi bir tuşa basın...</string>
+
+    <string name="reset_as_default">Varsayılan Olarak Sıfırla</string>
+    <string name="key_mappers">Tuş Eşlemeleri</string>
+
+    <string name="virtual_pad_edit">Sanal Pad Düzenle</string>
+
+    <string name="left">sol</string>
+    <string name="up">yukarı</string>
+    <string name="right">sağ</string>
+    <string name="down">aşağı</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+
+    <string name="lshoulder">LShoulder</string>
+    <string name="lthumbpress">LThumbPress</string>
+    <string name="ltrigger">LTrigger</string>
+
+    <string name="rshoulder">RShoulder</string>
+    <string name="rthumbpress">RThumbPress</string>
+    <string name="rtrigger">RTrigger</string>
+
+    <string name="start">başlat</string>
+    <string name="back">Geri</string>
+
+    <string name="use_global_config">Genel Yapılandırmayı Kullan</string>
+
+    <string name="settings">Ayarlar</string>
+
+
+    <string name="gratitude_content">Tüm SİMGELER için Ruban\'a teşekkürler\n\n
+		reddit/discord yönetiminden dolayı SRC267 (Sting)\'e teşekkürler\n\n
+		test için 妖妖\'ye teşekkürler\n\n
+		再见某人\'a teşekkürler \n\n
+        再见某人\'a teşekkürler \n\n
+        再见某人\'a teşekkürler \n\n
+        \n\n
+        		Xenia nakil optimizasyonuna dayanarak, Xenia projesinin tüm katılımcılarına teşekkürler\n\n
+    </string>
+
+    <string name="es_apu">APU</string>
+<string name="es_apu_apu">Ses Sistemi</string>
+<string name="es_apu_apu_max_queued_frames">Maksimum Sıradaki Kareler</string>
+<string name="es_apu_enable_xmp">Müzik Çaları Etkinleştir</string>
+<string name="es_apu_ffmpeg_verbose">FFmpeg Detaylı Çıktı</string>
+<string name="es_apu_mute">Tüm Sesi Kapat</string>
+<string name="es_apu_use_dedicated_xma_thread">Özel XMA İş Parçacığı</string>
+<string name="es_apu_use_new_decoder">Yeni XMA Kod Çözücü Kullan</string>
+<string name="es_apu_xmp_default_volume">Varsayılan Müzik Ses Seviyesi</string>
+
+<string name="es_cpu">CPU</string>
+<string name="es_cpu_break_condition_gpr">Kesme Koşulu GPR</string>
+<string name="es_cpu_break_condition_op">Kesme Koşulu Operatörü</string>
+<string name="es_cpu_break_condition_truncate">Değeri 32 bite kısalt</string>
+<string name="es_cpu_break_condition_value">Kesme Koşulu Değeri</string>
+<string name="es_cpu_break_on_debugbreak">Debugbreak\&apos;te Kes</string>
+<string name="es_cpu_break_on_instruction">Instruction\&apos;da Kes</string>
+<string name="es_cpu_break_on_start">Başlangıçta Kes</string>
+<string name="es_cpu_break_on_unimplemented_instructions">Uygulanmamış Instruction\&apos;larda Kes</string>
+<string name="es_cpu_clock_no_scaling">Saat Ölçeklemeyi Devre Dışı Bırak</string>
+<string name="es_cpu_clock_source_raw">Ham Saat Kaynağı Kullan</string>
+<string name="es_cpu_cpu">CPU Arka Ucu</string>
+<string name="es_cpu_debugprint_trap_log">Debugprint Tuzaklarını Günlükle</string>
+<string name="es_cpu_disable_global_lock">Genel Kilidi Devre Dışı Bırak</string>
+<string name="es_cpu_disassemble_functions">Fonksiyonları Ayır</string>
+<string name="es_cpu_ignore_undefined_externs">Tanımsız Extern\&apos;leri Yoksay</string>
+<string name="es_cpu_inline_mmio_access">Satır İçi MMIO Erişimi</string>
+<string name="es_cpu_load_module_map">Modül Haritasını Yükle</string>
+<string name="es_cpu_pvr">İşlemci Sürümü/Revizyonu</string>
+<string name="es_cpu_store_all_context_values">Tüm Bağlam Değerlerini Sakla</string>
+<string name="es_cpu_trace_function_coverage">Fonksiyon Kapsamını İzle</string>
+<string name="es_cpu_trace_function_data">Fonksiyon Verisini İzle</string>
+<string name="es_cpu_trace_function_data_path">Fonksiyon Veri İzleme Yolu</string>
+<string name="es_cpu_trace_function_references">Fonksiyon Referanslarını İzle</string>
+<string name="es_cpu_trace_functions">Fonksiyonları İzle</string>
+<string name="es_cpu_validate_hir">HIR\&apos;ı Doğrula</string>
+
+<string name="es_content">İçerik</string>
+<string name="es_content_license_mask">Lisans Maskesi</string>
+
+<string name="es_display">Görüntü</string>
+<string name="es_display_fullscreen">Tam Ekran Modu</string>
+<string name="es_display_host_present_from_non_ui_thread">UI Olmayan İş Parçacığından Doğrudan Sunum</string>
+<string name="es_display_postprocess_antialiasing">İşlem Sonrası Kenar Yumuşatma</string>
+<string name="es_display_postprocess_dither">İşlem Sonrası Titreme</string>
+<string name="es_display_postprocess_ffx_cas_additional_sharpness">CAS Ek Keskinlik</string>
+<string name="es_display_postprocess_ffx_fsr_max_upsampling_passes">FSR Maksimum Upsampling Geçişleri</string>
+<string name="es_display_postprocess_ffx_fsr_sharpness_reduction">FSR Keskinlik Azaltma</string>
+<string name="es_display_postprocess_scaling_and_sharpening">Ölçekleme ve Keskinleştirme</string>
+<string name="es_display_present_letterbox">Letterbox Sunumu</string>
+<string name="es_display_present_render_pass_clear">Render Geçişini Temizle</string>
+<string name="es_display_present_safe_area_x">Güvenli Alan X</string>
+<string name="es_display_present_safe_area_y">Güvenli Alan Y</string>
+
+<string name="es_gpu">GPU</string>
+<string name="es_gpu_clear_memory_page_state">Bellek Sayfa Durumunu Temizle</string>
+<string name="es_gpu_depth_float24_convert_in_pixel_shader">Derinliği Piksel Shader\&apos;da Dönüştür</string>
+<string name="es_gpu_depth_float24_round">Derinlik Dönüştürmesini Yuvarla</string>
+<string name="es_gpu_depth_transfer_not_equal_test">Derinlik Aktarımı Eşit Değil Testi</string>
+<string name="es_gpu_disassemble_pm4">PM4 Paketlerini Ayır</string>
+<string name="es_gpu_draw_resolution_scale_x">Çizim Çözünürlüğü Ölçeği X</string>
+<string name="es_gpu_draw_resolution_scale_y">Çizim Çözünürlüğü Ölçeği Y</string>
+<string name="es_gpu_draw_resolution_scaled_texture_offsets">Ölçeklenmiş Doku Ofsetleri</string>
+<string name="es_gpu_dump_shaders">Shader Döküm Yolu</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu">Kırpılmamış Çizimler için CPU\&apos;da VS Yürüt</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">PSI Arka Ucu için CPU\&apos;da VS Yürüt</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Makas ile CPU\&apos;da VS Yürüt</string>
+<string name="es_gpu_force_convert_line_loops_to_strips">Çizgi Döngülerini Şeritlere Dönüştürmeye Zorla</string>
+<string name="es_gpu_force_convert_quad_lists_to_triangle_lists">Dörtgen Listelerini Üçgen Listelerine Dönüştürmeye Zorla</string>
+<string name="es_gpu_force_convert_triangle_fans_to_lists">Üçgen Fanlarını Listelere Dönüştürmeye Zorla</string>
+<string name="es_gpu_framerate_limit">Kare Hızı Sınırı</string>
+<string name="es_gpu_gamma_render_target_as_srgb">Gamma RT sRGB olarak</string>
+<string name="es_gpu_gpu">Grafik Sistemi</string>
+<string name="es_gpu_gpu_allow_invalid_fetch_constants">Geçersiz Getirme Sabitlerine İzin Ver</string>
+<string name="es_gpu_half_pixel_offset">Yarım Piksel Ofseti</string>
+<string name="es_gpu_ignore_32bit_vertex_index_support">32-bit Tepe İndeksi Desteğini Yoksay</string>
+<string name="es_gpu_log_guest_driven_gpu_register_written_values">GPU Kayıt Yazmalarını Günlükle</string>
+<string name="es_gpu_log_ringbuffer_kickoff_initiator_bts">Ringbuffer Başlatmayı Günlükle</string>
+<string name="es_gpu_mrt_edram_used_range_clamp_to_min">MRT EDRAM\&apos;ı Min\&apos;e Sabitle</string>
+<string name="es_gpu_native_2x_msaa">Yerel 2x MSAA</string>
+<string name="es_gpu_native_stencil_value_output">Yerel Şablon Değer Çıkışı</string>
+<string name="es_gpu_non_seamless_cube_map">Kesintisiz Olmayan Küp Haritası</string>
+<string name="es_gpu_primitive_processor_cache_min_indices">İlkel Önbellek Min İndeksleri</string>
+<string name="es_gpu_query_occlusion_sample_lower_threshold">Oklüzyon Örneği Alt Eşiği</string>
+<string name="es_gpu_query_occlusion_sample_upper_threshold">Oklüzyon Örneği Üst Eşiği</string>
+<string name="es_gpu_readback_memexport">Memexport Geri Okuma</string>
+<string name="es_gpu_readback_resolve">Resolve Geri Okuma</string>
+<string name="es_gpu_render_target_path_vulkan">Render Hedefi Yolu (Vulkan)</string>
+<string name="es_gpu_resolve_resolution_scale_fill_half_pixel_offset">Resolve Ölçeği Yarım Piksel Ofseti Doldur</string>
+<string name="es_gpu_snorm16_render_target_full_range">SNORM16 RT Tam Aralık</string>
+<string name="es_gpu_store_shaders">Shader1ları Sakla</string>
+<string name="es_gpu_texture_cache_memory_limit_hard">Doku Önbelleği Sert Sınırı</string>
+<string name="es_gpu_texture_cache_memory_limit_render_to_texture">Doku Önbelleği RTT Sınırı</string>
+<string name="es_gpu_texture_cache_memory_limit_soft">Doku Önbelleği Yumuşak Sınırı</string>
+<string name="es_gpu_texture_cache_memory_limit_soft_lifetime">Doku Önbelleği Yumuşak Ömür Süresi</string>
+<string name="es_gpu_trace_gpu_prefix">GPU İzleme Öneki</string>
+<string name="es_gpu_trace_gpu_stream">GPU Akışını İzle</string>
+<string name="es_gpu_vsync">VSYNC</string>
+
+<string name="es_general">Genel</string>
+<string name="es_general_allow_plugins">Eklentilere İzin Ver</string>
+<string name="es_general_apply_patches">Yamaları Uygula</string>
+<string name="es_general_debug">Hata Ayıklama Modu</string>
+<string name="es_general_discord">Discord Zengin Varlığı</string>
+<string name="es_general_launch_module">Başlatma Modülü</string>
+<string name="es_general_notification_sound_path">Bildirim Ses Yolu</string>
+<string name="es_general_time_scalar">Zaman Skaları</string>
+
+<string name="es_hid">HID</string>
+<string name="es_hid_hid">Giriş Sistemi</string>
+<string name="es_hid_left_stick_deadzone_percentage">Sol Çubuk Ölü Bölgesi</string>
+<string name="es_hid_right_stick_deadzone_percentage">Sağ Çubuk Ölü Bölgesi</string>
+<string name="es_hid_vibration">Kontrolör Titreşimi</string>
+
+<string name="es_kernel">Çekirdek</string>
+<string name="es_kernel_allow_nui_initialization">NUI Başlatmaya İzin Ver</string>
+<string name="es_kernel_allow_incompatible_title_update">Uyumsuz Başlık Güncellemesine İzin Ver</string>
+<string name="es_kernel_apply_title_update">Başlık Güncellemelerini Uygula</string>
+<string name="es_kernel_cl">Komut Satırı Argümanları</string>
+<string name="es_kernel_default_achievements_backend">Başarımlar Arka Ucu</string>
+<string name="es_kernel_ignore_thread_affinities">İş Parçacığı Yakınlıklarını Yoksay</string>
+<string name="es_kernel_ignore_thread_priorities">İş Parçacığı Önceliklerini Yoksay</string>
+<string name="es_kernel_kernel_build_version">Çekirdek Derleme Sürümü</string>
+<string name="es_kernel_kernel_cert_monitor">Sertifika Monitörü</string>
+<string name="es_kernel_kernel_debug_monitor">Hata Ayıklama Monitörü</string>
+<string name="es_kernel_kernel_display_gamma_power">Görüntü Gama Gücü</string>
+<string name="es_kernel_kernel_display_gamma_type">Görüntü Gama Türü</string>
+<string name="es_kernel_kernel_pix">PIX</string>
+<string name="es_kernel_log_high_frequency_kernel_calls">Yüksek Frekanslı Çekirdek Çağrılarını Günlükle</string>
+<string name="es_kernel_staging_mode">Hazırlama Modu</string>
+
+<string name="es_logging">Günlükleme</string>
+<string name="es_logging_flush_log">Günlüğü Temizle</string>
+<string name="es_logging_log_file">Günlük Dosyası Yolu</string>
+<string name="es_logging_log_level">Günlük Seviyesi</string>
+<string name="es_logging_log_mask">Günlük Maskesi</string>
+<string name="es_logging_log_string_format_kernel_calls">Çekirdek Çağrılarını Günlükle</string>
+<string name="es_logging_log_to_debugprint">DebugPrint\&apos;e Günlükle</string>
+<string name="es_logging_log_to_stdout">Stdout\&apos;a Günlükle</string>
+
+<string name="es_memory">Bellek</string>
+<string name="es_memory_ignore_offset_for_ranged_allocations">Aralıklı Ayırmalar için Ofseti Yoksay</string>
+<string name="es_memory_mmap_address_high">MMAP Adresi Yüksek</string>
+<string name="es_memory_protect_on_release">Serbest Bırakılan Belleği Koru</string>
+<string name="es_memory_protect_zero">Sıfır Sayfayı Koru</string>
+<string name="es_memory_scribble_heap">Scribble Yığını</string>
+<string name="es_memory_writable_executable_memory">Yazılabilir Yürütülebilir Bellek</string>
+
+<string name="es_profiles">Profiller</string>
+<string name="es_profiles_logged_profile_slot_0_xuid">Profil Yuvası 0 XUID</string>
+<string name="es_profiles_logged_profile_slot_1_xuid">Profil Yuvası 1 XUID</string>
+<string name="es_profiles_logged_profile_slot_2_xuid">Profil Yuvası 2 XUID</string>
+<string name="es_profiles_logged_profile_slot_3_xuid">Profil Yuvası 3 XUID</string>
+
+<string name="es_storage">Depolama</string>
+<string name="es_storage_cache_root">Önbellek Kök Yolu</string>
+<string name="es_storage_content_root">İçerik Kök Yolu</string>
+<string name="es_storage_mount_cache">Önbelleği Bağla</string>
+<string name="es_storage_mount_scratch">Scratch\&apos;i Bağla</string>
+<string name="es_storage_storage_root">Depolama Kök Yolu</string>
+
+<string name="es_ui">Kullanıcı Arayüzü</string>
+<string name="es_ui_headless">Başsız Mod</string>
+<string name="es_ui_profiler_dpi_scaling">Profiler DPI Ölçekleme</string>
+<string name="es_ui_show_achievement_notification">Başarım Bildirimini Göster</string>
+<string name="es_ui_show_profiler">Profiler\&apos;ı Göster</string>
+<string name="es_ui_storage_selection_dialog">Depolama Seçimi Diyaloğu</string>
+
+<string name="es_video">Video</string>
+<string name="es_video_avpack">AV Paketi</string>
+<string name="es_video_enable_3d_mode">3D Modu Etkinleştir</string>
+<string name="es_video_interlaced">Interlaced Mod</string>
+<string name="es_video_internal_display_resolution">Dahili Görüntü Çözünürlüğü</string>
+<string name="es_video_internal_display_resolution_x">Özel Görüntü Genişliği</string>
+<string name="es_video_internal_display_resolution_y">Özel Görüntü Yüksekliği</string>
+<string name="es_video_use_50Hz_mode">50Hz Modunu Kullan</string>
+<string name="es_video_video_standard">Video Standardı</string>
+<string name="es_video_widescreen">Geniş Ekran Modu</string>
+
+<string name="es_vulkan">Vulkan</string>
+<string name="es_vulkan_vulkan_allow_present_mode_fifo_relaxed">FIFO Rahatlatılmış Sunum Moduna İzin Ver</string>
+<string name="es_vulkan_vulkan_allow_present_mode_immediate">Anında Sunum Moduna İzin Ver</string>
+<string name="es_vulkan_vulkan_allow_present_mode_mailbox">Posta Kutusu Sunum Moduna İzin Ver</string>
+<string name="es_vulkan_vulkan_device">Vulkan Aygıt İndeksi</string>
+<string name="es_vulkan_vulkan_log_debug_messages">Vulkan Hata Ayıklama Mesajlarını Günlükle</string>
+<string name="es_vulkan_vulkan_sparse_shared_memory">Seyrek Paylaşımlı Bellek</string>
+<string name="es_vulkan_vulkan_validation">Vulkan Doğrulama Katmanı</string>
+
+<string name="es_xconfig">XConfig</string>
+<string name="es_xconfig_audio_flag">Ses Bayrağı</string>
+<string name="es_xconfig_user_country">Kullanıcı Ülkesi</string>
+<string name="es_xconfig_user_language">Kullanıcı Dili</string>
+
+<string name="es_a64">a64</string>
+<string name="es_a64_a64_extension_mask">A64 Uzantı Maskesi</string>
+
+    <string name="es_hint_apu_apu">Ses sistemi. Kullanın: [any, nop, opensles, aaudio]</string>
+    <string name="es_hint_apu_apu_max_queued_frames">Gecikmeyi azaltmak için maksimum arabelleğe alınmış ses karesini değiştirmeye izin verir. Bu değeri düşürmek performans sorunlarına neden olabilir. Değer aralığı: [4-64]</string>
+    <string name="es_hint_apu_enable_xmp">Müzik Çalar oynatmayı etkinleştirir.</string>
+    <string name="es_hint_apu_ffmpeg_verbose">Ayrıntılı FFmpeg çıktısı (hata ayıklama ve üzeri)</string>
+    <string name="es_hint_apu_mute">Tüm ses çıkışını sessize alır.</string>
+    <string name="es_hint_apu_use_dedicated_xma_thread">XMA kod çözümü ayrı iş parçacığında etkinleştirir. Devre dışı daha iyi sonuçlar üretmelidir, ancak performansı biraz düşürür.</string>
+    <string name="es_hint_apu_use_new_decoder">Yeni deneysel XMA ses kod çözücünün kullanımını etkinleştirir.</string>
+    <string name="es_hint_apu_xmp_default_volume">Oyun ayarlamazsa varsayılan müzik sesi [0-100].</string>
+
+    <string name="es_hint_cpu_break_condition_gpr">GPR karşılaştırılan değer</string>
+    <string name="es_hint_cpu_break_condition_op">karşılaştırma operatörü</string>
+    <string name="es_hint_cpu_break_condition_truncate">değeri 32 bite kısalt</string>
+    <string name="es_hint_cpu_break_condition_value">karşılaştırılan değer</string>
+    <string name="es_hint_cpu_break_on_debugbreak">JITlenmiş __debugbreak isteklerinde int3.</string>
+    <string name="es_hint_cpu_break_on_instruction">Belirtilen konuk adresi yürütülmeden önce int3.</string>
+    <string name="es_hint_cpu_break_on_start">Başlangıçta hata ayıklayıcıya gir.</string>
+    <string name="es_hint_cpu_break_on_unimplemented_instructions">Uygulanmamış bir PowerPC talimatıyla karşılaşıldığında ana bilgisayar hata ayıklayıcısına gir (veya hata ayıklayıcı bağlı değilse çök).</string>
+    <string name="es_hint_cpu_clock_no_scaling">Ölçeklendirme kodunu devre dışı bırak. Zaman yönetimi ve kilitleme atlanır. Konuk sistem zamanı doğrudan ana bilgisayardan çekilir.</string>
+    <string name="es_hint_cpu_clock_source_raw">x64\'da, zaman kaynağı olarak RDTSC talimatını kullan. Değişmez TSC gerektirir. a64\'de, zaman kaynağı olarak CNTVCT_EL0 yazmacını kullan</string>
+    <string name="es_hint_cpu_cpu">CPU backend\'i [any, x64, a64].</string>
+    <string name="es_hint_cpu_debugprint_trap_log">Debugprint tuzaklarını aktif hata ayıklayıcıya kaydet</string>
+    <string name="es_hint_cpu_disable_global_lock">Konuk kodunda genel kilit kullanımını devre dışı bırakır. Ana bilgisayar kodunu etkilemez.</string>
+    <string name="es_hint_cpu_disassemble_functions">Oluşturma sırasında fonksiyonların kodunu çöz.</string>
+    <string name="es_hint_cpu_ignore_undefined_externs">Tanımlanmamış bir extern çağrıldığında çıkma.</string>
+    <string name="es_hint_cpu_inline_mmio_access">Satır içi sabit MMIO yüklemeleri ve depolamaları.</string>
+    <string name="es_hint_cpu_load_module_map">Sembol adları için ve oluşturulan sembol veritabanıyla karşılaştırmak için .map yükler.</string>
+    <string name="es_hint_cpu_pvr">İşlemci versiyon ve revizyon numarası.\nBit 0-15 versiyon numarasıdır.\nBit 16-31 revizyon numarasıdır.\nNot: Bazı XEX\'ler (mfgbootlauncher.xex gibi) 0x710700\'den küçük bir değeri kontrol edebilir.</string>
+    <string name="es_hint_cpu_store_all_context_values">Hata ayıklamaya yardımcı olmak için ölü context depolamalarını kaldırma.</string>
+    <string name="es_hint_cpu_trace_function_coverage">Fonksiyon talimat kapsama istatistikleri için izleme oluştur.</string>
+    <string name="es_hint_cpu_trace_function_data">Fonksiyon sonuç verileri için izleme oluştur.</string>
+    <string name="es_hint_cpu_trace_function_data_path">İzleme verilerini yazmak için dosya.</string>
+    <string name="es_hint_cpu_trace_function_references">Fonksiyon adres referansları için izleme oluştur.</string>
+    <string name="es_hint_cpu_trace_functions">Fonksiyon istatistikleri için izleme oluştur.</string>
+    <string name="es_hint_cpu_validate_hir">Derleme sırasında HIR üzerinde doğrulama kontrolleri yap.</string>
+
+    <string name="es_hint_content_license_mask">Etkinleştirilmiş içerik için lisans maskesi ayarla.\n0 = Lisans yok.\n1 = İlk lisans etkin. Genellikle Xbox Live Arcade başlıklarında tam sürüm lisansı.\n-1 veya 0xFFFFFFFF = Tüm olası lisanslar etkin. Genellikle kötü fikir, tanımlanmamış davranışa yol açabilir.</string>
+
+    <string name="es_hint_display_fullscreen">Emülatörü tam ekranda başlatıp başlatmama.</string>
+    <string name="es_hint_display_host_present_from_non_ui_thread">GPU emülasyon iş parçacığının, konuk çıktısını ana bilgisayar yüzeyine UI iş parçacığından ana bilgisayar pencere sistemi üzerinden yapmasını istemek yerine doğrudan sunmasına izin ver.</string>
+    <string name="es_hint_display_postprocess_antialiasing">Oyunun görüntü çıktısına uygulanacak işleme sonrası anti-aliasing efekti.
+AMD FidelityFX Contrast Adaptive Sharpening veya Super Resolution 1.0 aktif olduğunda işleme sonrası anti-aliasing kullanımı şiddetle önerilir.
+Kullanın: [none, fxaa, fxaa_extreme]
+none (veya burada listelenmeyen herhangi bir değer): Orijinal görüntüyü değiştirme.
+fxaa: NVIDIA Fast Approximate Anti-Aliasing 3.11, normal kalite ön ayarı (12).
+fxaa_extreme: NVIDIA Fast Approximate Anti-Aliasing 3.11, ekstrem kalite ön ayarı (39).</string>
+    <string name="es_hint_display_postprocess_dither">Gradyanların daha pürüzsüz olması için son görüntü çıktısını dahili hassasiyetten kanal başına 8 bite dither.\n10bpc ekranda, alt 2 bit tutulur ancak gürültü eklenecektir - 10bpc için devre dışı bırakma önerilebilir, ancak kullanılan gerçek ekranın 10bpc görüntüleme yeteneklerine bağlıdır.</string>
+    <string name="es_hint_display_postprocess_ffx_cas_additional_sharpness">AMD FidelityFX Contrast Adaptive Sharpening (CAS) için ek keskinlik, 0 ile 1 arası. Daha yüksek daha keskindir.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_max_upsampling_passes">Son pasajdan sonra bilinear esnemeye geri dönmeden önce AMD FidelityFX Super Resolution 1.0 (FSR)\'de gerçekleştirilen maksimum upsampling pasaj sayısı.\nHer pasaj sadece önceki boyutun 2x2\'sine kadar ölçeklendirir. Oyun 1280x720 görüntü çıkarırsa, 1 pasaj onu 2560x1440\'a (4K\'nın altında) çıkarır, 2 pasajdan sonra maksimum 5120x2880\'e (4K için 3840x2160 dahil) çıkarılır ve böyle devam eder.\nBu değişken, ekran çözünürlüğü çok yüksek değilse etki etmez, ancak çoklu FSR upsampling pasajlarının performans etkisi çok yüksekse veya daha yumuşak kenarlar isteniyorsa 4K veya 8K gibi çözünürlüklerde azaltılabilir.\nVarsayılan değer Xenia tarafından dahili olarak desteklenen maksimum değerdir.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_sharpness_reduction">AMD FidelityFX Super Resolution 1.0 (FSR) için keskinlik azaltma, duraklarda. Daha düşük daha keskindir.</string>
+    <string name="es_hint_display_postprocess_scaling_and_sharpening">Son ekran çıktısının yeniden örnekleme ve/veya keskinleştirme için kullanılacak işleme sonrası efekti.
+Kullanın: [bilinear, cas, fsr]
+bilinear (veya burada listelenmeyen herhangi bir değer): 1:1\'de orijinal görüntü, yeniden örnekleme için basit bilinear esnetme.
+cas: 2x2\'ye kadar ölçeklendirme faktörlerinde keskinleştirme için AMD FidelityFX Contrast Adaptive Sharpening (CAS) kullan, daha büyük faktörler için ek bilinear esnetme ile.
+fsr: En yüksek kaliteli upscaling için AMD FidelityFX Super Resolution 1.0 (FSR) kullan veya ölçeklendirme veya downsampling yapmadan keskinleştirme için AMD FidelityFX Contrast Adaptive Sharpening kullan.
+2x2\'den fazla faktörlerle ölçeklendirme için birden fazla FSR pasajı yapılır.</string>
+    <string name="es_hint_display_present_letterbox">Kırpacak daha fazla overscan alanı olmadığında görüntünün etrafında çubuklar göstererek esnetirken en-boy oranını koru.</string>
+    <string name="es_hint_display_present_render_pass_clear">Bunun desteklendiği grafik backend\'lerinde, yalnızca letterbox alanını temizleyen clear komutları yerine sunumda clear render pass yükleme işlemini kullan.</string>
+    <string name="es_hint_display_present_safe_area_x">Letterboxing veya esnetme olmadan en-boy oranını korumak için sunarken tutulabilecek görüntü genişliğinin yüzdesi.</string>
+    <string name="es_hint_display_present_safe_area_y">Letterboxing veya esnetme olmadan en-boy oranını korumak için sunarken tutulabilecek görüntü yüksekliğinin yüzdesi.</string>
+
+    <string name="es_hint_gpu_clear_memory_page_state">GPU tarafından yazılan verileri etkinleştirmek için bellek sayfalarının durumunu yenile. (Eksik karakter modellerini düzeltmek için \'Team Ninja\' oyunları için kullanın)</string>
+    <string name="es_hint_gpu_depth_float24_convert_in_pixel_shader">Ana bilgisayar derinlik tamponu kullanırken konuk çizimlerinin pixel shader\'larında derinlik değerlerini ana bilgisayar hassasiyetinden (32-bit kayan nokta) 24-bit kayan noktaya (20e4) dönüştürüp dönüştürmeyeceği.\nBu, tam ana bilgisayar hassasiyeti derinlik verileri kaybedilirse görsel artefaktları önler. Bu maliyetli bir seçenektir çünkü GPU\'nun derinlik tamponu sıkıştırmasını kullanmasını engeller ve ayrıca MSAA ile, piksel gölgelendirmesini MSAA örnek sayısına bağlı olarak 2 veya 4 kat daha ağır hale getirerek tüm piksel yerine her alt piksel örneği için pixel shader\'ın çalışmasını zorlar.</string>
+    <string name="es_hint_gpu_depth_float24_round">Ana bilgisayar derinlik tamponu kullanırken derinliği 24-bit kayan noktaya (20e4) ana bilgisayar hassasiyetinden (32-bit kayan nokta) dönüştürürken kesme (sıfıra yuvarlama) yerine en yakın çift sayıya yuvarlayıp yuvarlamayacağı.\nfalse: Önerilir. Dönüşüm derinlik değerlerini kameradan daha uzağa taşıyabilir.\ntrue: Yalnızca küçük 32-bit kayan nokta yuvarlama hatalarından kaynaklanan özel durumlar için.</string>
+    <string name="es_hint_gpu_depth_transfer_not_equal_test">Derinlik render hedefleri arasında veri aktarırken, verinin gidiş-dönüş durumunda derinlik tamponunda şu anda bulunanla aynıysa shader derinlik çıktısı üzerinden derinliği yeniden yazmaktan kaçınmak için "eşit değil" testini kullan.</string>
+    <string name="es_hint_gpu_disassemble_pm4">Yalnızca hata ayıklama yapılarında bir şey yapar, ayarlanırsa CP\'ye gönderilen tüm PM4 paketlerini söker ve kaydeder.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_x">Oyuna opak bir şekilde render çözünürlüğünü ölçeklendirmek için kullanılan tamsayı piksel genişlik ölçeği. 1, 2 ve 3 desteklenebilir, ancak 1\'in üzerindeki herhangi bir şeyin desteği cihaz özelliklerine bağlıdır.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_y">Oyuna opak bir şekilde render çözünürlüğünü ölçeklendirmek için kullanılan tamsayı piksel genişlik ölçeği. Daha fazla bilgi için draw_resolution_scale_x\'e bakın.</string>
+    <string name="es_hint_gpu_draw_resolution_scaled_texture_offsets">Render-to-texture için çözünürlük ölçeğini hesaba katarak doku getirme talimatlarından ofsetler uygula, bazı durumlarda daha doğru gölge filtreleme, bloom vb. için.</string>
+    <string name="es_hint_gpu_dump_shaders">Shader hata ayıklama için, derlendikçe GPU shader\'larını boşaltmak için yol.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu">Kırpma devre dışı bırakılmış çizimler için, öncelikle ekran alanı çizimleri (temizlemeler gibi), çizimde yer alan EDRAM\'ın kapsamını tahmin etmek için mümkün olduğunda CPU\'da vertex shader\'ı yürüt.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">execute_unclipped_draw_vs_on_cpu etkinse, ana bilgisayardaki render backend\'inin pixel shader interlock (rasterizer-sıralı görünüm) uygulamasını kullanırken bile kırpılmamış çizimler için vertex shader\'ı CPU\'da yürüt.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Scissor dikdörtgeni mevcut olsa bile, execute_unclipped_draw_vs_on_cpu kullanımını yalnızca scissor olmayan çizimlerle (scissor dikdörtgeninin sağ ve alt tarafları 8192 veya ötesinde) sınırlama, genellikle render hedefinin yüksekliğini tahmin etmek için yeterlidir.</string>
+    <string name="es_hint_gpu_force_convert_line_loops_to_strips">Yalnızca ana bilgisayar grafik API downlevel desteği testi için, ana bilgisayar line loop primitiflerini doğal olarak desteklese bile CPU\'nun line loops\'u line strips\'e dönüştürmesini zorla.</string>
+    <string name="es_hint_gpu_force_convert_quad_lists_to_triangle_lists">Yalnızca ana bilgisayar grafik API downlevel desteği testi için, ana bilgisayar quad list primitiflerini doğal olarak veya geometry shader emülasyonu yoluyla desteklese bile CPU\'nun quad lists\'i quad strips\'e dönüştürmesini zorla.</string>
+    <string name="es_hint_gpu_force_convert_triangle_fans_to_lists">Yalnızca ana bilgisayar grafik API downlevel desteği testi için, ana bilgisayar triangle fan primitiflerini doğal olarak desteklese bile CPU\'nun triangle fans\'ı triangle lists\'e dönüştürmesini zorla.</string>
+    <string name="es_hint_gpu_framerate_limit">Maksimum saniye başına kare. 0 = Sınırsız kare. 0\'a ayarlandığında ve VSYNC etkin olduğunda varsayılan 60\'tır.</string>
+    <string name="es_hint_gpu_gamma_render_target_as_srgb">Ana bilgisayar piecewise linear gamma\'yı doğru karışımla doğrudan yazamadığında, render hedefinde biraz farklı hassasiyet dağılımına sahipken ve oyun elde edilen renklere ham veri olarak doğrudan erişirse ciddi şekilde yanlış değerlere sahipken doğrusal renk alanında kavramsal olarak doğru karışım için ana bilgisayarda sRGB çıktısı kullan.</string>
+    <string name="es_hint_gpu_gpu">Grafik sistemi. Kullanın: [vulkan, null]</string>
+    <string name="es_hint_gpu_gpu_allow_invalid_fetch_constants">Geçersiz tipte doku ve vertex getirme sabitlerine izin ver - genellikle güvensiz çünkü sabit tamamen geçersiz değerler içerebilir, ancak neden geçersiz olduklarının gerçek nedeni bulunana kadar belirli oyunlarda getirme sabiti tipi hatalarını atlamak için kullanılabilir.</string>
+    <string name="es_hint_gpu_half_pixel_offset">Vertex half-pixel offset desteğini etkinleştir (D3D9 PA_SU_VTX_CNTL PIX_CENTER). Genellikle oyunlar half-pixel offset\'in farkındadır ve bunu etkinleştirmek doğru davranıştır (bunu devre dışı bırakmak bazı oyunlarda post-processing\'i önemli ölçüde bozabilir).</string>
+    <string name="es_hint_gpu_ignore_32bit_vertex_index_support">Yalnızca ana bilgisayar grafik API downlevel testi için (yalnızca Qualcomm Adreno 4xx seviyesi ana bilgisayar GPU testi için yararlı), ana bilgisayar yalnızca 24-bit indeksleri destekliyormuş gibi 32-bit vertex indekslerinin dolaylı veya ön maskeleme ve ön takasını zorla.</string>
+    <string name="es_hint_gpu_log_guest_driven_gpu_register_written_values">Yalnızca hata ayıklama yapılarında bir şey yapar, ayarlanırsa bir konuk tarafından yapılan gpu yazmacına her yazmayı kaydeder.</string>
+    <string name="es_hint_gpu_log_ringbuffer_kickoff_initiator_bts">Yalnızca hata ayıklama yapılarında bir şey yapar, ayarlanırsa yeni okuma pozisyonunu yazan konuk iş parçacığının pseudo-stacktrace\'ini kaydeder.</string>
+    <string name="es_hint_gpu_mrt_edram_used_range_clamp_to_min">Ana bilgisayar render hedefleriyle, birden fazla render hedefi bağlıysa, bunlardan herhangi birinde değiştirilen EDRAM aralığını, sonuncusunun EDRAM\'ın geri kalanını talep etmesine izin vermek yerine, EDRAM\'daki herhangi iki render hedefi arasındaki mesafeden daha büyük olmamasını tahmin et.</string>
+    <string name="es_hint_gpu_native_2x_msaa">Müsait olduğunda ana bilgisayar 2x MSAA kullan. 2x\'in zorunlu olmadığı ana bilgisayar GPU API\'lerinde ölçeklenebilirlik testi için devre dışı bırakılabilir, bu durumda bunun yerine 4x MSAA\'nın 2 örneği kullanılacaktır (benzer veya daha kötü kalite ve daha yüksek bellek kullanımı ile).</string>
+    <string name="es_hint_gpu_native_stencil_value_output">Render hedefleri arasında kopyalama gibi amaçlar için mevcut olduğunda pixel shader stencil referans çıktısını kullan. Ölçeklenebilirlik testi için devre dışı bırakılabilir, bu durumda çok daha pahalı olan 8 quad çizimi yapılacaktır.</string>
+    <string name="es_hint_gpu_non_seamless_cube_map">Direct3D 9 davranışını çoğaltmak için mümkün olduğunda kenarlara yakın küp haritası yüzleri arasında filtrelemeyi devre dışı bırak (VK_EXT_non_seamless_cube_map ile Vulkan).</string>
+    <string name="es_hint_gpu_primitive_processor_cache_min_indices">İşleme (primitive tipi dönüştürme veya sıfırlama indeksi değiştirme gibi) gerçekleştirilirse aynı karede daha sonra yeniden kullanmayı denemek için önbellekte saklanacak minimum konuk indeksi sayısı. Bunu çok yüksek bir değere ayarlamak aşırı CPU işlemesine yol açabilir, çok düşük bir değer ise aşırı kilitleme ve aramalara yol açabilir. Negatif değerler önbelleğe almayı devre dışı bırakır.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_lower_threshold">-1\'e ayarlanırsa hiçbir örnek sayısı yazılmaz, oyunlar askıda kalabilir. Aksi takdirde, her EVENT_WRITE_ZPD\'de her karenin örnek sayısı bu sayı kadar artırılacaktır. Bunu 0\'a ayarlamak her şeyin örtülü olarak bildirildiği anlamına gelir.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_upper_threshold">query_occlusion_sample_lower_threshold\'dan daha yüksek bir sayıya ayarla. query_occlusion_sample_lower_threshold -1\'e ayarlanmışsa bu değer göz ardı edilir.</string>
+    <string name="es_hint_gpu_readback_memexport">[Yalnızca D3D12] CPU\'da shader\'larda bellek export tarafından yazılan verileri oku. Bu bazı oyunlarda gerekebilir (ancak birçokı yalnızca GPU\'da export edilen verilere erişir ve bu bayrak böyle davranışı işlemek için gerekli değildir), ancak kare ortası senkronizasyona neden olur, bu yüzden büyük performans etkisi vardır.</string>
+    <string name="es_hint_gpu_readback_resolve">[Yalnızca D3D12] CPU\'da render-to-texture sonuçlarını oku. Bu bazı oyunlarda, örneğin kaydedilen oyunlarda ekran görüntüleri için gerekebilir, ancak kare ortası senkronizasyona neden olur, bu yüzden büyük performans etkisi vardır.</string>
+    <string name="es_hint_gpu_render_target_path_vulkan">Vulkan\'da kullanılacak render hedef emülasyon yolu. Kullanın: [any, fbo, fsi]\nfbo: Ana bilgisayar framebuffer\'ları ve sabit fonksiyonlu karıştırma ve derinlik/stencil testi, gerektiğinde render hedefleri arasında kopyalama. Daha düşük doğruluk (sınırlı piksel format desteği).\nfsi: Manuel piksel paketleme, karıştırma ve derinlik/stencil testi, serbest render hedef düzeni değişiklikleriyle. Fragment shader interlock destekleyen GPU gerektirir. En yüksek doğruluk (tüm piksel formatları yazılımda işlenir).</string>
+    <string name="es_hint_gpu_resolve_resolution_scale_fill_half_pixel_offset">Çözünürlük ölçeklendirme kullanırken, half-pixel offset\'in neden olduğu boşluğu ortadan kaldırmak için render hedef resolve alanlarının sol ve üst taraflarındaki ilk kesinlikle kaplı ana bilgisayar pikselini uzatan hack\'i uygula (bu belirli oyunlar için sahne grafiklerini görüntülemek için gereklidir).</string>
+    <string name="es_hint_gpu_snorm16_render_target_full_range">Ana bilgisayar yalnızca 16_16 ve 16_16_16_16 render hedeflerini -1...1 olarak destekleyebildiğinde, çarpımsal karıştırma doğruluğu pahasına mümkün olan tam değer aralığını kullanmak için -32...32\'yi -1...1\'e yeniden eşle.</string>
+    <string name="es_hint_gpu_store_shaders">Shader\'ları kalıcı olarak sakla ve oyunu ilk kez oynamarken çalışma zamanı dalgalanmalarını ve donmaları önlemek için oyunları yüklerken yükle.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_hard">Dokular mümkün olduğunca çabuk imha edilecek maksimum ana bilgisayar doku bellek kullanımı (megabayt cinsinden).</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_render_to_texture">Mevcut çizim çözünürlüğü ölçeği ile ölçeklendirilecek ana bilgisayar doku bellek bütçesinin (megabayt cinsinden) bir parçası.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft">Eski dokular imha edilecek maksimum ana bilgisayar doku bellek kullanımı (megabayt cinsinden).</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft_lifetime">Doku bellek kullanımı texture_cache_memory_limit_soft\'u aşarsa silinecek kadar eski kabul edilmesi için bir dokunun kullanılmadan geçmesi gereken saniye.</string>
+    <string name="es_hint_gpu_trace_gpu_prefix">GPU izleme dosyaları için ön ek yolu.</string>
+    <string name="es_hint_gpu_trace_gpu_stream">Tüm GPU paketlerini izle.</string>
+    <string name="es_hint_gpu_vsync">VSYNC\'i etkinleştir.</string>
+
+    <string name="es_hint_general_allow_plugins">plugins\title_id\plugin.xex\'ten plugin\'lerin/eğiticilerin yüklenmesine izin verir. Plugin\'ler mod yapmak için kullanılabilen homebrew xex modülleridir. Bu özellik deneyseldir.</string>
+    <string name="es_hint_general_apply_patches">Özel yama işlevselliğini etkinleştirir</string>
+    <string name="es_hint_general_debug">Hata ayıklamaya izin ver ve hata ayıklama bilgilerini sakla.</string>
+    <string name="es_hint_general_discord">Discord rich presence\'i etkinleştir</string>
+    <string name="es_hint_general_launch_module">.iso\'dan veya paketten default.xex veya oyun tarafından belirtilen modül yerine başlatılacak çalıştırılabilir dosya. Varsayılan modülü başlatmak için boş bırak.</string>
+    <string name="es_hint_general_notification_sound_path">Seçilen bildirim sesine giden yol (dosya adı dahil). Ses WAV formatında OLMALIDIR!</string>
+    <string name="es_hint_general_time_scalar">Zamanı hızlandırmak veya yavaşlatmak için kullanılan skaler (1x, 2x, 1/2x, vb.).</string>
+
+    <string name="es_hint_hid_hid">Giriş sistemi. Kullanın: [android, nop]</string>
+    <string name="es_hint_hid_left_stick_deadzone_percentage">Sol stick için ölü bölge seviyesini tanımlar. İzin verilen aralık [0.0-1.0].</string>
+    <string name="es_hint_hid_right_stick_deadzone_percentage">Sağ stick için ölü bölge seviyesini tanımlar. İzin verilen aralık [0.0-1.0].</string>
+    <string name="es_hint_hid_vibration">Denetçi titreşimini aç/kapat.</string>
+
+    <string name="es_hint_kernel_allow_nui_initialization">NUI başlatmayı etkinleştir. Yalnızca kinect oyunlarını test ederken true olarak ayarla. Belirli oyunlar avatar uygulaması gerektirebilir.</string>
+    <string name="es_hint_kernel_allow_incompatible_title_update">Eşleşmeyen imzalara sahip başlık güncellemelerinin uygulanmasına izin ver.</string>
+    <string name="es_hint_kernel_apply_title_update">Başlık güncellemelerini uygula.</string>
+    <string name="es_hint_kernel_cl">Konağa sağlanan ek komut satırını belirt.</string>
+    <string name="es_hint_kernel_default_achievements_backend">Hangi başarılar backend\'inin varsayılan olarak kullanılacağını tanımlar. Olası seçenekler: GPD.</string>
+    <string name="es_hint_kernel_ignore_thread_affinities">Oyun tarafından belirtilen iş parçacığı yakınlıklarını yoksayar.</string>
+    <string name="es_hint_kernel_ignore_thread_priorities">Oyun tarafından belirtilen iş parçacığı önceliklerini yoksayar.</string>
+    <string name="es_hint_kernel_kernel_build_version">Mevcut çekirdek versiyonunu tanımla</string>
+    <string name="es_hint_kernel_kernel_cert_monitor">Cert monitörünü etkinleştir.</string>
+    <string name="es_hint_kernel_kernel_debug_monitor">Hata ayıklama monitörünü etkinleştir.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_power">kernel_display_gamma_type 3 ile kullanılacak ekran gaması.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_type">Ekran gaması tipi: 0 - doğrusal, 1 - sRGB (CRT), 2 - BT.709 (HDTV), 3 - kernel_display_gamma_power yoluyla belirtilen güç.</string>
+    <string name="es_hint_kernel_kernel_pix">PIX\'i etkinleştir.</string>
+    <string name="es_hint_kernel_log_high_frequency_kernel_calls">Yüksek frekanslı çekirdek çağrılarını kHighFrequency etiketiyle kaydet.</string>
+    <string name="es_hint_kernel_staging_mode">Panellerde hata ayıklama bilgilerini render etmek için önizleme modunu etkinleştirir.</string>
+
+    <string name="es_hint_logging_flush_log">Her günlük satırı partisi sonrasında günlük dosyasını temizle.</string>
+    <string name="es_hint_logging_log_file">Günlükler verilen dosyaya yazılır</string>
+    <string name="es_hint_logging_log_level">Kaydedilecek maksimum seviye. (0=hata, 1=uyarı, 2=bilgi, 3=hata ayıklama)</string>
+    <string name="es_hint_logging_log_mask">Daha detaylı hata ayıklama günlüğü için belirli kategorileri devre dışı bırakır. Kernel = 1, Apu = 2, Cpu = 4.</string>
+    <string name="es_hint_logging_log_string_format_kernel_calls">Yüksek frekanslı çekirdek çağrılarını kHighFrequency etiketiyle kaydet.</string>
+    <string name="es_hint_logging_log_to_debugprint">Günlüğü DebugPrint\'e boşalt.</string>
+    <string name="es_hint_logging_log_to_stdout">Günlük çıktısını stdout\'a yaz.</string>
+
+    <string name="es_hint_memory_ignore_offset_for_ranged_allocations">Sağlanan aralıkla fiziksel ayırmalar için 4k ofsetini yoksaymaya izin verir. Belirli başlıklar sonucun sağlanan alt aralığa uyup uymadığını kontrol eder.</string>
+    <string name="es_hint_memory_mmap_address_high">1-124</string>
+    <string name="es_hint_memory_protect_on_release">Erişimleri önlemek için serbest bırakılan belleği koru.</string>
+    <string name="es_hint_memory_protect_zero">Sıfır sayfasını okumalara ve yazmalara karşı koru.</string>
+    <string name="es_hint_memory_scribble_heap">Tüm ayrılmış yığın belleğine 0xCD yaz.</string>
+    <string name="es_hint_memory_writable_executable_memory">Desteklenmediği platformlarda davranışı simüle etmek için belleğe hem yazma hem de yürütme erişimiyle haritalamaya izin ver</string>
+
+    <string name="es_hint_profiles_logged_profile_slot_0_xuid">Slot 0\'da önyüklemede yüklenecek profilin XUID\'si</string>
+    <string name="es_hint_profiles_logged_profile_slot_1_xuid">Slot 1\'de önyüklemede yüklenecek profilin XUID\'si</string>
+    <string name="es_hint_profiles_logged_profile_slot_2_xuid">Slot 2\'de önyüklemede yüklenecek profilin XUID\'si</string>
+    <string name="es_hint_profiles_logged_profile_slot_3_xuid">Slot 3\'te önyüklemede yüklenecek profilin XUID\'si</string>
+
+    <string name="es_hint_storage_cache_root">Emülatörün veya oyunun belirli bölümlerini hızlandırmak için kullanılan dosyalar için kök yol. Bu dosyalar kalıcı olabilir, ancak ilerleme kaybı gibi büyük yan etkiler olmadan silinebilirler. Boşsa, depolama kökü altındaki önbellek klasörü veya varsa işletim sistemi için tercih edilen önbellek dizini kullanılacaktır.</string>
+    <string name="es_hint_storage_content_root">Konuk içerik depolaması (kayıtlar, vb.) için kök yol veya depolama kökü altındaki içerik klasörünü kullanmak için boş.</string>
+    <string name="es_hint_storage_mount_cache">Önbellek bağlamayı etkinleştir</string>
+    <string name="es_hint_storage_mount_scratch">Scratch bağlamayı etkinleştir</string>
+    <string name="es_hint_storage_storage_root">Kalıcı dahili veri depolaması (yapılandırma, vb.) için kök yol veya belgeler klasörü gibi işletim sistemi için tercih edilen yolu veya taşınabilir.txt varsa emülatör çalıştırılabilir dizinini kullanmak için boş.</string>
+
+    <string name="es_hint_ui_headless">Gerektiğinde istemler için varsayılanları kullanarak hiçbir UI gösterme.</string>
+    <string name="es_hint_ui_profiler_dpi_scaling">Profilere pencere DPI ölçeklendirmesi uygula.</string>
+    <string name="es_hint_ui_show_achievement_notification">Ekranda başarı bildirisi göster.</string>
+    <string name="es_hint_ui_show_profiler">Varsayılan olarak profil oluşturma UI\'ını göster.</string>
+    <string name="es_hint_ui_storage_selection_dialog">Oyun istediğinde depolama aygıtı seçim iletişim kutusunu göster.</string>
+
+        <string name="es_hint_video_avpack">Video modları
+0 = PAL-60 Component (SD)
+1 = Kullanılmıyor
+2 = PAL-60 SCART
+3 = 480p Component (HD)
+4 = HDMI+A
+5 = PAL-60 Composite/S-Video
+6 = VGA
+7 = TV PAL-60
+8 = HDMI (varsayılan)</string>
+    <string name="es_hint_video_enable_3d_mode">Başlıklarda stereoskopik mod kullanımını etkinleştirir.</string>
+    <string name="es_hint_video_interlaced">Örgülü modu değiştirir.</string>
+    <string name="es_hint_video_internal_display_resolution">Farklı çözünürlükleri destekleyen oyunların belirli bir çözünürlükte oluşturulmasına izin verir. Bu, tüm oyunlarla çalışacağı veya performansı artıracağı garanti edilmez.\n0=640x480, 1=640x576, 2=720x480, 3=720x576, 4=800x600, 5=848x480, 6=1024x768, 7=1152x864, 8=1280x720 (Varsayılan), 9=1280x768, 10=1280x960, 11=1280x1024, 12=1360x768, 13=1440x900, 14=1680x1050, 15=1920x540, 16=1920x1080, 17=internal_display_resolution_x/y</string>
+    <string name="es_hint_video_internal_display_resolution_x">Özel genişlik. internal_display_resolution\'a bakın. Aralık 1-1920.</string>
+    <string name="es_hint_video_internal_display_resolution_y">Özel yükseklik. internal_display_resolution\'a bakın. Aralık 1-1080.</string>
+    <string name="es_hint_video_use_50Hz_mode">PAL-50 modunun kullanımını etkinleştirir.</string>
+    <string name="es_hint_video_video_standard">Farklı video sinyalleri arasında geçiş yapmayı etkinleştirir. 1=NTSC, 2=NTSC-J, 3=PAL</string>
+    <string name="es_hint_video_widescreen">16:9 ve 4:3 en boy oranı arasında geçiş yapar.</string>
+
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_fifo_relaxed">Kullanılabilir olduğunda, relaxed first-in-first-out sunum moduna (3. öncelik) izin verir, bu ana ekran dikey senkronizasyonunu beklemeye neden olur ancak kareler ana ekran yenileme hızını karşılamazsa yırtılma ile sunabilir.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_immediate">Kullanılabilir olduğunda, immediate sunum moduna (1. öncelik) izin verir, en düşük gecikme sunar ancak belirli durumlarda yırtılma olasılığı vardır ve yapılandırmaya bağlı olarak değişken yenileme hızı.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_mailbox">Kullanılabilir olduğunda, mailbox sunum moduna (2. öncelik) izin verir, yırtılma olasılığı olmadan düşük gecikme sunar.</string>
+    <string name="es_hint_vulkan_vulkan_device">Tercih edilen Vulkan fiziksel cihazının indeksi veya herhangi bir uyumlu cihaz kullanmak için -1.</string>
+    <string name="es_hint_vulkan_vulkan_log_debug_messages">İşletim sistemi hata ayıklama çıktısı yerine, Vulkan VK_EXT_debug_utils mesajlarını Xenia günlüğüne yaz.</string>
+    <string name="es_hint_vulkan_vulkan_sparse_shared_memory">Paylaşılan bellek öykünmesi için sparse bağlamayı etkinleştir. Devre dışı bırakmak video belleği kullanımını artırır - 512 MB arabellek oluşturulur - ancak sparse bağlamayı desteklemeyen grafik hata ayıklayıcılarının çalışmasına izin verir.</string>
+    <string name="es_hint_vulkan_vulkan_validation">Vulkan doğrulama katmanını etkinleştir (VK_LAYER_KHRONOS_validation). \'vulkan_log_debug_messages\' etkinse mesajlar Xenia günlüğüne yazılır, aksi takdirde işletim sistemi hata ayıklama çıktısına yazılır.</string>
+
+    <string name="es_hint_xconfig_audio_flag">Ses Modu Analog.
+0x00000001 = Dolby Pro Logic
+0x00000002 = Analog Mono
+Ses Modu Dijital.
+0x00000000 = Dijital Stereo (yukarıdakilerden birini tek başına seçin)
+0x00010000 = Dolby Digital
+0x00030000 = WMA PRO ile Dolby Digital
+Özel Bayraklar.
+0x00000003 = Stereo Bypass
+0x80000000 = Düşük Gecikme
+Bu yapılandırma, bir analog ve dijital bayrağı birlikte eşleştirmenizi gerektirir, dijital stereo ise yalnızca bir analog bayrak gerektirir. Bonus bayraklar isteğe bağlıdır. Örnek) 0x00010001</string>
+    <string name="es_hint_xconfig_user_country">Kullanıcı ülke kimliği.
+1=AE 2=AL 3=AM 4=AR 5=AT 6=AU 7=AZ 8=BE 9=BG
+10=BH 11=BN 12=BO 13=BR 14=BY 15=BZ 16=CA 18=CH 19=CL
+20=CN 21=CO 22=CR 23=CZ 24=DE 25=DK 26=DO 27=DZ 28=EC
+29=EE 30=EG 31=ES 32=FI 33=FO 34=FR 35=GB 36=GE 37=GR
+38=GT 39=HK 40=HN 41=HR 42=HU 43=ID 44=IE 45=IL 46=IN
+47=IQ 48=IR 49=IS 50=IT 51=JM 52=JO 53=JP 54=KE 55=KG
+56=KR 57=KW 58=KZ 59=LB 60=LI 61=LT 62=LU 63=LV 64=LY
+65=MA 66=MC 67=MK 68=MN 69=MO 70=MV 71=MX 72=MY 73=NI
+74=NL 75=NO 76=NZ 77=OM 78=PA 79=PE 80=PH 81=PK 82=PL
+83=PR 84=PT 85=PY 86=QA 87=RO 88=RU 89=SA 90=SE 91=SG
+92=SI 93=SK 95=SV 96=SY 97=TH 98=TN 99=TR 100=TT 101=TW
+102=UA 103=US 104=UY 105=UZ 106=VE 107=VN 108=YE 109=ZA</string>
+    <string name="es_hint_xconfig_user_language">Kullanıcı dil kimliği.\n1=en 2=ja 3=de 4=fr 5=es 6=it 7=ko 8=zh\n9=pt 11=pl 12=ru 13=sv 14=tr 15=nb 16=nl 17=zh</string>
+
+    <string name="es_hint_a64_a64_extension_mask">Belirli komut seti özelliklerinin algılanmasına ve kullanılmasına izin ver.
+0 = armv8.0
+1 = LSE
+2 = F16C
+-1 = Tüm olası işlemci özelliklerini algıla ve kullan</string>
+
+
+</resources>

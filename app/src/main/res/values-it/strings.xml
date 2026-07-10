@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="es_apu_xma_decoder">Decoder Xma</string>
+    <string name="es_cpu_disable_context_promotion">Disabilita Promozione Contesto</string>
+    <string name="es_cpu_disable_instruction_infocache">Disabilita Cache Informazioni Istruzioni</string>
+    <string name="es_cpu_disable_prefetch_and_cachecontrol">Disabilita Prefetch e Controllo Cache</string>
+    <string name="es_cpu_dump_translated_hir_functions">Scarica Funzioni HIR Tradotte</string>
+    <string name="es_cpu_emit_inline_mmio_checks">Emetti Verifiche MMIO Inline</string>
+    <string name="es_cpu_emit_mmio_aware_stores_for_recorded_exception_addresses">Emetti Archiviazioni Consapevoli di MMIO per Indirizzi di Eccezione Registrati</string>
+    <string name="es_cpu_enable_early_precompilation">Abilita Precompilazione Anticipata</string>
+    <string name="es_cpu_full_optimization_even_with_debug">Ottimizzazione Completa Anche con Debug</string>
+    <string name="es_cpu_ignore_trap_instructions">Ignora Istruzioni Trap</string>
+    <string name="es_cpu_no_reserved_ops">Nessuna Operazione Riservata</string>
+    <string name="es_cpu_permit_float_constant_evaluation">Consenti Valutazione Costanti Float</string>
+    <string name="es_cpu_record_mmio_access_exceptions">Registra Eccezioni di Accesso MMIO</string>
+    <string name="es_cpu_writable_code_segments">Segmenti di Codice Scrivibili</string>
+    <string name="es_gpu_gpu_allow_invalid_upload_range">GPU Consenti Intervallo di Caricamento Non Valido</string>
+    <string name="es_gpu_target_trace_file">File di Traccia Obiettivo</string>
+    <string name="es_gpu_trace_dump_path">Percorso di Scarico Traccia</string>
+    <string name="es_general_allow_game_relative_writes">Consenti Scritture Relative al Gioco</string>
+    <string name="es_general_controller_hotkeys">Tasti di Scelta Rapida del Controller</string>
+    <string name="es_general_disable_doubleclick_fullscreen">Disabilita Schermo Intero con Doppio Clic</string>
+    <string name="es_hid_guide_button">Pulsante Guida</string>
+    <string name="es_kernel_allow_avatar_initialization">Consenti Inizializzazione Avatar</string>
+    <string name="es_storage_force_mount_devkit">Forza Montaggio Devkit</string>
+    <string name="es_storage_mount_memory_unit">Monta Unità di Memoria</string>
+    <string name="es_ui_custom_font_path">Percorso Carattere Personalizzato</string>
+
+    <string name="_default">Predefinito</string>
+    <string name="driver_library_path_dialog_add_hint">Aggiungi Driver Personalizzato (*.zip)</string>
+    <string name="es_vulkan_vulkan_lib_path">Percorso Libreria Driver Personalizzato</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">Forza Clock Massimi Driver Personalizzato</string>
+
+    <string name="create_shortcut">Crea Scorciatoia</string>
+    <string name="disable_virtual_keyboard">Disabilita la tastiera virtuale</string>
+    <string name="joystick">Joystick</string>
+
+    <string name="dpad">Dpad</string>
+    <string name="abxy">ABXY</string>
+    <string name="lr">LR</string>
+    <string name="start_back">Start/Indietro</string>
+
+    <string name="save_and_quit">Salva ed Esci</string>
+    <string name="scale_rate">Tasso di Scala</string>
+
+    <string name="refresh_list">Aggiorna Elenco</string>
+    <string name="about">Informazioni</string>
+    <string name="gratitude">Ringraziamenti</string>
+    <string name="update_log">Registro Aggiornamenti</string>
+    <string name="device_info">Informazioni Dispositivo</string>
+    <string name="open_source_licenses">Licenze Open Source</string>
+
+    <string name="open_file_manager">Apri Gestore File</string>
+    <string name="game_list_loading">L\'elenco dei giochi si sta caricando...</string>
+    <string name="quit">Esci</string>
+    <string name="device_unsupport_vulkan_msg">Il tuo dispositivo non supporta Vulkan e non può soddisfare i requisiti minimi per eseguire questa applicazione, per favore esci.</string>
+
+    <string name="loading">Caricamento...</string>
+    <string name="msg_processing">Elaborazione...</string>
+    <string name="empty_game_list">L\'elenco dei giochi è vuoto, per favore imposta la directory dei giochi</string>
+
+    <string name="enable_vibrator">Abilita Vibratore</string>
+
+    <string name="set_game_dir">Imposta Directory Giochi</string>
+
+    <string name="clear">Cancella</string>
+    <string name="press_a_key">Premi un tasto qualsiasi per continuare...</string>
+
+    <string name="reset_as_default">Reimposta come Predefinito</string>
+    <string name="key_mappers">Mappature Tasti</string>
+
+    <string name="virtual_pad_edit">Modifica Pad Virtuale</string>
+
+    <string name="left">sinistra</string>
+    <string name="up">su</string>
+    <string name="right">destra</string>
+    <string name="down">giù</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+
+    <string name="lshoulder">LShoulder</string>
+    <string name="lthumbpress">LThumbPress</string>
+    <string name="ltrigger">LTrigger</string>
+
+    <string name="rshoulder">RShoulder</string>
+    <string name="rthumbpress">RThumbPress</string>
+    <string name="rtrigger">RTrigger</string>
+
+    <string name="start">avvia</string>
+    <string name="back">Indietro</string>
+
+    <string name="use_global_config">Usa Configurazione Globale</string>
+
+    <string name="settings">Impostazioni</string>
+
+
+    <string name="gratitude_content">Grazie Ruban per tutte le ICONE\n\n
+		Grazie a SRC267 (Sting) per la gestione di reddit/discord\n\n
+		Grazie a 妖妖 per i test\n\n
+		Grazie a 再见某人 \n\n
+        Grazie a 再见某人 \n\n
+        Grazie a 再见某人 \n\n
+        \n\n
+        		Basato sull\'ottimizzazione di trapianto Xenia, grazie a tutti i partecipanti del progetto Xenia\n\n
+    </string>
+
+    <string name="es_apu">APU</string>
+<string name="es_apu_apu">Sistema Audio</string>
+<string name="es_apu_apu_max_queued_frames">Frame Massimi in Coda</string>
+<string name="es_apu_enable_xmp">Abilita Lettore Musicale</string>
+<string name="es_apu_ffmpeg_verbose">Output Verbose FFmpeg</string>
+<string name="es_apu_mute">Silenzia Tutto l\&apos;Audio</string>
+<string name="es_apu_use_dedicated_xma_thread">Thread XMA Dedicato</string>
+<string name="es_apu_use_new_decoder">Usa Nuovo Decoder XMA</string>
+<string name="es_apu_xmp_default_volume">Volume Musica Predefinito</string>
+
+<string name="es_cpu">CPU</string>
+<string name="es_cpu_break_condition_gpr">Condizione di Interruzione GPR</string>
+<string name="es_cpu_break_condition_op">Operatore Condizione di Interruzione</string>
+<string name="es_cpu_break_condition_truncate">Tronca Valore a 32-bit</string>
+<string name="es_cpu_break_condition_value">Valore Condizione di Interruzione</string>
+<string name="es_cpu_break_on_debugbreak">Interruzione su Debugbreak</string>
+<string name="es_cpu_break_on_instruction">Interruzione su Istruzione</string>
+<string name="es_cpu_break_on_start">Interruzione all\&apos;Avvio</string>
+<string name="es_cpu_break_on_unimplemented_instructions">Interruzione su Istruzioni Non Implementate</string>
+<string name="es_cpu_clock_no_scaling">Disabilita Scaling Orologio</string>
+<string name="es_cpu_clock_source_raw">Usa Sorgente Orologio Grezza</string>
+<string name="es_cpu_cpu">Backend CPU</string>
+<string name="es_cpu_debugprint_trap_log">Log Trappole Debugprint</string>
+<string name="es_cpu_disable_global_lock">Disabilita Blocco Globale</string>
+<string name="es_cpu_disassemble_functions">Disassembla Funzioni</string>
+<string name="es_cpu_ignore_undefined_externs">Ignora Esterni Non Definiti</string>
+<string name="es_cpu_inline_mmio_access">Accesso MMIO Inline</string>
+<string name="es_cpu_load_module_map">Carica Mappa Modulo</string>
+<string name="es_cpu_pvr">Versione/Revisione Processore</string>
+<string name="es_cpu_store_all_context_values">Memorizza Tutti i Valori di Contesto</string>
+<string name="es_cpu_trace_function_coverage">Traccia Copertura Funzioni</string>
+<string name="es_cpu_trace_function_data">Traccia Dati Funzioni</string>
+<string name="es_cpu_trace_function_data_path">Percorso Traccia Dati Funzioni</string>
+<string name="es_cpu_trace_function_references">Traccia Riferimenti Funzioni</string>
+<string name="es_cpu_trace_functions">Traccia Funzioni</string>
+<string name="es_cpu_validate_hir">Valida HIR</string>
+
+<string name="es_content">Contenuto</string>
+<string name="es_content_license_mask">Maschera Licenza</string>
+
+<string name="es_display">Display</string>
+<string name="es_display_fullscreen">Modalità Schermo Intero</string>
+<string name="es_display_host_present_from_non_ui_thread">Presentazione Diretta da Thread Non-UI</string>
+<string name="es_display_postprocess_antialiasing">Antialiasing Post-elaborazione</string>
+<string name="es_display_postprocess_dither">Dithering Post-elaborazione</string>
+<string name="es_display_postprocess_ffx_cas_additional_sharpness">Nitidezza Aggiuntiva CAS</string>
+<string name="es_display_postprocess_ffx_fsr_max_upsampling_passes">Passaggi Massimi Upsampling FSR</string>
+<string name="es_display_postprocess_ffx_fsr_sharpness_reduction">Riduzione Nitidezza FSR</string>
+<string name="es_display_postprocess_scaling_and_sharpening">Scaling e Nitidezza</string>
+<string name="es_display_present_letterbox">Presentazione Letterbox</string>
+<string name="es_display_present_render_pass_clear">Cancella Passaggio Render</string>
+<string name="es_display_present_safe_area_x">Area Sicura X</string>
+<string name="es_display_present_safe_area_y">Area Sicura Y</string>
+
+<string name="es_gpu">GPU</string>
+<string name="es_gpu_clear_memory_page_state">Cancella Stato Pagina Memoria</string>
+<string name="es_gpu_depth_float24_convert_in_pixel_shader">Converti Profondità in Pixel Shader</string>
+<string name="es_gpu_depth_float24_round">Arrotonda Conversione Profondità</string>
+<string name="es_gpu_depth_transfer_not_equal_test">Test Non Uguale Trasferimento Profondità</string>
+<string name="es_gpu_disassemble_pm4">Disassembla Pacchetti PM4</string>
+<string name="es_gpu_draw_resolution_scale_x">Scala Risoluzione Disegno X</string>
+<string name="es_gpu_draw_resolution_scale_y">Scala Risoluzione Disegno Y</string>
+<string name="es_gpu_draw_resolution_scaled_texture_offsets">Offset Texture Scalate</string>
+<string name="es_gpu_dump_shaders">Percorso Dump Shader</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu">Esegui VS su CPU per Disegni Non Ritagliati</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Esegui VS su CPU per Backend PSI</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Esegui VS su CPU con Forbici</string>
+<string name="es_gpu_force_convert_line_loops_to_strips">Forza Conversione Anelli Linee</string>
+<string name="es_gpu_force_convert_quad_lists_to_triangle_lists">Forza Conversione Liste Quad</string>
+<string name="es_gpu_force_convert_triangle_fans_to_lists">Forza Conversione Ventagli Triangoli</string>
+<string name="es_gpu_framerate_limit">Limite Framerate</string>
+<string name="es_gpu_gamma_render_target_as_srgb">Target Render Gamma come sRGB</string>
+<string name="es_gpu_gpu">Sistema Grafico</string>
+<string name="es_gpu_gpu_allow_invalid_fetch_constants">Consenti Costanti Fetch Non Valide</string>
+<string name="es_gpu_half_pixel_offset">Offset Mezzo Pixel</string>
+<string name="es_gpu_ignore_32bit_vertex_index_support">Ignora Supporto Indice Vertice 32-bit</string>
+<string name="es_gpu_log_guest_driven_gpu_register_written_values">Log Scritture Registro GPU</string>
+<string name="es_gpu_log_ringbuffer_kickoff_initiator_bts">Log Avvio Ringbuffer</string>
+<string name="es_gpu_mrt_edram_used_range_clamp_to_min">Limita EDRAM MRT al Minimo</string>
+<string name="es_gpu_native_2x_msaa">MSAA Nativo 2x</string>
+<string name="es_gpu_native_stencil_value_output">Output Valore Stencil Nativo</string>
+<string name="es_gpu_non_seamless_cube_map">Mappa Cubica Non Continua</string>
+<string name="es_gpu_primitive_processor_cache_min_indices">Indici Minimi Cache Primitive</string>
+<string name="es_gpu_query_occlusion_sample_lower_threshold">Soglia Inferiore Campione Occlusione</string>
+<string name="es_gpu_query_occlusion_sample_upper_threshold">Soglia Superiore Campione Occlusione</string>
+<string name="es_gpu_readback_memexport">Readback Memexport</string>
+<string name="es_gpu_readback_resolve">Readback Resolve</string>
+<string name="es_gpu_render_target_path_vulkan">Percorso Target Render (Vulkan)</string>
+<string name="es_gpu_resolve_resolution_scale_fill_half_pixel_offset">Offset Mezzo Pixel Riempimento Scala Resolve</string>
+<string name="es_gpu_snorm16_render_target_full_range">Intervallo Completo RT SNORM16</string>
+<string name="es_gpu_store_shaders">Memorizza Shader</string>
+<string name="es_gpu_texture_cache_memory_limit_hard">Limite Rigido Cache Texture</string>
+<string name="es_gpu_texture_cache_memory_limit_render_to_texture">Limite RTT Cache Texture</string>
+<string name="es_gpu_texture_cache_memory_limit_soft">Limite Morbido Cache Texture</string>
+<string name="es_gpu_texture_cache_memory_limit_soft_lifetime">Durata Cache Texture Morbida</string>
+<string name="es_gpu_trace_gpu_prefix">Prefisso Traccia GPU</string>
+<string name="es_gpu_trace_gpu_stream">Traccia Flusso GPU</string>
+<string name="es_gpu_vsync">VSYNC</string>
+
+<string name="es_general">Generale</string>
+<string name="es_general_allow_plugins">Consenti Plugin</string>
+<string name="es_general_apply_patches">Applica Patch</string>
+<string name="es_general_debug">Modalità Debug</string>
+<string name="es_general_discord">Discord Rich Presence</string>
+<string name="es_general_launch_module">Modulo di Avvio</string>
+<string name="es_general_notification_sound_path">Percorso Suono Notifica</string>
+<string name="es_general_time_scalar">Scalare Tempo</string>
+
+<string name="es_hid">HID</string>
+<string name="es_hid_hid">Sistema di Input</string>
+<string name="es_hid_left_stick_deadzone_percentage">Zona Morta Levetta Sinistra</string>
+<string name="es_hid_right_stick_deadzone_percentage">Zona Morta Levetta Destra</string>
+<string name="es_hid_vibration">Vibrazione Controller</string>
+
+<string name="es_kernel">Kernel</string>
+<string name="es_kernel_allow_nui_initialization">Consenti Inizializzazione NUI</string>
+<string name="es_kernel_allow_incompatible_title_update">Consenti Aggiornamento Titolo Incompatibile</string>
+<string name="es_kernel_apply_title_update">Applica Aggiornamenti Titolo</string>
+<string name="es_kernel_cl">Argomenti Linea di Comando</string>
+<string name="es_kernel_default_achievements_backend">Backend Obiettivi</string>
+<string name="es_kernel_ignore_thread_affinities">Ignora Affinità Thread</string>
+<string name="es_kernel_ignore_thread_priorities">Ignora Priorità Thread</string>
+<string name="es_kernel_kernel_build_version">Versione Build Kernel</string>
+<string name="es_kernel_kernel_cert_monitor">Monitor Certificati</string>
+<string name="es_kernel_kernel_debug_monitor">Monitor Debug</string>
+<string name="es_kernel_kernel_display_gamma_power">Potenza Gamma Display</string>
+<string name="es_kernel_kernel_display_gamma_type">Tipo Gamma Display</string>
+<string name="es_kernel_kernel_pix">PIX</string>
+<string name="es_kernel_log_high_frequency_kernel_calls">Log Chiamate Alta Frequenza</string>
+<string name="es_kernel_staging_mode">Modalità Staging</string>
+
+<string name="es_logging">Logging</string>
+<string name="es_logging_flush_log">Svuota Log</string>
+<string name="es_logging_log_file">Percorso File Log</string>
+<string name="es_logging_log_level">Livello Log</string>
+<string name="es_logging_log_mask">Maschera Log</string>
+<string name="es_logging_log_string_format_kernel_calls">Log Chiamate Kernel</string>
+<string name="es_logging_log_to_debugprint">Log su DebugPrint</string>
+<string name="es_logging_log_to_stdout">Log su Stdout</string>
+
+<string name="es_memory">Memoria</string>
+<string name="es_memory_ignore_offset_for_ranged_allocations">Ignora Offset per Allocazioni a Intervallo</string>
+<string name="es_memory_mmap_address_high">Indirizzo MMAP Alto</string>
+<string name="es_memory_protect_on_release">Proteggi Memoria Rilasciata</string>
+<string name="es_memory_protect_zero">Proteggi Pagina Zero</string>
+<string name="es_memory_scribble_heap">Heap Scribble</string>
+<string name="es_memory_writable_executable_memory">Memoria Eseguibile Scrivibile</string>
+
+<string name="es_profiles">Profili</string>
+<string name="es_profiles_logged_profile_slot_0_xuid">Slot Profilo 0 XUID</string>
+<string name="es_profiles_logged_profile_slot_1_xuid">Slot Profilo 1 XUID</string>
+<string name="es_profiles_logged_profile_slot_2_xuid">Slot Profilo 2 XUID</string>
+<string name="es_profiles_logged_profile_slot_3_xuid">Slot Profilo 3 XUID</string>
+
+<string name="es_storage">Archiviazione</string>
+<string name="es_storage_cache_root">Percorso Radice Cache</string>
+<string name="es_storage_content_root">Percorso Radice Contenuto</string>
+<string name="es_storage_mount_cache">Monta Cache</string>
+<string name="es_storage_mount_scratch">Monta Scratch</string>
+<string name="es_storage_storage_root">Percorso Radice Archiviazione</string>
+
+<string name="es_ui">UI</string>
+<string name="es_ui_headless">Modalità Headless</string>
+<string name="es_ui_profiler_dpi_scaling">Scaling DPI Profiler</string>
+<string name="es_ui_show_achievement_notification">Mostra Notifica Obiettivo</string>
+<string name="es_ui_show_profiler">Mostra Profiler</string>
+<string name="es_ui_storage_selection_dialog">Finestra Selezione Archiviazione</string>
+
+<string name="es_video">Video</string>
+<string name="es_video_avpack">Pacchetto AV</string>
+<string name="es_video_enable_3d_mode">Abilita Modalità 3D</string>
+<string name="es_video_interlaced">Modalità Interlacciata</string>
+<string name="es_video_internal_display_resolution">Risoluzione Display Interna</string>
+<string name="es_video_internal_display_resolution_x">Larghezza Display Personalizzata</string>
+<string name="es_video_internal_display_resolution_y">Altezza Display Personalizzata</string>
+<string name="es_video_use_50Hz_mode">Usa Modalità 50Hz</string>
+<string name="es_video_video_standard">Standard Video</string>
+<string name="es_video_widescreen">Modalità Schermo Esteso</string>
+
+<string name="es_vulkan">Vulkan</string>
+<string name="es_vulkan_vulkan_allow_present_mode_fifo_relaxed">Consenti Modalità Presentazione FIFO Rilassata</string>
+<string name="es_vulkan_vulkan_allow_present_mode_immediate">Consenti Modalità Presentazione Immediata</string>
+<string name="es_vulkan_vulkan_allow_present_mode_mailbox">Consenti Modalità Presentazione Mailbox</string>
+<string name="es_vulkan_vulkan_device">Indice Dispositivo Vulkan</string>
+<string name="es_vulkan_vulkan_log_debug_messages">Log Messaggi Debug Vulkan</string>
+<string name="es_vulkan_vulkan_sparse_shared_memory">Memoria Condivisa Sparse</string>
+<string name="es_vulkan_vulkan_validation">Livello Validazione Vulkan</string>
+
+<string name="es_xconfig">XConfig</string>
+<string name="es_xconfig_audio_flag">Flag Audio</string>
+<string name="es_xconfig_user_country">Paese Utente</string>
+<string name="es_xconfig_user_language">Lingua Utente</string>
+
+<string name="es_a64">a64</string>
+<string name="es_a64_a64_extension_mask">Maschera Estensione A64</string>
+
+    <string name="es_hint_apu_apu">Sistema audio. Usa: [any, nop, opensles, aaudio]</string>
+    <string name="es_hint_apu_apu_max_queued_frames">Consente di modificare il numero massimo di frame audio bufferizzati per ridurre il ritardo audio. Abbassare questo valore potrebbe causare problemi di prestazioni. Intervallo valori: [4-64]</string>
+    <string name="es_hint_apu_enable_xmp">Abilita la riproduzione del Music Player.</string>
+    <string name="es_hint_apu_ffmpeg_verbose">Output FFmpeg verboso (debug e superiori)</string>
+    <string name="es_hint_apu_mute">Disattiva tutto l\'output audio.</string>
+    <string name="es_hint_apu_use_dedicated_xma_thread">Abilita la decodifica XMA su un thread separato. Disabilitato dovrebbe produrre risultati migliori, ma diminuire le prestazioni leggermente.</string>
+    <string name="es_hint_apu_use_new_decoder">Abilita l\'utilizzo del nuovo decoder audio XMA sperimentale.</string>
+    <string name="es_hint_apu_xmp_default_volume">Volume musicale predefinito se il gioco non lo imposta [0-100].</string>
+
+    <string name="es_hint_cpu_break_condition_gpr">GPR confrontato con</string>
+    <string name="es_hint_cpu_break_condition_op">operatore di confronto</string>
+    <string name="es_hint_cpu_break_condition_truncate">tronca il valore a 32-bit</string>
+    <string name="es_hint_cpu_break_condition_value">valore confrontato</string>
+    <string name="es_hint_cpu_break_on_debugbreak">int3 sulle richieste __debugbreak JITate.</string>
+    <string name="es_hint_cpu_break_on_instruction">int3 prima che l\'indirizzo guest specificato venga eseguito.</string>
+    <string name="es_hint_cpu_break_on_start">Entra nel debugger all\'avvio.</string>
+    <string name="es_hint_cpu_break_on_unimplemented_instructions">Break nel debugger host (o crash se nessun debugger collegato) se viene incontrata un\'istruzione PowerPC non implementata.</string>
+    <string name="es_hint_cpu_clock_no_scaling">Disabilita il codice di scaling. La gestione del tempo e il locking sono bypassati. L\'orario di sistema guest è prelevato direttamente dall\'host.</string>
+    <string name="es_hint_cpu_clock_source_raw">Su x64, usa l\'istruzione RDTSC come sorgente temporale. Richiede TSC invariante. Su a64, usa il registro CNTVCT_EL0 come sorgente temporale</string>
+    <string name="es_hint_cpu_cpu">Backend CPU [any, x64, a64].</string>
+    <string name="es_hint_cpu_debugprint_trap_log">Registra i trap debugprint nel debugger attivo</string>
+    <string name="es_hint_cpu_disable_global_lock">Disabilita l\'uso del lock globale nel codice guest. Non influisce sul codice host.</string>
+    <string name="es_hint_cpu_disassemble_functions">Disassembla le funzioni durante la generazione.</string>
+    <string name="es_hint_cpu_ignore_undefined_externs">Non uscire quando viene chiamato un extern undefined.</string>
+    <string name="es_hint_cpu_inline_mmio_access">Load e store MMIO costanti inline.</string>
+    <string name="es_hint_cpu_load_module_map">Carica un .map per i nomi dei simboli e per differenziare con il database dei simboli generato.</string>
+    <string name="es_hint_cpu_pvr">Numero di versione e revisione del processore.\nI bit da 0 a 15 sono il numero di versione.\nI bit da 16 a 31 sono il numero di revisione.\nNota: Alcuni XEX (come mfgbootlauncher.xex) potrebbero controllare un valore inferiore a 0x710700.</string>
+    <string name="es_hint_cpu_store_all_context_values">Non rimuovere gli store di contesto morti per aiutare il debugging.</string>
+    <string name="es_hint_cpu_trace_function_coverage">Genera tracing per le statistiche di copertura delle istruzioni delle funzioni.</string>
+    <string name="es_hint_cpu_trace_function_data">Genera tracing per i dati dei risultati delle funzioni.</string>
+    <string name="es_hint_cpu_trace_function_data_path">File su cui scrivere i dati di trace.</string>
+    <string name="es_hint_cpu_trace_function_references">Genera tracing per i riferimenti agli indirizzi delle funzioni.</string>
+    <string name="es_hint_cpu_trace_functions">Genera tracing per le statistiche delle funzioni.</string>
+    <string name="es_hint_cpu_validate_hir">Esegui controlli di validazione sull\'HIR durante la compilazione.</string>
+
+    <string name="es_hint_content_license_mask">Imposta la maschera di licenza per il contenuto attivato.\n0 = Nessuna licenza abilitata.\n1 = Prima licenza abilitata. Generalmente la licenza versione completa nei titoli Xbox Live Arcade.\n-1 o 0xFFFFFFFF = Tutte le licenze possibili abilitate. Generalmente una cattiva idea, potrebbe portare a comportamenti undefined.</string>
+
+    <string name="es_hint_display_fullscreen">Se avviare l\'emulatore in fullscreen.</string>
+    <string name="es_hint_display_host_present_from_non_ui_thread">Consenti al thread di emulazione GPU di presentare l\'output guest alla superficie host direttamente invece di richiedere al thread UI di farlo tramite il sistema window dell\'host.</string>
+    <string name="es_hint_display_postprocess_antialiasing">Effetto anti-aliasing post-processing da applicare all\'output immagine del gioco.
+L\'uso di anti-aliasing post-process è fortemente raccomandato quando AMD FidelityFX Contrast Adaptive Sharpening o Super Resolution 1.0 è attivo.
+Usa: [none, fxaa, fxaa_extreme]
+none (o qualsiasi valore non elencato qui): Non alterare l\'immagine originale.
+fxaa: NVIDIA Fast Approximate Anti-Aliasing 3.11, preset qualità normale (12).
+fxaa_extreme: NVIDIA Fast Approximate Anti-Aliasing 3.11, preset qualità estrema (39).</string>
+    <string name="es_hint_display_postprocess_dither">Effettua dither dell\'output immagine finale dalla precisione interna a 8 bit per canale in modo che i gradienti siano più fluidi.\nSu un display 10bpc, i 2 bit inferiori saranno mantenuti, ma verrà aggiunto rumore - la disattivazione potrebbe essere raccomandata per 10bpc, ma dipende dalle capacità di visualizzazione 10bpc del display effettivo utilizzato.</string>
+    <string name="es_hint_display_postprocess_ffx_cas_additional_sharpness">Nitidezza aggiuntiva per AMD FidelityFX Contrast Adaptive Sharpening (CAS), da 0 a 1. Più alto è più nitido.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_max_upsampling_passes">Numero massimo di pass di upsampling eseguiti in AMD FidelityFX Super Resolution 1.0 (FSR) prima di tornare allo stretching bilineare dopo il pass finale.\nOgni pass scala solo fino a 2x2 la dimensione precedente. Se il gioco produce un\'immagine 1280x720, 1 pass la scalerà fino a 2560x1440 (sotto 4K), dopo 2 pass sarà scalata fino a un massimo di 5120x2880 (incluso 3840x2160 per 4K), e così via.\nQuesta variabile non ha effetto se la risoluzione del display non è molto alta, ma può essere ridotta su risoluzioni come 4K o 8K nel caso l\'impatto prestazionale di più pass di upsampling FSR sia troppo elevato, o se si desiderano bordi più morbidi.\nIl valore predefinito è il massimo supportato internamente da Xenia.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_sharpness_reduction">Riduzione nitidezza per AMD FidelityFX Super Resolution 1.0 (FSR), in stop. Più basso è più nitido.</string>
+    <string name="es_hint_display_postprocess_scaling_and_sharpening">Effetto post-processing da usare per ricampionamento e/o nitidezza dell\'output display finale.
+Usa: [bilinear, cas, fsr]
+bilinear (o qualsiasi valore non elencato qui): Immagine originale a 1:1, semplice stretching bilineare per ricampionamento.
+cas: Usa AMD FidelityFX Contrast Adaptive Sharpening (CAS) per nitidezza a fattori di scaling fino a 2x2, con stretching bilineare aggiuntivo per fattori più grandi.
+fsr: Usa AMD FidelityFX Super Resolution 1.0 (FSR) per upscaling di massima qualità, o AMD FidelityFX Contrast Adaptive Sharpening per nitidezza senza scaling o downsampling.
+Per scaling con fattori superiori a 2x2, vengono eseguiti più pass FSR.</string>
+    <string name="es_hint_display_present_letterbox">Mantieni le proporzioni durante lo stretching mostrando barre attorno all\'immagine quando non c\'è più area overscan da ritagliare.</string>
+    <string name="es_hint_display_present_render_pass_clear">Su backend grafici dove questo è supportato, usa l\'operazione di load render pass clear nella presentazione invece di comandi clear che puliscono solo l\'area letterbox.</string>
+    <string name="es_hint_display_present_safe_area_x">Percentuale della larghezza immagine che può essere mantenuta durante la presentazione per mantenere le proporzioni senza letterboxing o stretching.</string>
+    <string name="es_hint_display_present_safe_area_y">Percentuale dell\'altezza immagine che può essere mantenuta durante la presentazione per mantenere le proporzioni senza letterboxing o stretching.</string>
+
+    <string name="es_hint_gpu_clear_memory_page_state">Aggiorna lo stato delle pagine di memoria per abilitare i dati scritti dalla gpu. (Usa per i giochi \'Team Ninja\' per correggere modelli personaggio mancanti)</string>
+    <string name="es_hint_gpu_depth_float24_convert_in_pixel_shader">Se convertire i valori di profondità a floating-point a 24-bit (20e4) dalla precisione host (floating-point a 32-bit) direttamente nei pixel shader dei draw guest quando si usa un depth buffer host.\nQuesto previene artefatti visivi se i dati di profondità precisione host completa vengono persi. Questa è un\'opzione costosa perché rende la GPU incapace di usare la compressione del depth buffer, e anche con MSAA, forza il pixel shader a eseguire per ogni campione subpixel piuttosto che per l\'intero pixel, rendendo il pixel shading 2 o 4 volte più pesante a seconda del conteggio campioni MSAA.</string>
+    <string name="es_hint_gpu_depth_float24_round">Se arrotondare al pari più vicino, piuttosto che troncando (arrotondando verso zero), la profondità quando la si converte a floating-point a 24-bit (20e4) dalla precisione host (floating-point a 32-bit) quando si usa un depth buffer host.\nfalse: Raccomandato. La conversione potrebbe spostare i valori di profondità più lontano dalla telecamera.\ntrue: Solo per casi speciali di problemi causati da errori di arrotondamento floating-point a 32-bit minori.</string>
+    <string name="es_hint_gpu_depth_transfer_not_equal_test">Quando si trasferiscono dati tra render target di profondità, usa il test "not equal" per evitare di riscrivere la profondità tramite output depth shader se è la stessa attualmente nel depth buffer in caso di round trip dei dati.</string>
+    <string name="es_hint_gpu_disassemble_pm4">Fa qualcosa solo nelle build debug, se impostato disassemblerà e registrerà tutti i pacchetti PM4 inviati al CP.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_x">Scala larghezza pixel intera usata per scalare la risoluzione di rendering opacamente al gioco. 1, 2 e 3 potrebbero essere supportati, ma il supporto di anything sopra 1 dipende dalle proprietà del dispositivo.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_y">Scala larghezza pixel intera usata per scalare la risoluzione di rendering opacamente al gioco. Vedi draw_resolution_scale_x per maggiori informazioni.</string>
+    <string name="es_hint_gpu_draw_resolution_scaled_texture_offsets">Applica offset dalle istruzioni fetch texture tenendo conto della scala di risoluzione per render-to-texture, per filtering ombre, bloom, ecc., più corretti, in alcuni casi.</string>
+    <string name="es_hint_gpu_dump_shaders">Per debugging shader, percorso dove dumpare gli shader GPU mentre vengono compilati.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu">Esegui il vertex shader per draw con clipping disabilitato, principalmente draw screen-space (come clears), sulla CPU quando possibile per stimolare l\'estensione dell\'EDRAM coinvolta nel draw.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Se execute_unclipped_draw_vs_on_cpu è abilitato, esegui il vertex shader per draw non clippati sulla CPU anche quando si usa l\'implementazione pixel shader interlock (vista rasterizer-ordered) del render backend sull\'host.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Non limitare l\'uso di execute_unclipped_draw_vs_on_cpu ai soli draw non-scissored (con i lati destro e inferiore del rettangolo scissor a 8192 o oltre) anche se il rettangolo scissor è presente, di solito è sufficiente per stimare l\'altezza del render target.</string>
+    <string name="es_hint_gpu_force_convert_line_loops_to_strips">Solo per testing supporto downlevel API grafiche host, forza la conversione CPU di line loops a line strips anche se l\'host supporta primitivi line loop nativamente.</string>
+    <string name="es_hint_gpu_force_convert_quad_lists_to_triangle_lists">Solo per testing supporto downlevel API grafiche host, forza la conversione CPU di quad lists a quad strips anche se l\'host supporta primitivi quad list nativamente o tramite emolazione geometry shader.</string>
+    <string name="es_hint_gpu_force_convert_triangle_fans_to_lists">Solo per testing supporto downlevel API grafiche host, forza la conversione CPU di triangle fans a triangle lists anche se l\'host supporta primitivi triangle fan nativamente.</string>
+    <string name="es_hint_gpu_framerate_limit">Massimo frame al secondo. 0 = Frame illimitati. Predefinito 60, quando impostato a 0, e VSYNC è abilitato.</string>
+    <string name="es_hint_gpu_gamma_render_target_as_srgb">Quando l\'host non può scrivere gamma lineare piecewise direttamente con blending corretto, usa output sRGB sull\'host per blending concettualmente corretto nello spazio colore lineare avendo distribuzione precisione leggermente diversa nel render target e valori severamente errati se il gioco accede ai colori risultanti direttamente come dati raw.</string>
+    <string name="es_hint_gpu_gpu">Sistema grafico. Usa: [vulkan, null]</string>
+    <string name="es_hint_gpu_gpu_allow_invalid_fetch_constants">Consenti costanti fetch texture e vertex con tipo invalid - generalmente insicuro perché la costante potrebbe contenere valori completamente invalidi, ma può essere usato per bypassare errori di tipo costante fetch in certi giochi finché il motivo reale per cui sono invalidi viene trovato.</string>
+    <string name="es_hint_gpu_half_pixel_offset">Abilita supporto di vertex half-pixel offset (D3D9 PA_SU_VTX_CNTL PIX_CENTER). Generalmente i giochi sono consapevoli dell\'half-pixel offset, e avere questo abilitato è il comportamento corretto (disabilitare questo potrebbe rompere significativamente il post-processing in alcuni giochi).</string>
+    <string name="es_hint_gpu_ignore_32bit_vertex_index_support">Solo per testing downlevel API grafiche host (utile solo per testing GPU host livello Qualcomm Adreno 4xx), forza indirection o pre-masking e pre-swapping di indici vertex a 32-bit come se l\'host supportasse solo indici a 24-bit.</string>
+    <string name="es_hint_gpu_log_guest_driven_gpu_register_written_values">Fa qualcosa solo nelle build debug, se impostato registrerà ogni scrittura a un registro gpu fatta da un guest.</string>
+    <string name="es_hint_gpu_log_ringbuffer_kickoff_initiator_bts">Fa qualcosa solo nelle build debug, se impostato registrerà lo pseudo-stacktrace del thread guest che ha scritto la nuova posizione di lettura.</string>
+    <string name="es_hint_gpu_mrt_edram_used_range_clamp_to_min">Con render target host, se più render target sono vincolati, stima l\'intervallo EDRAM modificato in uno di essi non sia più grande della distanza tra due render target nell\'EDRAM, piuttosto che permettere all\'ultimo di rivendicare il resto dell\'EDRAM.</string>
+    <string name="es_hint_gpu_native_2x_msaa">Usa 2x MSAA host quando disponibile. Può essere disabilitato per testing scalabilità su API GPU host dove 2x non è obbligatorio, in questo caso, 2 campioni di 4x MSAA saranno usati (con qualità simile o peggiore e uso memoria superiore).</string>
+    <string name="es_hint_gpu_native_stencil_value_output">Usa output riferimento stencil pixel shader dove disponibile per scopi come copying tra render target. Può essere disabilitato per testing scalabilità, in questo caso, sarà fatto drawing di 8 quad molto più costoso.</string>
+    <string name="es_hint_gpu_non_seamless_cube_map">Disabilita filtering tra facce cube map vicino bordi dove possibile (Vulkan con VK_EXT_non_seamless_cube_map) per riprodurre il comportamento Direct3D 9.</string>
+    <string name="es_hint_gpu_primitive_processor_cache_min_indices">Numero più piccolo di indici guest da memorizzare nella cache per provare riutilizzare più tardi nello stesso frame se processing (come conversione tipo primitivo o sostituzione indice reset) viene eseguito. Impostare questo a un valore molto alto potrebbe risultare in excessive CPU processing, mentre un valore molto basso potrebbe risultare in excessive locking e lookups. Valori negativi disabilitano caching.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_lower_threshold">Se impostato a -1 nessun sample count viene scritto, i giochi potrebbero hangarsi. Altrimenti, il sample count di ogni tile sarà incrementato su ogni EVENT_WRITE_ZPD di questo numero. Impostare questo a 0 significa che tutto è riportato come occluded.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_upper_threshold">Imposta a numero più alto di query_occlusion_sample_lower_threshold. Questo valore è ignorato se query_occlusion_sample_lower_threshold è impostato a -1.</string>
+    <string name="es_hint_gpu_readback_memexport">[Solo D3D12] Leggi dati scritti da memory export negli shader sulla CPU. Questo potrebbe essere necessario in alcuni giochi (ma molti accedono solo ai dati esportati sulla GPU, e questo flag non è necessario per gestire tale comportamento), ma causa sincronizzazione mid-frame, quindi ha un enorme impatto prestazionale.</string>
+    <string name="es_hint_gpu_readback_resolve">[Solo D3D12] Leggi risultati render-to-texture sulla CPU. Questo potrebbe essere necessario in alcuni giochi, per esempio, per screenshot nei giochi salvati, ma causa sincronizzazione mid-frame, quindi ha un enorme impatto prestazionale.</string>
+    <string name="es_hint_gpu_render_target_path_vulkan">Percorso emulazione render target da usare su Vulkan. Usa: [any, fbo, fsi]\nfbo: Framebuffer host e blending fixed-function e testing depth/stencil, copying tra render target quando necessario. Accuratezza inferiore (supporto formato pixel limitato).\nfsi: Packing pixel manuale, blending e testing depth/stencil, con cambiamenti layout render target liberi. Richiede GPU che supporta fragment shader interlock. Massima accuratezza (tutti i formati pixel gestiti in software).</string>
+    <string name="es_hint_gpu_resolve_resolution_scale_fill_half_pixel_offset">Quando si usa scaling risoluzione, applica l\'hack che stretcha il primo pixel host sicuramente coperto nei lati sinistro e superiore delle aree resolve render target per eliminare il gap causato dall\'half-pixel offset (questo è necessario per certi giochi per visualizzare la grafica scena).</string>
+    <string name="es_hint_gpu_snorm16_render_target_full_range">Quando l\'host può supportare solo render target 16_16 e 16_16_16_16 come -1...1, rimappa -32...32 a -1...1 per usare il pieno intervallo possibile di valori, a spese della correttezza del blending moltiplicativo.</string>
+    <string name="es_hint_gpu_store_shaders">Memorizza shader persistentemente e caricali quando si caricano i giochi per evitare spike runtime e freeze quando si gioca al gioco non per la prima volta.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_hard">Uso memoria texture host massimo (in megabyte) oltre il quale le texture saranno distrutte il prima possibile.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_render_to_texture">Parte del budget memoria texture host (in megabyte) che sarà scalata dalla scala risoluzione drawing corrente.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft">Uso memoria texture host massimo (in megabyte) oltre il quale le texture vecchie saranno distrutte.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft_lifetime">Secondi che una texture dovrebbe essere inutilizzata per essere considerata abbastanza vecchia da essere eliminata se l\'uso memoria texture supera texture_cache_memory_limit_soft.</string>
+    <string name="es_hint_gpu_trace_gpu_prefix">Percorso prefisso per file trace GPU.</string>
+    <string name="es_hint_gpu_trace_gpu_stream">Traccia tutti i pacchetti GPU.</string>
+    <string name="es_hint_gpu_vsync">Abilita VSYNC.</string>
+
+    <string name="es_hint_general_allow_plugins">Consente il caricamento di plugin/trainer da plugins\title_id\plugin.xex. I plugin sono moduli homebrew xex che possono essere usati per creare mod. Questa funzione è sperimentale.</string>
+    <string name="es_hint_general_apply_patches">Abilita funzionalità di patching personalizzato</string>
+    <string name="es_hint_general_debug">Consenti debugging e mantieni informazioni debug.</string>
+    <string name="es_hint_general_discord">Abilita Discord rich presence</string>
+    <string name="es_hint_general_launch_module">Eseguibile da avviare da .iso o dal pacchetto invece di default.xex o il modulo specificato dal gioco. Lascia vuoto per avviare il modulo predefinito.</string>
+    <string name="es_hint_general_notification_sound_path">Percorso (incluso nome file) al suono notifica selezionato. Il suono DEVE essere in formato wav!</string>
+    <string name="es_hint_general_time_scalar">Scalare usato per velocizzare o rallentare il tempo (1x, 2x, 1/2x, ecc).</string>
+
+    <string name="es_hint_hid_hid">Sistema input. Usa: [android, nop]</string>
+    <string name="es_hint_hid_left_stick_deadzone_percentage">Definisce livello deadzone per stick sinistro. Intervallo consentito [0.0-1.0].</string>
+    <string name="es_hint_hid_right_stick_deadzone_percentage">Definisce livello deadzone per stick destro. Intervallo consentito [0.0-1.0].</string>
+    <string name="es_hint_hid_vibration">Attiva/disattiva vibrazione controller.</string>
+
+    <string name="es_hint_kernel_allow_nui_initialization">Abilita inizializzazione NUI. Imposta true solo quando testi giochi kinect. Certi giochi potrebbero richiedere implementazione avatar.</string>
+    <string name="es_hint_kernel_allow_incompatible_title_update">Consenti aggiornamento titoli con firme non corrispondenti di essere applicati.</string>
+    <string name="es_hint_kernel_apply_title_update">Applica aggiornamenti titolo.</string>
+    <string name="es_hint_kernel_cl">Specifica command-line aggiuntiva fornita al guest.</string>
+    <string name="es_hint_kernel_default_achievements_backend">Definisce quale backend achievements dovrebbe essere usato come predefinito. Opzioni possibili: GPD.</string>
+    <string name="es_hint_kernel_ignore_thread_affinities">Ignora affinità thread specificate dal gioco.</string>
+    <string name="es_hint_kernel_ignore_thread_priorities">Ignora priorità thread specificate dal gioco.</string>
+    <string name="es_hint_kernel_kernel_build_version">Definisci versione kernel corrente</string>
+    <string name="es_hint_kernel_kernel_cert_monitor">Abilita monitor cert.</string>
+    <string name="es_hint_kernel_kernel_debug_monitor">Abilita monitor debug.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_power">Gamma display da usare con kernel_display_gamma_type 3.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_type">Tipo gamma display: 0 - lineare, 1 - sRGB (CRT), 2 - BT.709 (HDTV), 3 - potenza specificata tramite kernel_display_gamma_power.</string>
+    <string name="es_hint_kernel_kernel_pix">Abilita PIX.</string>
+    <string name="es_hint_kernel_log_high_frequency_kernel_calls">Registra chiamate kernel con tag kHighFrequency.</string>
+    <string name="es_hint_kernel_staging_mode">Abilita modalità anteprima nelle dashboard per rendere informazioni debug.</string>
+
+    <string name="es_hint_logging_flush_log">Flush file log dopo ogni batch righe log.</string>
+    <string name="es_hint_logging_log_file">I log sono scritti nel file specificato</string>
+    <string name="es_hint_logging_log_level">Livello massimo da registrare. (0=error, 1=warning, 2=info, 3=debug)</string>
+    <string name="es_hint_logging_log_mask">Disabilita categorie specifiche per logging debug più granulare. Kernel = 1, Apu = 2, Cpu = 4.</string>
+    <string name="es_hint_logging_log_string_format_kernel_calls">Registra chiamate kernel con tag kHighFrequency.</string>
+    <string name="es_hint_logging_log_to_debugprint">Dump log su DebugPrint.</string>
+    <string name="es_hint_logging_log_to_stdout">Scrivi output log su stdout</string>
+
+    <string name="es_hint_memory_ignore_offset_for_ranged_allocations">Consente di ignorare offset 4k per allocazioni fisiche con intervallo fornito. Certi titoli controllano se il risultato corrisponde all\'intervallo inferiore fornito.</string>
+    <string name="es_hint_memory_mmap_address_high">1-124</string>
+    <string name="es_hint_memory_protect_on_release">Proteggi memoria rilasciata per prevenire accessi.</string>
+    <string name="es_hint_memory_protect_zero">Proteggi pagina zero da letture e scritture.</string>
+    <string name="es_hint_memory_scribble_heap">Scribble 0xCD in tutta la memoria heap allocata.</string>
+    <string name="es_hint_memory_writable_executable_memory">Consenti mapping memoria con accesso sia write che execute, per simulare comportamento su piattaforme dove non è supportato</string>
+
+    <string name="es_hint_profiles_logged_profile_slot_0_xuid">XUID del profilo da caricare all\'avvio nello slot 0</string>
+    <string name="es_hint_profiles_logged_profile_slot_1_xuid">XUID del profilo da caricare all\'avvio nello slot 1</string>
+    <string name="es_hint_profiles_logged_profile_slot_2_xuid">XUID del profilo da caricare all\'avvio nello slot 2</string>
+    <string name="es_hint_profiles_logged_profile_slot_3_xuid">XUID del profilo da caricare all\'avvio nello slot 3</string>
+
+    <string name="es_hint_storage_cache_root">Percorso root per file usati per velocizzare certe parti dell\'emulatore o del gioco. Questi file potrebbero essere persistenti, ma possono essere eliminati senza maggiori effetti collaterali come perdita progresso. Se vuoto, la cartella cache sotto storage root, o, se disponibile, la directory cache preferita per l\'OS, sarà usata.</string>
+    <string name="es_hint_storage_content_root">Percorso root per archiviazione contenuto guest (salvataggi, ecc.), o vuoto per usare la cartella content sotto storage root.</string>
+    <string name="es_hint_storage_mount_cache">Abilita mount cache</string>
+    <string name="es_hint_storage_mount_scratch">Abilita mount scratch</string>
+    <string name="es_hint_storage_storage_root">Percorso root per archiviazione dati interni persistenti (config, ecc.), o vuoto per usare il percorso preferito per l\'OS, come la cartella documenti, o la directory eseguibile emulatore se portable.txt è presente in essa.</string>
+
+    <string name="es_hint_ui_headless">Non visualizzare alcuna UI, usando predefiniti per prompt come necessario.</string>
+    <string name="es_hint_ui_profiler_dpi_scaling">Applica scaling DPI finestra al profiler.</string>
+    <string name="es_hint_ui_show_achievement_notification">Mostra notifica achievement sullo schermo.</string>
+    <string name="es_hint_ui_show_profiler">Mostra UI profiling per impostazione predefinita.</string>
+    <string name="es_hint_ui_storage_selection_dialog">Mostra finestra selezione dispositivo storage quando il gioco lo richiede.</string>
+
+    <string name="es_hint_video_avpack">Modalità video
+0 = PAL-60 Component (SD)
+1 = Non utilizzato
+2 = PAL-60 SCART
+3 = 480p Component (HD)
+4 = HDMI+A
+5 = PAL-60 Composite/S-Video
+6 = VGA
+7 = TV PAL-60
+8 = HDMI (predefinito)</string>
+    <string name="es_hint_video_enable_3d_mode">Consente l\'utilizzo della modalità stereoscopica nei titoli.</string>
+    <string name="es_hint_video_interlaced">Attiva/disattiva la modalità interlacciata.</string>
+    <string name="es_hint_video_internal_display_resolution">Consenti ai giochi che supportano risoluzioni diverse di eseguire il rendering in una risoluzione specifica. Non è garantito che funzioni con tutti i giochi o migliori le prestazioni.\n0=640x480, 1=640x576, 2=720x480, 3=720x576, 4=800x600, 5=848x480, 6=1024x768, 7=1152x864, 8=1280x720 (Predefinito), 9=1280x768, 10=1280x960, 11=1280x1024, 12=1360x768, 13=1440x900, 14=1680x1050, 15=1920x540, 16=1920x1080, 17=internal_display_resolution_x/y</string>
+    <string name="es_hint_video_internal_display_resolution_x">Larghezza personalizzata. Vedi internal_display_resolution. Intervallo 1-1920.</string>
+    <string name="es_hint_video_internal_display_resolution_y">Altezza personalizzata. Vedi internal_display_resolution. Intervallo 1-1080.</string>
+    <string name="es_hint_video_use_50Hz_mode">Consente l\'utilizzo della modalità PAL-50.</string>
+    <string name="es_hint_video_video_standard">Consente la commutazione tra diversi segnali video. 1=NTSC, 2=NTSC-J, 3=PAL</string>
+    <string name="es_hint_video_widescreen">Commuta tra il rapporto aspect ratio 16:9 e 4:3.</string>
+
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_fifo_relaxed">Se disponibile, consenti la modalità di presentazione relaxed first-in-first-out (3ª priorità), che causa l\'attesa della sincronizzazione verticale del display host, ma può presentare con tearing se i frame non soddisfano la frequenza di aggiornamento del display host.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_immediate">Se disponibile, consenti la modalità di presentazione immediate (1ª priorità), offrendo la latenza più bassa con la possibilità di tearing in alcuni casi e, a seconda della configurazione, frequenza di aggiornamento variabile.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_mailbox">Se disponibile, consenti la modalità di presentazione mailbox (2ª priorità), offrendo bassa latenza senza possibilità di tearing.</string>
+    <string name="es_hint_vulkan_vulkan_device">Indice del dispositivo fisico Vulkan preferito o -1 per utilizzare qualsiasi dispositivo compatibile.</string>
+    <string name="es_hint_vulkan_vulkan_log_debug_messages">Scrivi i messaggi VK_EXT_debug_utils di Vulkan nel log Xenia, anziché nell\'output di debug del sistema operativo.</string>
+    <string name="es_hint_vulkan_vulkan_sparse_shared_memory">Abilita binding sparse per l\'emulazione della memoria condivisa. Disabilitarlo aumenta l\'utilizzo della memoria video - viene creato un buffer da 512 MB - ma consente ai debugger grafici che non supportano il binding sparse di funzionare.</string>
+    <string name="es_hint_vulkan_vulkan_validation">Abilita il layer di validazione Vulkan (VK_LAYER_KHRONOS_validation). I messaggi verranno scritti nel log Xenia se \'vulkan_log_debug_messages\' è abilitato, altrimenti nell\'output di debug del sistema operativo.</string>
+
+    <string name="es_hint_xconfig_audio_flag">Modalità Audio Analogico.
+0x00000001 = Dolby Pro Logic
+0x00000002 = Mono Analogico
+Modalità Audio Digitale.
+0x00000000 = Stereo Digitale (scegliere uno dei precedenti da solo)
+0x00010000 = Dolby Digital
+0x00030000 = Dolby Digital con WMA PRO
+Flag Speciali.
+0x00000003 = Bypass Stereo
+0x80000000 = Bassa Latenza
+Questa configurazione richiede di accoppiare un flag analogico e digitale insieme mentre lo stereo digitale richiede solo un flag analogico. I flag bonus sono opzionali. Es) 0x00010001</string>
+    <string name="es_hint_xconfig_user_country">ID paese utente.
+1=AE 2=AL 3=AM 4=AR 5=AT 6=AU 7=AZ 8=BE 9=BG
+10=BH 11=BN 12=BO 13=BR 14=BY 15=BZ 16=CA 18=CH 19=CL
+20=CN 21=CO 22=CR 23=CZ 24=DE 25=DK 26=DO 27=DZ 28=EC
+29=EE 30=EG 31=ES 32=FI 33=FO 34=FR 35=GB 36=GE 37=GR
+38=GT 39=HK 40=HN 41=HR 42=HU 43=ID 44=IE 45=IL 46=IN
+47=IQ 48=IR 49=IS 50=IT 51=JM 52=JO 53=JP 54=KE 55=KG
+56=KR 57=KW 58=KZ 59=LB 60=LI 61=LT 62=LU 63=LV 64=LY
+65=MA 66=MC 67=MK 68=MN 69=MO 70=MV 71=MX 72=MY 73=NI
+74=NL 75=NO 76=NZ 77=OM 78=PA 79=PE 80=PH 81=PK 82=PL
+83=PR 84=PT 85=PY 86=QA 87=RO 88=RU 89=SA 90=SE 91=SG
+92=SI 93=SK 95=SV 96=SY 97=TH 98=TN 99=TR 100=TT 101=TW
+102=UA 103=US 104=UY 105=UZ 106=VE 107=VN 108=YE 109=ZA</string>
+    <string name="es_hint_xconfig_user_language">ID lingua utente.\n1=en 2=ja 3=de 4=fr 5=es 6=it 7=ko 8=zh\n9=pt 11=pl 12=ru 13=sv 14=tr 15=nb 16=nl 17=zh</string>
+
+    <string name="es_hint_a64_a64_extension_mask">Consenti il rilevamento e l\'utilizzo di funzionalità specifiche del set di istruzioni.
+0 = armv8.0
+1 = LSE
+2 = F16C
+-1 = Rileva e utilizza tutte le possibili funzionalità del processore</string>
+
+
+</resources>

@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="es_apu_xma_decoder">Xma 解碼器</string>
+    <string name="es_cpu_disable_context_promotion">停用上下文提升</string>
+    <string name="es_cpu_disable_instruction_infocache">停用指令資訊快取</string>
+    <string name="es_cpu_disable_prefetch_and_cachecontrol">停用預取與快取控制</string>
+    <string name="es_cpu_dump_translated_hir_functions">傾印已翻譯的 HIR 函式</string>
+    <string name="es_cpu_emit_inline_mmio_checks">內聯 MMIO 檢查</string>
+    <string name="es_cpu_emit_mmio_aware_stores_for_recorded_exception_addresses">為已記錄的例外位址生成 MMIO 感知儲存</string>
+    <string name="es_cpu_enable_early_precompilation">啟用早期預編譯</string>
+    <string name="es_cpu_full_optimization_even_with_debug">即使在除錯模式下也進行完整最佳化</string>
+    <string name="es_cpu_ignore_trap_instructions">忽略陷阱指令</string>
+    <string name="es_cpu_no_reserved_ops">無保留操作</string>
+    <string name="es_cpu_permit_float_constant_evaluation">允許浮點常量求值</string>
+    <string name="es_cpu_record_mmio_access_exceptions">記錄 MMIO 存取例外</string>
+    <string name="es_cpu_writable_code_segments">可寫入程式碼區段</string>
+    <string name="es_gpu_gpu_allow_invalid_upload_range">允許無效的 GPU 上傳範圍</string>
+    <string name="es_gpu_target_trace_file">目標追蹤檔案</string>
+    <string name="es_gpu_trace_dump_path">追蹤傾印路徑</string>
+    <string name="es_general_allow_game_relative_writes">允許遊戲相對寫入</string>
+    <string name="es_general_controller_hotkeys">控制器快捷鍵</string>
+    <string name="es_general_disable_doubleclick_fullscreen">停用雙擊全螢幕</string>
+    <string name="es_hid_guide_button">導覽按鈕</string>
+    <string name="es_kernel_allow_avatar_initialization">允許 Avatar 初始化</string>
+    <string name="es_storage_force_mount_devkit">強制掛載 Devkit</string>
+    <string name="es_storage_mount_memory_unit">掛載儲存單元</string>
+    <string name="es_ui_custom_font_path">自訂字型路徑</string>
+
+    <string name="_default">預設</string>
+    <string name="driver_library_path_dialog_add_hint">新增自訂驅動程式 (*.zip)</string>
+    <string name="es_vulkan_vulkan_lib_path">自訂驅動程式庫路徑</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">自訂驅動程式強制最大時脈</string>
+
+    <string name="create_shortcut">創建捷徑</string>
+    <string name="disable_virtual_keyboard">停用虛擬鍵盤</string>
+    <string name="joystick">搖桿</string>
+
+    <string name="dpad">方向鍵</string>
+    <string name="abxy">ABXY</string>
+    <string name="lr">LR</string>
+    <string name="start_back">開始/返回</string>
+
+    <string name="save_and_quit">儲存並退出</string>
+    <string name="scale_rate">縮放比例</string>
+
+    <string name="refresh_list">重新整理列表</string>
+    <string name="about">關於</string>
+    <string name="gratitude">感謝</string>
+    <string name="update_log">更新日誌</string>
+    <string name="device_info">裝置資訊</string>
+    <string name="open_source_licenses">開源授權</string>
+
+    <string name="open_file_manager">開啟檔案管理器</string>
+    <string name="game_list_loading">遊戲列表載入中...</string>
+    <string name="quit">退出</string>
+    <string name="device_unsupport_vulkan_msg">您的裝置不支援 Vulkan，無法滿足執行此應用程式的最低需求，請退出。</string>
+
+    <string name="loading">載入中...</string>
+    <string name="msg_processing">處理中...</string>
+    <string name="empty_game_list">遊戲列表為空，請設定遊戲目錄</string>
+
+    <string name="enable_vibrator">啟用震動</string>
+
+    <string name="set_game_dir">設定遊戲目錄</string>
+
+    <string name="clear">清除</string>
+    <string name="press_a_key">按下任意鍵繼續...</string>
+
+    <string name="reset_as_default">重設為預設值</string>
+    <string name="key_mappers">按鍵對應</string>
+
+    <string name="virtual_pad_edit">虛擬手把編輯</string>
+
+    <string name="left">左</string>
+    <string name="up">上</string>
+    <string name="right">右</string>
+    <string name="down">下</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+
+    <string name="lshoulder">L肩鍵</string>
+    <string name="lthumbpress">L搖桿按下</string>
+    <string name="ltrigger">L扳機</string>
+
+    <string name="rshoulder">R肩鍵</string>
+    <string name="rthumbpress">R搖桿按下</string>
+    <string name="rtrigger">R扳機</string>
+
+    <string name="start">開始</string>
+    <string name="back">返回</string>
+
+    <string name="use_global_config">使用全域設定</string>
+
+    <string name="settings">設定</string>
+
+    <string name="gratitude_content">感謝 Ruban 提供所有圖示\n\n
+        感謝 SRC267 (Sting) 管理 reddit/discord\n\n
+        感謝 妖妖 測試\n\n
+        感謝 再見某人 \n\n
+        感謝 再見某人 \n\n
+        感謝 再見某人 \n\n
+        \n\n
+        基於 Xenia 移植優化，感謝所有參與 Xenia 專案的人員\n\n
+    </string>
+
+    <string name="es_apu">APU</string>
+<string name="es_apu_apu">音訊系統</string>
+<string name="es_apu_apu_max_queued_frames">最大佇列幀數</string>
+<string name="es_apu_enable_xmp">啟用音樂播放器</string>
+<string name="es_apu_ffmpeg_verbose">FFmpeg 詳細輸出</string>
+<string name="es_apu_mute">靜音所有音訊</string>
+<string name="es_apu_use_dedicated_xma_thread">專用 XMA 執行緒</string>
+<string name="es_apu_use_new_decoder">使用新的 XMA 解碼器</string>
+<string name="es_apu_xmp_default_volume">預設音樂音量</string>
+
+<string name="es_hint_apu_apu">音訊系統。可用值：[any, nop, opensles, aaudio]</string>
+<string name="es_hint_apu_apu_max_queued_frames">允許變更最大緩衝音訊幀數以減少音訊延遲。降低此值可能會導致效能問題。取值範圍：[4-64]</string>
+<string name="es_hint_apu_enable_xmp">啟用音樂播放器播放。</string>
+<string name="es_hint_apu_ffmpeg_verbose">詳細的 FFmpeg 輸出（除錯及以上級別）</string>
+<string name="es_hint_apu_mute">靜音所有音訊輸出。</string>
+<string name="es_hint_apu_use_dedicated_xma_thread">在獨立執行緒上啟用 XMA 解碼。停用應該會產生更好的結果，但會稍微降低效能。</string>
+<string name="es_hint_apu_use_new_decoder">啟用新的實驗性 XMA 音訊解碼器。</string>
+<string name="es_hint_apu_xmp_default_volume">如果遊戲未設定，則為預設音樂音量 [0-100]。</string>
+
+<string name="es_cpu">CPU</string>
+<string name="es_cpu_break_condition_gpr">中斷條件 GPR</string>
+<string name="es_cpu_break_condition_op">中斷條件運算子</string>
+<string name="es_cpu_break_condition_truncate">將值截斷為 32 位元</string>
+<string name="es_cpu_break_condition_value">中斷條件值</string>
+<string name="es_cpu_break_on_debugbreak">在 Debugbreak 時中斷</string>
+<string name="es_cpu_break_on_instruction">在指令處中斷</string>
+<string name="es_cpu_break_on_start">啟動時中斷</string>
+<string name="es_cpu_break_on_unimplemented_instructions">在未實作的指令處中斷</string>
+<string name="es_cpu_clock_no_scaling">停用時脈縮放</string>
+<string name="es_cpu_clock_source_raw">使用原始時脈來源</string>
+<string name="es_cpu_cpu">CPU 後端</string>
+<string name="es_cpu_debugprint_trap_log">記錄 Debugprint 陷阱</string>
+<string name="es_cpu_disable_global_lock">停用全域鎖定</string>
+<string name="es_cpu_disassemble_functions">反組譯函式</string>
+<string name="es_cpu_ignore_undefined_externs">忽略未定義的外部引用</string>
+<string name="es_cpu_inline_mmio_access">內聯 MMIO 存取</string>
+<string name="es_cpu_load_module_map">載入模組對應</string>
+<string name="es_cpu_pvr">處理器版本/修訂版</string>
+<string name="es_cpu_store_all_context_values">儲存所有內容值</string>
+<string name="es_cpu_trace_function_coverage">追蹤函式覆蓋率</string>
+<string name="es_cpu_trace_function_data">追蹤函式資料</string>
+<string name="es_cpu_trace_function_data_path">函式資料追蹤路徑</string>
+<string name="es_cpu_trace_function_references">追蹤函式引用</string>
+<string name="es_cpu_trace_functions">追蹤函式</string>
+<string name="es_cpu_validate_hir">驗證 HIR</string>
+
+<string name="es_hint_cpu_break_condition_gpr">與 GPR 比較</string>
+<string name="es_hint_cpu_break_condition_op">比較運算子</string>
+<string name="es_hint_cpu_break_condition_truncate">將值截斷為 32 位元</string>
+<string name="es_hint_cpu_break_condition_value">比較的值</string>
+<string name="es_hint_cpu_break_on_debugbreak">在 JITed __debugbreak 請求時中斷。</string>
+<string name="es_hint_cpu_break_on_instruction">在執行給定的訪客地址之前中斷。</string>
+<string name="es_hint_cpu_break_on_start">啟動時中斷到除錯器。</string>
+<string name="es_hint_cpu_break_on_unimplemented_instructions">如果遇到未實作的 PowerPC 指令，則中斷到主機除錯器（如果沒有附加除錯器則崩潰）。</string>
+<string name="es_hint_cpu_clock_no_scaling">停用縮放程式碼。繞過時間管理和鎖定。訪客系統時間直接從主機獲取。</string>
+<string name="es_hint_cpu_clock_source_raw">在 x64 上，使用 RDTSC 指令作為時間源。需要不變的 TSC。在 a64 上，使用 CNTVCT_EL0 暫存器作為時間源</string>
+<string name="es_hint_cpu_cpu">CPU 後端 [any, x64, a64]。</string>
+<string name="es_hint_cpu_debugprint_trap_log">將除錯列印陷阱記錄到活動除錯器</string>
+<string name="es_hint_cpu_disable_global_lock">停用訪客程式碼中的全域鎖定使用。不影響主機程式碼。</string>
+<string name="es_hint_cpu_disassemble_functions">在生成期間反組譯函式。</string>
+<string name="es_hint_cpu_ignore_undefined_externs">呼叫未定義的外部引用時不退出。</string>
+<string name="es_hint_cpu_inline_mmio_access">內聯常量 MMIO 載入和儲存。</string>
+<string name="es_hint_cpu_load_module_map">載入 .map 檔案以取得符號名稱並與生成的符號資料庫進行對比。</string>
+<string name="es_hint_cpu_pvr">處理器版本和修訂號。\n位元 0 到 15 是版本號。\n位元 16 到 31 是修訂號。\n注意：某些 XEX（如 mfgbootlauncher.xex）可能會檢查小於 0x710700 的值。</string>
+<string name="es_hint_cpu_store_all_context_values">不要剝離死內容儲存以協助除錯。</string>
+<string name="es_hint_cpu_trace_function_coverage">生成函式指令覆蓋率統計的跟蹤。</string>
+<string name="es_hint_cpu_trace_function_data">生成函式結果資料的跟蹤。</string>
+<string name="es_hint_cpu_trace_function_data_path">寫入跟蹤資料的檔案。</string>
+<string name="es_hint_cpu_trace_function_references">生成函式地址引用的跟蹤。</string>
+<string name="es_hint_cpu_trace_functions">生成函式統計資訊的跟蹤。</string>
+<string name="es_hint_cpu_validate_hir">在編譯期間對 HIR 執行驗證檢查。</string>
+
+<string name="es_content">內容</string>
+<string name="es_content_license_mask">授權遮罩</string>
+
+<string name="es_hint_content_license_mask">設定啟動內容的授權遮罩。\n0 = 不啟用授權。\n1 = 啟用第一個授權。通常是 Xbox Live Arcade 遊戲的完整版本授權。\n-1 或 0xFFFFFFFF = 啟用所有可能的授權。通常是個壞主意，可能導致未定義的行為。</string>
+
+<string name="es_display">顯示</string>
+<string name="es_display_fullscreen">全螢幕模式</string>
+<string name="es_display_host_present_from_non_ui_thread">從非 UI 執行緒直接呈現</string>
+<string name="es_display_postprocess_antialiasing">後處理反鋸齒</string>
+<string name="es_display_postprocess_dither">後處理抖動</string>
+<string name="es_display_postprocess_ffx_cas_additional_sharpness">CAS 額外銳利度</string>
+<string name="es_display_postprocess_ffx_fsr_max_upsampling_passes">FSR 最大上採樣通道數</string>
+<string name="es_display_postprocess_ffx_fsr_sharpness_reduction">FSR 銳利度降低</string>
+<string name="es_display_postprocess_scaling_and_sharpening">縮放和銳化</string>
+<string name="es_display_present_letterbox">信箱模式呈現</string>
+<string name="es_display_present_render_pass_clear">清除渲染通道</string>
+<string name="es_display_present_safe_area_x">安全區域 X</string>
+<string name="es_display_present_safe_area_y">安全區域 Y</string>
+
+<string name="es_hint_display_fullscreen">是否在全螢幕模式下啟動模擬器。</string>
+<string name="es_hint_display_host_present_from_non_ui_thread">允許 GPU 模擬執行緒直接將訪客輸出呈現到主機表面，而不是通過主機視窗系統請求 UI 執行緒執行此操作。</string>
+<string name="es_hint_display_postprocess_antialiasing">要應用於遊戲的影像輸出的後處理抗鋸齒效果。
+當啟動 AMD FidelityFX 對比度自適應銳化或超級解析度 1.0 時，強烈建議使用後處理抗鋸齒。
+可用值：[none, fxaa, fxaa_extreme]
+none（或未列出的任何值）：不改變原始影像。
+fxaa：NVIDIA Fast Approximate Anti-Aliasing 3.11，正常品質預設 (12)。
+fxaa_extreme：NVIDIA Fast Approximate Anti-Aliasing 3.11，極端品質預設 (39)。</string>
+<string name="es_hint_display_postprocess_dither">將最終影像輸出從內部精度抖動到每通道 8 位，以便漸變更平滑。\n在 10bpc 顯示器上，較低的 2 位仍將保留，但會新增噪點 - 對於 10bpc 建議停用，但這取決於實際顯示器的 10bpc 顯示能力。</string>
+<string name="es_hint_display_postprocess_ffx_cas_additional_sharpness">AMD FidelityFX 對比度自適應銳化 (CAS) 的額外銳利度，從 0 到 1。越高越銳利。</string>
+<string name="es_hint_display_postprocess_ffx_fsr_max_upsampling_passes">AMD FidelityFX 超級解析度 1.0 (FSR) 中執行的最大上採樣通道數，然後在最終通道後回退到雙線性拉伸。\n每個通道僅上採樣到上一個大小的最多 2x2。如果遊戲輸出 1280x720 影像，1 個通道將上採樣到最多 2560x1440（低於 4K），2 個通道後將上採樣到最多 5120x2880（包括 3840x2160 用於 4K），依此類推。\n如果顯示器解析度不是非常高，此變數沒有影響，但在 4K 或 8K 等解析度下可以減少，以防多個 FSR 上採樣通道的效能影響太大，或者如果需要更柔和的邊緣。\n預設值是 Xenia 內部支援的最大值。</string>
+<string name="es_hint_display_postprocess_ffx_fsr_sharpness_reduction">AMD FidelityFX 超級解析度 1.0 (FSR) 的銳利度降低，以檔為單位。越低越銳利。</string>
+<string name="es_hint_display_postprocess_scaling_and_sharpening">用於重新採樣和/或銳化最終顯示輸出的後處理效果。
+可用值：[bilinear, cas, fsr]
+bilinear（或未列出的任何值）：原始影像 1:1，簡單的雙線性拉伸用於重新採樣。
+cas：使用 AMD FidelityFX 對比度自適應銳化 (CAS) 進行銳化，縮放因子最多 2x2，對於更大的因子使用額外的雙線性拉伸。
+fsr：使用 AMD FidelityFX 超級解析度 1.0 (FSR) 進行最高品質的上採樣，或者在不縮放或降採樣時使用 AMD FidelityFX 對比度自適應銳化進行銳化。
+對於超過 2x2 的縮放因子，將執行多個 FSR 通道。</string>
+<string name="es_hint_display_present_letterbox">通过在沒有更多過掃描區域可裁剪時在影像周圍顯示黑條來保持寬高比。</string>
+<string name="es_hint_display_present_render_pass_clear">在支援此功能的圖形後端上，在呈現中使用清除渲染通道負載操作，而不是清除僅清除信箱模式區域的命令。</string>
+<string name="es_hint_display_present_safe_area_x">呈現時可以保持的影像寬度百分比，以保持寬高比而不進行信箱模式或拉伸。</string>
+<string name="es_hint_display_present_safe_area_y">呈現時可以保持的影像高度百分比，以保持寬高比而不進行信箱模式或拉伸。</string>
+
+<string name="es_gpu">GPU</string>
+<string name="es_gpu_clear_memory_page_state">清除記憶體頁面狀態</string>
+<string name="es_gpu_depth_float24_convert_in_pixel_shader">在像素著色器中轉換深度</string>
+<string name="es_gpu_depth_float24_round">四捨五入深度轉換</string>
+<string name="es_gpu_depth_transfer_not_equal_test">深度傳輸不等測試</string>
+<string name="es_gpu_disassemble_pm4">反組譯 PM4 封包</string>
+<string name="es_gpu_draw_resolution_scale_x">繪製解析度縮放 X</string>
+<string name="es_gpu_draw_resolution_scale_y">繪製解析度縮放 Y</string>
+<string name="es_gpu_draw_resolution_scaled_texture_offsets">縮放紋理偏移</string>
+<string name="es_gpu_dump_shaders">傾印著色器路徑</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu">在 CPU 上執行 VS 以進行未裁剪繪製</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">在 CPU 上執行 VS 以用於 PSI 後端</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">在 CPU 上執行 VS 並使用剪刀</string>
+<string name="es_gpu_force_convert_line_loops_to_strips">強制轉換線迴圈為條帶</string>
+<string name="es_gpu_force_convert_quad_lists_to_triangle_lists">強制轉換四邊形列表為三角形列表</string>
+<string name="es_gpu_force_convert_triangle_fans_to_lists">強制轉換三角形扇形為列表</string>
+<string name="es_gpu_framerate_limit">幀率限制</string>
+<string name="es_gpu_gamma_render_target_as_srgb">Gamma RT 作為 sRGB</string>
+<string name="es_gpu_gpu">圖形系統</string>
+<string name="es_gpu_gpu_allow_invalid_fetch_constants">允許無效的擷取常數</string>
+<string name="es_gpu_half_pixel_offset">半像素偏移</string>
+<string name="es_gpu_ignore_32bit_vertex_index_support">忽略 32 位元頂點索引支援</string>
+<string name="es_gpu_log_guest_driven_gpu_register_written_values">記錄 GPU 暫存器寫入</string>
+<string name="es_gpu_log_ringbuffer_kickoff_initiator_bts">記錄環形緩衝區啟動</string>
+<string name="es_gpu_mrt_edram_used_range_clamp_to_min">MRT EDRAM 夾緊到最小值</string>
+<string name="es_gpu_native_2x_msaa">原生 2x MSAA</string>
+<string name="es_gpu_native_stencil_value_output">原生模板值輸出</string>
+<string name="es_gpu_non_seamless_cube_map">非無縫立方体贴圖</string>
+<string name="es_gpu_primitive_processor_cache_min_indices">圖元快取最小索引</string>
+<string name="es_gpu_query_occlusion_sample_lower_threshold">遮蔽採樣下限閾值</string>
+<string name="es_gpu_query_occlusion_sample_upper_threshold">遮蔽採樣上限閾值</string>
+<string name="es_gpu_readback_memexport">回讀 Memexport</string>
+<string name="es_gpu_readback_resolve">回讀 Resolve</string>
+<string name="es_gpu_render_target_path_vulkan">渲染目標路徑 (Vulkan)</string>
+<string name="es_gpu_resolve_resolution_scale_fill_half_pixel_offset">Resolve 縮放填充半像素偏移</string>
+<string name="es_gpu_snorm16_render_target_full_range">SNORM16 RT 全範圍</string>
+<string name="es_gpu_store_shaders">儲存著色器</string>
+<string name="es_gpu_texture_cache_memory_limit_hard">紋理快取硬限制</string>
+<string name="es_gpu_texture_cache_memory_limit_render_to_texture">紋理快取 RTT 限制</string>
+<string name="es_gpu_texture_cache_memory_limit_soft">紋理快取軟限制</string>
+<string name="es_gpu_texture_cache_memory_limit_soft_lifetime">紋理快取軟限制生命週期</string>
+<string name="es_gpu_trace_gpu_prefix">GPU 追蹤前綴</string>
+<string name="es_gpu_trace_gpu_stream">追蹤 GPU 資料流</string>
+<string name="es_gpu_vsync">VSYNC</string>
+
+<string name="es_hint_gpu_clear_memory_page_state">刷新記憶體頁面狀態以啟用 GPU 寫入資料。（用於 ‘Team Ninja’ 遊戲以修復缺失的角色模型）</string>
+<string name="es_hint_gpu_depth_float24_convert_in_pixel_shader">當使用主機深度緩衝區時，在使用主機深度緩衝區的訪客繪製的像素著色器中直接將深度值從主機精度（32 位浮點）轉換為 24 位浮點（20e4）。
+這可以防止如果丟失完整主機精度深度資料時的視覺偽影。這是一個代價高昂的選項，因為它使 GPU 無法使用深度緩衝區壓縮，而且在 MSAA 的情況下，強制像素著色器為每個子像素樣本執行而不是為整個像素執行，使像素著色根據 MSAA 樣本計數重 2 或 4 倍。</string>
+<string name="es_hint_gpu_depth_float24_round">當使用主機深度緩衝區時，在從主機精度（32 位浮點）轉換為 24 位浮點（20e4）時，是否捨入到最接近的偶數，而不是截斷（向零捨入）深度。\nfalse：推薦。轉換可能會使深度值遠離相機。\ntrue：僅用於由微小 32 位浮點捨入錯誤引起的特殊問題情況。</string>
+<string name="es_hint_gpu_depth_transfer_not_equal_test">在深度渲染目標之間傳輸資料時，使用"不相等"測試，以避免在資料的往返情況下，如果深度緩衝區中的當前深度相同，則通過著色器深度輸出重新寫入深度。</string>
+<string name="es_hint_gpu_disassemble_pm4">僅在除錯版本中有用，如果設定，將反組譯並記錄所有發送到 CP 的 PM4 封包。</string>
+<string name="es_hint_gpu_draw_resolution_scale_x">用於不透明地縮放渲染解析度的整數像素寬度比例。可能支援 1、2 和 3，但高於 1 的支援取決於裝置屬性。</string>
+<string name="es_hint_gpu_draw_resolution_scale_y">用於不透明地縮放渲染解析度的整數像素高度比例。有關更多資訊，請參閱 draw_resolution_scale_x。</string>
+<string name="es_hint_gpu_draw_resolution_scaled_texture_offsets">應用考慮渲染到紋理的解析度縮放的紋理獲取指令的偏移，以獲得更正確的陰影過濾、bloom 等。</string>
+<string name="es_hint_gpu_dump_shaders">用於著色器除錯，路徑用於在編譯時轉儲 GPU 著色器。</string>
+<string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu">在可能時在 CPU 上執行禁用裁剪的繪製的頂點著色器，主要是螢幕空間繪製（如清除），以估計繪製中涉及的 EDRAM 範圍。</string>
+<string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">如果啟用了 execute_unclipped_draw_vs_on_cpu，即使在使用主機上的主機渲染後端像素著色器交錯（光柵器有序視圖）實現時，也在 CPU 上執行未裁剪繪製的頂點著色器。</string>
+<string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">不要將 execute_unclipped_draw_vs_on_cpu 的使用限制為非剪刀繪製（剪刀矩形的右側和底部在 8192 或更遠），即使存在剪刀矩形，它通常足以估計渲染目标的高度。</string>
+<string name="es_hint_gpu_force_convert_line_loops_to_strips">僅用於主機圖形 API 降級支援測試，強制 CPU 將線迴圈轉換為線條帶，即使主機原生支援線迴圈圖元。</string>
+<string name="es_hint_gpu_force_convert_quad_lists_to_triangle_lists">僅用於主機圖形 API 降級支援測試，強制 CPU 將四邊形列表轉換為四邊形條帶，即使主機原生支援或通过幾何著色器模擬支援四邊形列表圖元。</string>
+<string name="es_hint_gpu_force_convert_triangle_fans_to_lists">僅用於主機圖形 API 降級支援測試，強制 CPU 將三角形扇形轉換為三角形列表，即使主機原生支援三角形扇形圖元。</string>
+<string name="es_hint_gpu_framerate_limit">最大幀率。0 = 無限幀。預設為 60，當設定為 0 且 VSYNC 啟用時。</string>
+<string name="es_hint_gpu_gamma_render_target_as_srgb">當主機無法直接以正確的混合寫入分段線性伽馬時，在主機上使用 sRGB 輸出以在線性顏色空間中進行概念上正確的混合，同时在渲染目标中具有略微不同的精度分佈，並且如果遊戲直接訪問結果顏色作為原始資料，則具有嚴重不正確的值。</string>
+<string name="es_hint_gpu_gpu">圖形系統。可用值：[vulkan, null]</string>
+<string name="es_hint_gpu_gpu_allow_invalid_fetch_constants">允許類型無效的紋理和頂點獲取常量 - 通常不安全，因為常量可能包含完全無效的值，但可用於繞過某些遊戲中的獲取常量類型錯誤，直到找到它們真正無效的原因。</string>
+<string name="es_hint_gpu_half_pixel_offset">啟用頂點半像素偏移支援（D3D9 PA_SU_VTX_CNTL PIX_CENTER）。通常遊戲都知道半像素偏移，啟用這是正確的行為（停用這可能會在某些遊戲中嚴重破壞後處理）。</string>
+<string name="es_hint_gpu_ignore_32bit_vertex_index_support">僅用於主機圖形 API 降級測試（僅用於高通 Adreno 4xx 級主機 GPU 測試），強制間接或預掩碼和預交換 32 位頂點索引，就像主機只支援 24 位索引一樣。</string>
+<string name="es_hint_gpu_log_guest_driven_gpu_register_written_values">僅在除錯版本中有用，如果設定，將記錄訪客對 gpu 暫存器的每次寫入。</string>
+<string name="es_hint_gpu_log_ringbuffer_kickoff_initiator_bts">僅在除錯版本中有用，如果設定，將記錄寫入新讀取位置的訪客執行緒的偽堆疊跟蹤。</string>
+<string name="es_hint_gpu_mrt_edram_used_range_clamp_to_min">使用主機渲染目标時，如果綁定了多個渲染目标，估計在任何渲染目标中修改的 EDRAM 範圍不大於 EDRAM 中任何兩個渲染目标之間的距離，而不是允許最後一個聲明 EDRAM 的其餘部分。</string>
+<string name="es_hint_gpu_native_2x_msaa">在可用時使用主機 2x MSAA。可以在主機 GPU API 上不強制要求 2x 的情況下停用它以進行可擴展性測試，在這種情況下，將使用 4x MSAA 的 2 個樣本代替（具有相似或更差的品質和更高的記憶體使用量）。</string>
+<string name="es_hint_gpu_native_stencil_value_output">在可用時使用像素著色器模板參考輸出用於複製渲染目标等目的。可以停用以進行可擴展性測試，在這種情況下，將完成繪製 8 個四邊形的成本高得多的操作。</string>
+<string name="es_hint_gpu_non_seamless_cube_map">在可能的情況下禁用立方體貼圖面邊緣附近的過濾（Vulkan 與 VK_EXT_non_seamless_cube_map）以重現 Direct3D 9 行為。</string>
+<string name="es_hint_gpu_primitive_processor_cache_min_indices">要在快取中儲存的最小訪客索引數量，以便稍後在同一幀中嘗試重用，如果執行處理（如圖元類型轉換或重置索引替換）。將此值設定為非常高可能會導致過度的 CPU 處理，而非常低的值可能會導致過多的鎖定和查找。負值停用快取。</string>
+<string name="es_hint_gpu_query_occlusion_sample_lower_threshold">如果設定為 -1，則不寫入樣本計數，遊戲可能會掛起。否則，每個 EVENT_WRITE_ZPD 上的每個圖塊的樣本計數將增加此數字。將其設定為 0 表示所有內容都被報告為遮擋。</string>
+<string name="es_hint_gpu_query_occlusion_sample_upper_threshold">設定為大於 query_occlusion_sample_lower_threshold 的數字。如果 query_occlusion_sample_lower_threshold 設定為 -1，則忽略此值。</string>
+<string name="es_hint_gpu_readback_memexport">[D3D12 專用] 在 CPU 上讀取著色器中記憶體寫入的資料。這可能在一些遊戲中是必需的（但許多遊戲只在 GPU 上訪問匯出的資料，不需要此標誌來處理此類行為），但會導致幀中同步，因此對效能有巨大影響。</string>
+<string name="es_hint_gpu_readback_resolve">[D3D12 專用] 在 CPU 上讀取渲染到紋理的結果。這可能在一些遊戲中是必需的，例如，保存遊戲中的截圖，但會導致幀中同步，因此對效能有巨大影響。</string>
+<string name="es_hint_gpu_render_target_path_vulkan">在 Vulkan 上要使用的渲染目标模擬路徑。可用值：[any, fbo, fsi]\nfbo：主機帧緩衝区和固定功能混合和深度/模板測試，在渲染目标之間複製時根據需要。較低精度（有限的像素格式支援）。\nfsi：手動像素打包、混合和深度/模板測試，具有自由的渲染目标布局更改。需要支援片段著色器交錯的主機。最高精度（所有像素格式在軟體中處理）。</string>
+<string name="es_hint_gpu_resolve_resolution_scale_fill_half_pixel_offset">使用解析度縮放時，應用擴展左側和頂部渲染目标解析區域中第一個肯定覆蓋的主機像素的黑客，以消除由半像素偏移引起的間隙（這對於某些遊戲顯示場景圖形是必要的）。</string>
+<string name="es_hint_gpu_snorm16_render_target_full_range">當主機只能支援 16_16 和 16_16_16_16 渲染目标為 -1...1 時，重新映射 -32...32 到 -1...1 以使用可能的完整值範圍，以犧牲乘法混合正確性為代價。</string>
+<string name="es_hint_gpu_store_shaders">持久儲存著色器並在載入遊戲時載入它們，以避免在多次玩遊戲時的執行時峰值和凍結。</string>
+<string name="es_hint_gpu_texture_cache_memory_limit_hard">超過此限制時將盡快銷毀紋理的最大主機紋理記憶體使用量（以兆字节為單位）。</string>
+<string name="es_hint_gpu_texture_cache_memory_limit_render_to_texture">將根據當前繪製解析度縮放的主機紋理記憶體預算的一部分（以兆字节為單位）。</string>
+<string name="es_hint_gpu_texture_cache_memory_limit_soft">超過此限制時將銷毀舊紋理的最大主機紋理記憶體使用量（以兆字节為單位）。</string>
+<string name="es_hint_gpu_texture_cache_memory_limit_soft_lifetime">如果紋理記憶體使用量超過 texture_cache_memory_limit_soft，紋理應未使用多少秒才能被視為足夠舊以被刪除。</string>
+<string name="es_hint_gpu_trace_gpu_prefix">GPU 跟蹤檔案的字首路徑。</string>
+<string name="es_hint_gpu_trace_gpu_stream">跟蹤所有 GPU 封包。</string>
+<string name="es_hint_gpu_vsync">啟用 VSYNC。</string>
+
+<string name="es_general">一般</string>
+<string name="es_general_allow_plugins">允許外掛程式</string>
+<string name="es_general_apply_patches">套用修補程式</string>
+<string name="es_general_debug">除錯模式</string>
+<string name="es_general_discord">Discord 豐富狀態</string>
+<string name="es_general_launch_module">啟動模組</string>
+<string name="es_general_notification_sound_path">通知聲音路徑</string>
+<string name="es_general_time_scalar">時間標量</string>
+
+<string name="es_hint_general_allow_plugins">允許從 plugins\title_id\plugin.xex 載入插件/修改器。插件是可用於製作修改的自製 xex 模組。此功能是實驗性的。</string>
+<string name="es_hint_general_apply_patches">啟用自訂補丁功能</string>
+<string name="es_hint_general_debug">允許除錯並保留除錯資訊。</string>
+<string name="es_hint_general_discord">啟用 Discord 豐富狀態</string>
+<string name="es_hint_general_launch_module">要啟動的可執行檔案來自 .iso 或套件，而不是 default.xex 或遊戲指定的模組。留空以啟動預設模組。</string>
+<string name="es_hint_general_notification_sound_path">選定通知聲音的路徑（包括檔名）。聲音必須是 wav 格式！</string>
+<string name="es_hint_general_time_scalar">用於加速或減慢時間的標量（1x、2x、1/2x 等）。</string>
+
+<string name="es_hid">HID</string>
+<string name="es_hid_hid">輸入系統</string>
+<string name="es_hid_left_stick_deadzone_percentage">左搖桿死區</string>
+<string name="es_hid_right_stick_deadzone_percentage">右搖桿死區</string>
+<string name="es_hid_vibration">控制器振動</string>
+
+<string name="es_hint_hid_hid">輸入系統。可用值：[android, nop]</string>
+<string name="es_hint_hid_left_stick_deadzone_percentage">定義左搖桿死區級別。允許範圍 [0.0-1.0]。</string>
+<string name="es_hint_hid_right_stick_deadzone_percentage">定義右搖桿死區級別。允許範圍 [0.0-1.0]。</string>
+<string name="es_hint_hid_vibration">切換控制器振動。</string>
+
+<string name="es_kernel">核心</string>
+<string name="es_kernel_allow_nui_initialization">允許 NUI 初始化</string>
+<string name="es_kernel_allow_incompatible_title_update">允許不相容的標題更新</string>
+<string name="es_kernel_apply_title_update">套用標題更新</string>
+<string name="es_kernel_cl">命令列引數</string>
+<string name="es_kernel_default_achievements_backend">成就後端</string>
+<string name="es_kernel_ignore_thread_affinities">忽略執行緒親和性</string>
+<string name="es_kernel_ignore_thread_priorities">忽略執行緒優先順序</string>
+<string name="es_kernel_kernel_build_version">核心建置版本</string>
+<string name="es_kernel_kernel_cert_monitor">憑證監視器</string>
+<string name="es_kernel_kernel_debug_monitor">除錯監視器</string>
+<string name="es_kernel_kernel_display_gamma_power">顯示伽馬功率</string>
+<string name="es_kernel_kernel_display_gamma_type">顯示伽馬類型</string>
+<string name="es_kernel_kernel_pix">PIX</string>
+<string name="es_kernel_log_high_frequency_kernel_calls">記錄高頻率呼叫</string>
+<string name="es_kernel_staging_mode">暫存模式</string>
+    
+<string name="es_hint_kernel_allow_nui_initialization">啟用 NUI 初始化。僅在測試 kinect 遊戲時設定為 true。某些遊戲可能需要 avatar 實現。</string>
+<string name="es_hint_kernel_allow_incompatible_title_update">允許應用簽名不匹配的標題更新。</string>
+<string name="es_hint_kernel_apply_title_update">應用標題更新。</string>
+<string name="es_hint_kernel_cl">指定提供給訪客的其他命令列。</string>
+<string name="es_hint_kernel_default_achievements_backend">定義應使用哪個成就後端。可能的選項：GPD。</string>
+<string name="es_hint_kernel_ignore_thread_affinities">忽略遊戲指定的執行緒親和性。</string>
+<string name="es_hint_kernel_ignore_thread_priorities">忽略遊戲指定的執行緒優先順序。</string>
+<string name="es_hint_kernel_kernel_build_version">定義當前核心版本</string>
+<string name="es_hint_kernel_kernel_cert_monitor">啟用憑證監視器。</string>
+<string name="es_hint_kernel_kernel_debug_monitor">啟用除錯監視器。</string>
+<string name="es_hint_kernel_kernel_display_gamma_power">與核心顯示伽馬類型 3 一起使用的顯示伽馬。</string>
+<string name="es_hint_kernel_kernel_display_gamma_type">顯示伽馬類型：0 - 線性，1 - sRGB (CRT)，2 - BT.709 (HDTV)，3 - 通過 kernel_display_gamma_power 指定的冪。</string>
+<string name="es_hint_kernel_kernel_pix">啟用 PIX。</string>
+<string name="es_hint_kernel_log_high_frequency_kernel_calls">記錄帶有 kHighFrequency 標籤的核心呼叫。</string>
+<string name="es_hint_kernel_staging_mode">在儀表板中啟用預覽模式以渲染除錯資訊。</string>
+
+<string name="es_logging">日誌記錄</string>
+<string name="es_logging_flush_log">清除日誌</string>
+<string name="es_logging_log_file">日誌檔案路徑</string>
+<string name="es_logging_log_level">日誌等級</string>
+<string name="es_logging_log_mask">日誌遮罩</string>
+<string name="es_logging_log_string_format_kernel_calls">記錄核心呼叫</string>
+<string name="es_logging_log_to_debugprint">記錄到 DebugPrint</string>
+<string name="es_logging_log_to_stdout">記錄到 Stdout</string>
+
+<string name="es_hint_logging_flush_log">每批日誌行後重新整理日誌檔案。</string>
+<string name="es_hint_logging_log_file">日誌寫入給定檔案</string>
+<string name="es_hint_logging_log_level">要記錄的最大級別。(0=錯誤，1=警告，2=資訊，3=除錯)</string>
+<string name="es_hint_logging_log_mask">停用特定類別以更精細的除錯日誌。核心 = 1，APU = 2，CPU = 4。</string>
+<string name="es_hint_logging_log_string_format_kernel_calls">記錄帶有 kHighFrequency 標籤的核心呼叫。</string>
+<string name="es_hint_logging_log_to_debugprint">將日誌轉儲到 DebugPrint。</string>
+<string name="es_hint_logging_log_to_stdout">將日誌輸出寫入 stdout</string>
+
+<string name="es_memory">記憶體</string>
+<string name="es_memory_ignore_offset_for_ranged_allocations">忽略範圍配置的偏移</string>
+<string name="es_memory_mmap_address_high">MMAP 位址高位</string>
+<string name="es_memory_protect_on_release">保護已釋放記憶體</string>
+<string name="es_memory_protect_zero">保護零頁</string>
+<string name="es_memory_scribble_heap">塗鴉堆積</string>
+<string name="es_memory_writable_executable_memory">可寫可執行記憶體</string>
+
+<string name="es_hint_memory_ignore_offset_for_ranged_allocations">允許忽略具有提供範圍的物理分配的 4k 偏移。某些標題檢查結果是否匹配提供的較低範圍。</string>
+<string name="es_hint_memory_mmap_address_high">1-124</string>
+<string name="es_hint_memory_protect_on_release">保護已釋放的記憶體以防止訪問。</string>
+<string name="es_hint_memory_protect_zero">保護零頁不被讀寫。</string>
+<string name="es_hint_memory_scribble_heap">將所有分配的堆記憶體塗寫為 0xCD。</string>
+<string name="es_hint_memory_writable_executable_memory">允許映射具有寫和執行訪問權限的記憶體，用於模擬在不支援此功能的平台上的行為</string>
+
+<string name="es_profiles">設定檔</string>
+<string name="es_profiles_logged_profile_slot_0_xuid">設定檔插槽 0 XUID</string>
+<string name="es_profiles_logged_profile_slot_1_xuid">設定檔插槽 1 XUID</string>
+<string name="es_profiles_logged_profile_slot_2_xuid">設定檔插槽 2 XUID</string>
+<string name="es_profiles_logged_profile_slot_3_xuid">設定檔插槽 3 XUID</string>
+
+<string name="es_hint_profiles_logged_profile_slot_0_xuid">啟動時在插槽 0 中載入的設定檔的 XUID</string>
+<string name="es_hint_profiles_logged_profile_slot_1_xuid">啟動時在插槽 1 中載入的設定檔的 XUID</string>
+<string name="es_hint_profiles_logged_profile_slot_2_xuid">啟動時在插槽 2 中載入的設定檔的 XUID</string>
+<string name="es_hint_profiles_logged_profile_slot_3_xuid">啟動時在插槽 3 中載入的設定檔的 XUID</string>
+
+<string name="es_storage">儲存裝置</string>
+<string name="es_storage_cache_root">快取根路徑</string>
+<string name="es_storage_content_root">內容根路徑</string>
+<string name="es_storage_mount_cache">掛載快取</string>
+<string name="es_storage_mount_scratch">掛載暫存儲存</string>
+<string name="es_storage_storage_root">儲存根路徑</string>
+
+<string name="es_hint_storage_cache_root">用於加速模擬器或遊戲的某些部分的檔案的根路徑。這些檔案可能是持久的，但可以刪除而不會造成重大副作用，如進度丟失。如果為空，則使用儲存根目錄下的快取資料夾，或者（如果可用）作業系統首選的快取目錄。</string>
+<string name="es_hint_storage_content_root">訪客內容儲存（存檔等）的根路徑，或為空以使用儲存根目錄下的 content 資料夾。</string>
+<string name="es_hint_storage_mount_cache">啟用快取掛載</string>
+<string name="es_hint_storage_mount_scratch">啟用暫存儲存掛載</string>
+<string name="es_hint_storage_storage_root">持久內部資料儲存（組態等）的根路徑，或為空以使用作業系統首選的路徑，如文件資料夾，或者如果其中存在 portable.txt，則使用模擬器可執行檔案目錄。</string>
+
+<string name="es_ui">使用者介面</string>
+<string name="es_ui_headless">無頭模式</string>
+<string name="es_ui_profiler_dpi_scaling">Profiler DPI 縮放</string>
+<string name="es_ui_show_achievement_notification">顯示成就通知</string>
+<string name="es_ui_show_profiler">顯示 Profiler</string>
+<string name="es_ui_storage_selection_dialog">儲存選擇對話方塊</string>
+
+<string name="es_hint_ui_headless">不顯示任何 UI，根據需要預設提示。</string>
+<string name="es_hint_ui_profiler_dpi_scaling">將視窗 DPI 縮放應用於分析器。</string>
+<string name="es_hint_ui_show_achievement_notification">在螢幕上顯示成就通知。</string>
+<string name="es_hint_ui_show_profiler">預設顯示分析 UI。</string>
+<string name="es_hint_ui_storage_selection_dialog">當遊戲請求時顯示儲存裝置選擇對話方塊。</string>
+
+<string name="es_video">視訊</string>
+<string name="es_video_avpack">AV 套件</string>
+<string name="es_video_enable_3d_mode">啟用 3D 模式</string>
+<string name="es_video_interlaced">隔行掃描模式</string>
+<string name="es_video_internal_display_resolution">內部顯示解析度</string>
+<string name="es_video_internal_display_resolution_x">自訂顯示寬度</string>
+<string name="es_video_internal_display_resolution_y">自訂顯示高度</string>
+<string name="es_video_use_50Hz_mode">使用 50Hz 模式</string>
+<string name="es_video_video_standard">視訊標準</string>
+<string name="es_video_widescreen">寬螢幕模式</string>
+
+<string name="es_hint_video_avpack">視訊模式
+0 = PAL-60 分量 (SD)
+1 = 未使用
+2 = PAL-60 SCART
+3 = 480p 分量 (HD)
+4 = HDMI+A
+5 = PAL-60 複合/S-Video
+6 = VGA
+7 = TV PAL-60
+8 = HDMI（預設）</string>
+<string name="es_hint_video_enable_3d_mode">啟用遊戲中的立體模式。</string>
+<string name="es_hint_video_interlaced">切換隔行模式。</string>
+<string name="es_hint_video_internal_display_resolution">允許支援不同解析度的遊戲以特定解析度渲染。這不保證與所有遊戲一起工作或提高效能。\n0=640x480, 1=640x576, 2=720x480, 3=720x576, 4=800x600, 5=848x480, 6=1024x768, 7=1152x864, 8=1280x720 (預設), 9=1280x768, 10=1280x960, 11=1280x1024, 12=1360x768, 13=1440x900, 14=1680x1050, 15=1920x540, 16=1920x1080, 17=internal_display_resolution_x/y</string>
+<string name="es_hint_video_internal_display_resolution_x">自訂寬度。請參閱 internal_display_resolution。範圍 1-1920。</string>
+<string name="es_hint_video_internal_display_resolution_y">自訂高度。請參閱 internal_display_resolution。範圍 1-1080。</string>
+<string name="es_hint_video_use_50Hz_mode">啟用 PAL-50 模式的使用。</string>
+<string name="es_hint_video_video_standard">啟用在不同視訊信號之間切換。1=NTSC, 2=NTSC-J, 3=PAL</string>
+<string name="es_hint_video_widescreen">在 16:9 和 4:3 寬高比之間切換。</string>
+
+<string name="es_vulkan">Vulkan</string>
+<string name="es_vulkan_vulkan_allow_present_mode_fifo_relaxed">允許 FIFO Relaxed 呈現模式</string>
+<string name="es_vulkan_vulkan_allow_present_mode_immediate">允許 Immediate 呈現模式</string>
+<string name="es_vulkan_vulkan_allow_present_mode_mailbox">允許 Mailbox 呈現模式</string>
+<string name="es_vulkan_vulkan_device">Vulkan 裝置索引</string>
+<string name="es_vulkan_vulkan_log_debug_messages">記錄 Vulkan 除錯訊息</string>
+<string name="es_vulkan_vulkan_sparse_shared_memory">稀疏共享記憶體</string>
+<string name="es_vulkan_vulkan_validation">Vulkan 驗證層</string>
+
+<string name="es_hint_vulkan_vulkan_allow_present_mode_fifo_relaxed">當可用時，允許寬鬆的先進先出呈現模式（第 3 優先順序），這會導致等待主機顯示垂直同步，但如果幀不符合主機顯示重新整理率，可能會出現撕裂。</string>
+<string name="es_hint_vulkan_vulkan_allow_present_mode_immediate">當可用時，允許即時呈現模式（第 1 優先順序），提供最低延遲，但在某些情況下可能出現撕裂，並且根據組態，可能支援可變重新整理率。</string>
+<string name="es_hint_vulkan_vulkan_allow_present_mode_mailbox">當可用時，允許信箱呈現模式（第 2 優先順序），提供低延遲而沒有撕裂的可能性。</string>
+<string name="es_hint_vulkan_vulkan_device">首選 Vulkan 物理裝置的索引，或 -1 以使用任何相容的裝置。</string>
+<string name="es_hint_vulkan_vulkan_log_debug_messages">將 Vulkan VK_EXT_debug_utils 訊息寫入 Xenia 日誌，而不是作業系統除錯輸出。</string>
+<string name="es_hint_vulkan_vulkan_sparse_shared_memory">啟用稀疏綁定用於共享記憶體模擬。停用它會增加視訊記憶體使用量 - 建立 512 MB 緩衝區 - 但允許不支援稀疏綁定的圖形除錯器工作。</string>
+<string name="es_hint_vulkan_vulkan_validation">啟用 Vulkan 驗證層 (VK_LAYER_KHRONOS_validation)。如果啟用了‘vulkan_log_debug_messages’，訊息將寫入 Xenia 日誌，否則寫入作業系統除錯輸出。</string>
+
+<string name="es_xconfig">XConfig</string>
+<string name="es_xconfig_audio_flag">音訊旗標</string>
+<string name="es_xconfig_user_country">使用者國家</string>
+<string name="es_xconfig_user_language">使用者語言</string>
+
+<string name="es_hint_xconfig_audio_flag">音訊模式類比。
+0x00000001 = 杜比環繞聲
+0x00000002 = 類比單聲道
+音訊模式數位。
+0x00000000 = 數位立體聲（單獨選擇上述之一）
+0x00010000 = 杜比數位
+0x00030000 = 帶 WMA PRO 的杜比數位
+特殊標誌。
+0x00000003 = 立體聲旁路
+0x80000000 = 低延遲
+此組態要求您將類比和數位標誌配對，而數位立體聲只需要類比標誌。額外標誌是可選的。例如 0x00010001</string>
+<string name="es_hint_xconfig_user_country">使用者國家 ID。
+1=AE 2=AL 3=AM 4=AR 5=AT 6=AU 7=AZ 8=BE 9=BG
+10=BH 11=BN 12=BO 13=BR 14=BY 15=BZ 16=CA 18=CH 19=CL
+20=CN 21=CO 22=CR 23=CZ 24=DE 25=DK 26=DO 27=DZ 28=EC
+29=EE 30=EG 31=ES 32=FI 33=FO 34=FR 35=GB 36=GE 37=GR
+38=GT 39=HK 40=HN 41=HR 42=HU 43=ID 44=IE 45=IL 46=IN
+47=IQ 48=IR 49=IS 50=IT 51=JM 52=JO 53=JP 54=KE 55=KG
+56=KR 57=KW 58=KZ 59=LB 60=LI 61=LT 62=LU 63=LV 64=LY
+65=MA 66=MC 67=MK 68=MN 69=MO 70=MV 71=MX 72=MY 73=NI
+74=NL 75=NO 76=NZ 77=OM 78=PA 79=PE 80=PH 81=PK 82=PL
+83=PR 84=PT 85=PY 86=QA 87=RO 88=RU 89=SA 90=SE 91=SG
+92=SI 93=SK 95=SV 96=SY 97=TH 98=TN 99=TR 100=TT 101=TW
+102=UA 103=US 104=UY 105=UZ 106=VE 107=VN 108=YE 109=ZA</string>
+<string name="es_hint_xconfig_user_language">使用者語言 ID。\n1=en 2=ja 3=de 4=fr 5=es 6=it 7=ko 8=zh\n9=pt 11=pl 12=ru 13=sv 14=tr 15=nb 16=nl 17=zh</string>
+
+<string name="es_a64">a64</string>
+<string name="es_a64_a64_extension_mask">A64 擴充遮罩</string>
+
+<string name="es_hint_a64_a64_extension_mask">允許檢測和利用特定的指令集功能。
+0 = armv8.0
+1 = LSE
+2 = F16C
+-1 = 檢測并利用所有可能的處理器功能</string>
+
+</resources>

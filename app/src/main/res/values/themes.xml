@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Base theme used by the AndroidManifest only. The actual visual theme
+      is provided at runtime by Jetpack Compose (Material 3 Expressive).
+      We extend Theme.Material3 to inherit proper Material 3 window
+      decorations and color handling for the host Activity.
+    -->
+    <style name="Theme.Ax360eCompose" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

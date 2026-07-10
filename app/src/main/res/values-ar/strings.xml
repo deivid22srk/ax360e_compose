@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="es_apu_xma_decoder">فك تشفير Xma</string>
+    <string name="es_cpu_disable_context_promotion">تعطيل ترقية السياق</string>
+    <string name="es_cpu_disable_instruction_infocache">تعطيل ذاكرة التخزين المؤقت للتعليمات</string>
+    <string name="es_cpu_disable_prefetch_and_cachecontrol">تعطيل الجلب المسبق والتحكم في ذاكرة التخزين المؤقت</string>
+    <string name="es_cpu_dump_translated_hir_functions">تفريغ وظائف HIR المترجمة</string>
+    <string name="es_cpu_emit_inline_mmio_checks">إصدار فحوصات MMIO مضمنة</string>
+    <string name="es_cpu_emit_mmio_aware_stores_for_recorded_exception_addresses">إصدار عمليات تخزين واعية بـ MMIO لعناوين الاستثناءات المسجلة</string>
+    <string name="es_cpu_enable_early_precompilation">تفعيل الترجمة المسبقة المبكرة</string>
+    <string name="es_cpu_full_optimization_even_with_debug">تحسين كامل حتى مع التصحيح</string>
+    <string name="es_cpu_ignore_trap_instructions">تجاهل تعليمات الفخ</string>
+    <string name="es_cpu_no_reserved_ops">لا عمليات محجوزة</string>
+    <string name="es_cpu_permit_float_constant_evaluation">السماح بتقييم الثوابت العائمة</string>
+    <string name="es_cpu_record_mmio_access_exceptions">تسجيل استثناءات الوصول إلى MMIO</string>
+    <string name="es_cpu_writable_code_segments">قطاعات كود قابلة للكتابة</string>
+    <string name="es_gpu_gpu_allow_invalid_upload_range">السماح بنطاق رفع غير صالح لوحدة المعالجة الرسومية</string>
+    <string name="es_gpu_target_trace_file">ملف تتبع الهدف</string>
+    <string name="es_gpu_trace_dump_path">مسار تفريغ التتبع</string>
+    <string name="es_general_allow_game_relative_writes">السماح بالكتابات النسبية للعبة</string>
+    <string name="es_general_controller_hotkeys">مفاتيح الاختصار لوحدة التحكم</string>
+    <string name="es_general_disable_doubleclick_fullscreen">تعطيل ملء الشاشة بالنقر المزدوج</string>
+    <string name="es_hid_guide_button">زر الدليل</string>
+    <string name="es_kernel_allow_avatar_initialization">السماح بتهيئة الصورة الرمزية</string>
+    <string name="es_storage_force_mount_devkit">فرض تركيب Devkit</string>
+    <string name="es_storage_mount_memory_unit">تركيب وحدة الذاكرة</string>
+    <string name="es_ui_custom_font_path">مسار الخط المخصص</string>
+
+    <string name="_default">افتراضي</string>
+    <string name="driver_library_path_dialog_add_hint">إضافة برنامج تشغيل مخصص (*.zip)</string>
+    <string name="es_vulkan_vulkan_lib_path">مسار مكتبة برنامج التشغيل المخصص</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">فرض أقصى ترددات لبرنامج التشغيل المخصص</string>
+
+    <string name="create_shortcut">إنشاء اختصار</string>
+    <string name="disable_virtual_keyboard">تعطيل لوحة المفاتيح الافتراضية</string>
+    <string name="joystick">عصا التحكم</string>
+
+    <string name="dpad">Dpad</string>
+    <string name="abxy">ABXY</string>
+    <string name="lr">LR</string>
+    <string name="start_back">ابدأ/عودة</string>
+
+    <string name="save_and_quit">حفظ وخروج</string>
+    <string name="scale_rate">معدل التحجيم</string>
+
+    <string name="refresh_list">تحديث القائمة</string>
+    <string name="about">حول</string>
+    <string name="gratitude">الامتنان</string>
+    <string name="update_log">سجل التحديث</string>
+    <string name="device_info">معلومات الجهاز</string>
+    <string name="open_source_licenses">تراخيص المصدر المفتوح</string>
+
+    <string name="open_file_manager">فتح مدير الملفات</string>
+    <string name="game_list_loading">جارٍ تحميل قائمة الألعاب...</string>
+    <string name="quit">خروج</string>
+    <string name="device_unsupport_vulkan_msg">جهازك لا يدعم Vulkan ولا يمكنه تلبية الحد الأدنى من المتطلبات لتشغيل هذا التطبيق، يرجى الخروج.</string>
+
+    <string name="loading">جارٍ التحميل...</string>
+    <string name="msg_processing">جارٍ المعالجة...</string>
+    <string name="empty_game_list">قائمة الألعاب فارغة، يرجى تعيين دليل الألعاب</string>
+
+    <string name="enable_vibrator">تفعيل الاهتزاز</string>
+
+    <string name="set_game_dir">تعيين دليل الألعاب</string>
+
+    <string name="clear">مسح</string>
+    <string name="press_a_key">اضغط على أي مفتاح للمتابعة...</string>
+
+    <string name="reset_as_default">إعادة التعيين كافتراضي</string>
+    <string name="key_mappers">مخططات المفاتيح</string>
+
+    <string name="virtual_pad_edit">تحرير اللوحة الافتراضية</string>
+
+    <string name="left">يسار</string>
+    <string name="up">أعلى</string>
+    <string name="right">يمين</string>
+    <string name="down">أسفل</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+
+    <string name="lshoulder">LShoulder</string>
+    <string name="lthumbpress">LThumbPress</string>
+    <string name="ltrigger">LTrigger</string>
+
+    <string name="rshoulder">RShoulder</string>
+    <string name="rthumbpress">RThumbPress</string>
+    <string name="rtrigger">RTrigger</string>
+
+    <string name="start">ابدأ</string>
+    <string name="back">عودة</string>
+
+    <string name="use_global_config">استخدام التكوين العام</string>
+
+    <string name="settings">الإعدادات</string>
+
+
+    <string name="gratitude_content">شكر لـ Ruban على جميع الأيقونات\n\n
+		شكر لـ SRC267 (Sting) لإدارة ريديت/ديسكورد\n\n
+		شكر لـ 妖妖 على الاختبار\n\n
+		شكر لـ 再见某人 \n\n
+        شكر لـ 再见某人 \n\n
+        شكر لـ 再见某人 \n\n
+        \n\n
+        		مبased على تحسين نقل Xenia، شكر لجميع المشاركين في مشروع Xenia\n\n
+    </string>
+
+    <string name="es_apu">وحدة الصوت</string>
+<string name="es_apu_apu">نظام الصوت</string>
+<string name="es_apu_apu_max_queued_frames">الحد الأقصى للأطر في قائمة الانتظار</string>
+<string name="es_apu_enable_xmp">تفعيل مشغل الموسيقى</string>
+<string name="es_apu_ffmpeg_verbose">إخراج FFmpeg المفصل</string>
+<string name="es_apu_mute">كتم جميع الأصوات</string>
+<string name="es_apu_use_dedicated_xma_thread">استخدام خيط مخصص لـ XMA</string>
+<string name="es_apu_use_new_decoder">استخدام فك التشفير الجديد لـ XMA</string>
+<string name="es_apu_xmp_default_volume">مستوى الصوت الافتراضي للموسيقى</string>
+
+<string name="es_cpu">المعالج</string>
+<string name="es_cpu_break_condition_gpr">شرط التوقف GPR</string>
+<string name="es_cpu_break_condition_op">عامل شرط التوقف</string>
+<string name="es_cpu_break_condition_truncate">اقتطاع القيمة إلى 32 بت</string>
+<string name="es_cpu_break_condition_value">قيمة شرط التوقف</string>
+<string name="es_cpu_break_on_debugbreak">التوقف عند Debugbreak</string>
+<string name="es_cpu_break_on_instruction">التوقف عند التعليمات</string>
+<string name="es_cpu_break_on_start">التوقف عند البدء</string>
+<string name="es_cpu_break_on_unimplemented_instructions">التوقف عند التعليمات غير المطبقة</string>
+<string name="es_cpu_clock_no_scaling">تعطيل تحجيم الساعة</string>
+<string name="es_cpu_clock_source_raw">استخدام مصدر الساعة الخام</string>
+<string name="es_cpu_cpu">واجهة المعالج الخلفية</string>
+<string name="es_cpu_debugprint_trap_log">تسجيل محاصرات Debugprint</string>
+<string name="es_cpu_disable_global_lock">تعطيل القفل العام</string>
+<string name="es_cpu_disassemble_functions">تحليل الوظائف</string>
+<string name="es_cpu_ignore_undefined_externs">تجاهل المراجع الخارجية غير المعرفة</string>
+<string name="es_cpu_inline_mmio_access">الوصول المباشر إلى MMIO</string>
+<string name="es_cpu_load_module_map">تحميل خريطة الوحدة</string>
+<string name="es_cpu_pvr">إصدار/مراجعة المعالج</string>
+<string name="es_cpu_store_all_context_values">تخزين جميع قيم السياق</string>
+<string name="es_cpu_trace_function_coverage">تتبع تغطية الوظائف</string>
+<string name="es_cpu_trace_function_data">تتبع بيانات الوظائف</string>
+<string name="es_cpu_trace_function_data_path">مسار تتبع بيانات الوظائف</string>
+<string name="es_cpu_trace_function_references">تتبع مراجع الوظائف</string>
+<string name="es_cpu_trace_functions">تتبع الوظائف</string>
+<string name="es_cpu_validate_hir">التحقق من صحة HIR</string>
+
+<string name="es_content">المحتوى</string>
+<string name="es_content_license_mask">قناع الترخيص</string>
+
+<string name="es_display">العرض</string>
+<string name="es_display_fullscreen">وضع ملء الشاشة</string>
+<string name="es_display_host_present_from_non_ui_thread">عرض مباشر من خيط غير واجهة المستخدم</string>
+<string name="es_display_postprocess_antialiasing">تنعيم الحواف ما بعد المعالجة</string>
+<string name="es_display_postprocess_dither">تشويش ما بعد المعالجة</string>
+<string name="es_display_postprocess_ffx_cas_additional_sharpness">حدة إضافية لـ CAS</string>
+<string name="es_display_postprocess_ffx_fsr_max_upsampling_passes"> passes الحد الأقصى لرفع العينة FSR</string>
+<string name="es_display_postprocess_ffx_fsr_sharpness_reduction">تقليل حدة FSR</string>
+<string name="es_display_postprocess_scaling_and_sharpening">تحجيم وحَدّة</string>
+<string name="es_display_present_letterbox">عرض Letterbox</string>
+<string name="es_display_present_render_pass_clear">مسح Render Pass</string>
+<string name="es_display_present_safe_area_x">منطقة الأمان X</string>
+<string name="es_display_present_safe_area_y">منطقة الأمان Y</string>
+
+<string name="es_gpu">وحدة المعالجة الرسومية</string>
+<string name="es_gpu_clear_memory_page_state">مسح حالة صفحة الذاكرة</string>
+<string name="es_gpu_depth_float24_convert_in_pixel_shader">تحويل العمق في Pixel Shader</string>
+<string name="es_gpu_depth_float24_round">تقريب تحويل العمق</string>
+<string name="es_gpu_depth_transfer_not_equal_test">اختبار عدم تساوي نقل العمق</string>
+<string name="es_gpu_disassemble_pm4">تحليل حزم PM4</string>
+<string name="es_gpu_draw_resolution_scale_x">تحجيم دقة الرسم X</string>
+<string name="es_gpu_draw_resolution_scale_y">تحجيم دقة الرسم Y</string>
+<string name="es_gpu_draw_resolution_scaled_texture_offsets">تعويضات الملمس المُحجَّمة</string>
+<string name="es_gpu_dump_shaders">مسار تصدير الشيدرز</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu">تنفيذ VS على المعالج للرسومات غير المقطوعة</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">تنفيذ VS على المعالج لواجهة PSI</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">تنفيذ VS على المعالج مع المقص</string>
+<string name="es_gpu_force_convert_line_loops_to_strips">فرض تحويل حلقات الخطوط</string>
+<string name="es_gpu_force_convert_quad_lists_to_triangle_lists">فرض تحويل قوائم الأرباع</string>
+<string name="es_gpu_force_convert_triangle_fans_to_lists">فرض تحويل مراوح المثلثات</string>
+<string name="es_gpu_framerate_limit">حد معدل الإطارات</string>
+<string name="es_gpu_gamma_render_target_as_srgb">هدف العرض غاما كـ sRGB</string>
+<string name="es_gpu_gpu">نظام الرسومات</string>
+<string name="es_gpu_gpu_allow_invalid_fetch_constants">السماح بثوابت الجلب غير الصالحة</string>
+<string name="es_gpu_half_pixel_offset">تعويض نصف البكسل</string>
+<string name="es_gpu_ignore_32bit_vertex_index_support">تجاهل دعم مؤشرات القمم 32 بت</string>
+<string name="es_gpu_log_guest_driven_gpu_register_written_values">تسجيل كتابات سجل GPU</string>
+<string name="es_gpu_log_ringbuffer_kickoff_initiator_bts">تسجيل تشغيل Ringbuffer</string>
+<string name="es_gpu_mrt_edram_used_range_clamp_to_min">حد أدنى لـ MRT EDRAM</string>
+<string name="es_gpu_native_2x_msaa">MSAA الأصلي 2x</string>
+<string name="es_gpu_native_stencil_value_output">إخراج قيمة الاستنسل الأصلي</string>
+<string name="es_gpu_non_seamless_cube_map">خريطة مكعبة غير متصلة</string>
+<string name="es_gpu_primitive_processor_cache_min_indices">الحد الأدنى لمؤشرات ذاكرة التخزين المؤقت الأولية</string>
+<string name="es_gpu_query_occlusion_sample_lower_threshold">الحد الأدنى لعينة الاختفاء</string>
+<string name="es_gpu_query_occlusion_sample_upper_threshold">الحد الأعلى لعينة الاختفاء</string>
+<string name="es_gpu_readback_memexport">استرجاع Memexport</string>
+<string name="es_gpu_readback_resolve">استرجاع الحل</string>
+<string name="es_gpu_render_target_path_vulkan">مسار هدف العرض (Vulkan)</string>
+<string name="es_gpu_resolve_resolution_scale_fill_half_pixel_offset">تعويض نصف البكسل لملء تحجيم الحل</string>
+<string name="es_gpu_snorm16_render_target_full_range">النطاق الكامل لهدف العرض SNORM16</string>
+<string name="es_gpu_store_shaders">تخزين الشيدرز</string>
+<string name="es_gpu_texture_cache_memory_limit_hard">الحد الأقصى لذاكرة التخزين المؤقت للنصوص</string>
+<string name="es_gpu_texture_cache_memory_limit_render_to_texture">حد RTT لذاكرة التخزين المؤقت للنصوص</string>
+<string name="es_gpu_texture_cache_memory_limit_soft">الحد الأدنى لذاكرة التخزين المؤقت للنصوص</string>
+<string name="es_gpu_texture_cache_memory_limit_soft_lifetime">عمر ذاكرة التخزين المؤقت اللينة للنصوص</string>
+<string name="es_gpu_trace_gpu_prefix">بادئة تتبع GPU</string>
+<string name="es_gpu_trace_gpu_stream">تتبع تيار GPU</string>
+<string name="es_gpu_vsync">مزامنة عمودية</string>
+
+<string name="es_general">عام</string>
+<string name="es_general_allow_plugins">السماح بالإضافات</string>
+<string name="es_general_apply_patches">تطبيق التصحيحات</string>
+<string name="es_general_debug">وضع التصحيح</string>
+<string name="es_general_discord">Discord Rich Presence</string>
+<string name="es_general_launch_module">وحدة التشغيل</string>
+<string name="es_general_notification_sound_path">مسار صوت الإشعارات</string>
+<string name="es_general_time_scalar">مقياس الوقت</string>
+
+<string name="es_hid">HID</string>
+<string name="es_hid_hid">نظام الإدخال</string>
+<string name="es_hid_left_stick_deadzone_percentage">منطقة ميتة للعصا اليسرى</string>
+<string name="es_hid_right_stick_deadzone_percentage">منطقة ميتة للعصا اليمنى</string>
+<string name="es_hid_vibration">اهتزاز يد التحكم</string>
+
+<string name="es_kernel">النواة</string>
+<string name="es_kernel_allow_nui_initialization">السماح بتهيئة NUI</string>
+<string name="es_kernel_allow_incompatible_title_update">السماح بتحديثات العنوان غير المتوافقة</string>
+<string name="es_kernel_apply_title_update">تطبيق تحديثات العنوان</string>
+<string name="es_kernel_cl">وسائط سطر الأوامر</string>
+<string name="es_kernel_default_achievements_backend">واجهة الإنجازات الخلفية</string>
+<string name="es_kernel_ignore_thread_affinities">تجاهل انتماءات الخيوط</string>
+<string name="es_kernel_ignore_thread_priorities">تجاهل أولويات الخيوط</string>
+<string name="es_kernel_kernel_build_version">إصدار بناء النواة</string>
+<string name="es_kernel_kernel_cert_monitor">مراقب الشهادات</string>
+<string name="es_kernel_kernel_debug_monitor">مراقب التصحيح</string>
+<string name="es_kernel_kernel_display_gamma_power">قوة غاما العرض</string>
+<string name="es_kernel_kernel_display_gamma_type">نوع غاما العرض</string>
+<string name="es_kernel_kernel_pix">PIX</string>
+<string name="es_kernel_log_high_frequency_kernel_calls">تسجيل المكالمات عالية التردد</string>
+<string name="es_kernel_staging_mode">وضع التدريج</string>
+
+<string name="es_logging">التسجيل</string>
+<string name="es_logging_flush_log">إفراغ السجل</string>
+<string name="es_logging_log_file">مسار ملف السجل</string>
+<string name="es_logging_log_level">مستوى السجل</string>
+<string name="es_logging_log_mask">قناع السجل</string>
+<string name="es_logging_log_string_format_kernel_calls">تسجيل مكالمات النواة</string>
+<string name="es_logging_log_to_debugprint">تسجيل إلى DebugPrint</string>
+<string name="es_logging_log_to_stdout">تسجيل إلى Stdout</string>
+
+<string name="es_memory">الذاكرة</string>
+<string name="es_memory_ignore_offset_for_ranged_allocations">تجاهل التعويض للتخصيصات النطاقية</string>
+<string name="es_memory_mmap_address_high">عنوان MMAP العالي</string>
+<string name="es_memory_protect_on_release">حماية الذاكرة المحررة</string>
+<string name="es_memory_protect_zero">حماية الصفحة الصفرية</string>
+<string name="es_memory_scribble_heap">.heap المخطوطة</string>
+<string name="es_memory_writable_executable_memory">ذاكرة تنفيذية قابلة للكتابة</string>
+
+<string name="es_profiles">الملفات الشخصية</string>
+<string name="es_profiles_logged_profile_slot_0_xuid">ملف تعريف الفتحة 0 XUID</string>
+<string name="es_profiles_logged_profile_slot_1_xuid">ملف تعريف الفتحة 1 XUID</string>
+<string name="es_profiles_logged_profile_slot_2_xuid">ملف تعريف الفتحة 2 XUID</string>
+<string name="es_profiles_logged_profile_slot_3_xuid">ملف تعريف الفتحة 3 XUID</string>
+
+<string name="es_storage">التخزين</string>
+<string name="es_storage_cache_root">مسار جذر التخزين المؤقت</string>
+<string name="es_storage_content_root">مسار جذر المحتوى</string>
+<string name="es_storage_mount_cache">تثبيت التخزين المؤقت</string>
+<string name="es_storage_mount_scratch">تثبيت المسودة</string>
+<string name="es_storage_storage_root">مسار جذر التخزين</string>
+
+<string name="es_ui">واجهة المستخدم</string>
+<string name="es_ui_headless">وضع بدون رأس</string>
+<string name="es_ui_profiler_dpi_scaling">تحجيم DPI للمحلل</string>
+<string name="es_ui_show_achievement_notification">إظهار إشعارات الإنجاز</string>
+<string name="es_ui_show_profiler">إظهار المحلل</string>
+<string name="es_ui_storage_selection_dialog">مربع حوار اختيار التخزين</string>
+
+<string name="es_video">الفيديو</string>
+<string name="es_video_avpack">حزمة AV</string>
+<string name="es_video_enable_3d_mode">تفعيل وضع 3D</string>
+<string name="es_video_interlaced">وضع التداخل</string>
+<string name="es_video_internal_display_resolution">دقة العرض الداخلية</string>
+<string name="es_video_internal_display_resolution_x">عرض العرض المخصص</string>
+<string name="es_video_internal_display_resolution_y">ارتفاع العرض المخصص</string>
+<string name="es_video_use_50Hz_mode">استخدام وضع 50Hz</string>
+<string name="es_video_video_standard">معيار الفيديو</string>
+<string name="es_video_widescreen">وضع الشاشة العريضة</string>
+
+<string name="es_vulkan">Vulkan</string>
+<string name="es_vulkan_vulkan_allow_present_mode_fifo_relaxed">السماح بوضع العرض FIFO المرتاح</string>
+<string name="es_vulkan_vulkan_allow_present_mode_immediate">السماح بوضع العرض الفوري</string>
+<string name="es_vulkan_vulkan_allow_present_mode_mailbox">السماح بوضع عرض Mailbox</string>
+<string name="es_vulkan_vulkan_device">فهرس جهاز Vulkan</string>
+<string name="es_vulkan_vulkan_log_debug_messages">تسجيل رسائل تصحيح Vulkan</string>
+<string name="es_vulkan_vulkan_sparse_shared_memory">ذاكرة مشتركة متناثرة</string>
+<string name="es_vulkan_vulkan_validation">طبقة التحقق من Vulkan</string>
+
+<string name="es_xconfig">XConfig</string>
+<string name="es_xconfig_audio_flag">علامة الصوت</string>
+<string name="es_xconfig_user_country">بلد المستخدم</string>
+<string name="es_xconfig_user_language">لغة المستخدم</string>
+
+<string name="es_a64">a64</string>
+<string name="es_a64_a64_extension_mask">قناع امتداد A64</string>
+
+    <string name="es_hint_apu_apu">نظام الصوت. استخدم: [any, nop, opensles, aaudio]</string>
+    <string name="es_hint_apu_apu_max_queued_frames">يسمح بتغيير الحد الأقصى لإطارات الصوت المخزنة في الذاكرة المؤقتة لتقليل تأخير الصوت. قد يؤدي خفض هذه القيمة إلى مشاكل في الأداء. نطاق القيمة: [4-64]</string>
+    <string name="es_hint_apu_enable_xmp">يمكّن تشغيل مشغل الموسيقى.</string>
+    <string name="es_hint_apu_ffmpeg_verbose">إخراج FFmpeg مفصل (تصحيح وأعلى)</string>
+    <string name="es_hint_apu_mute">يكتم جميع مخرجات الصوت.</string>
+    <string name="es_hint_apu_use_dedicated_xma_thread">يمكّن فك ترميز XMA على خيط منفصل. يجب أن ينتج عن التعطيل نتائج أفضل، لكن يقلل الأداء قليلاً.</string>
+    <string name="es_hint_apu_use_new_decoder">يمكّن استخدام فك ترميز الصوت التجريبي الجديد لـ XMA.</string>
+    <string name="es_hint_apu_xmp_default_volume">مستوى صوت مشغل الموسيقى الافتراضي إذا لم تحدد اللعبة ذلك [0-100].</string>
+
+    <string name="es_hint_cpu_break_condition_gpr">GPR مقارنة بـ</string>
+    <string name="es_hint_cpu_break_condition_op">مشغل المقارنة</string>
+    <string name="es_hint_cpu_break_condition_truncate">اقتطاع القيمة إلى 32 بت</string>
+    <string name="es_hint_cpu_break_condition_value">القيمة التي تتم المقارنة بها</string>
+    <string name="es_hint_cpu_break_on_debugbreak">int3 على طلبات __debugbreak المعالجة JIT.</string>
+    <string name="es_hint_cpu_break_on_instruction">int3 قبل تنفيذ عنوان الضيف المحدد.</string>
+    <string name="es_hint_cpu_break_on_start">التوقف عند المحمك عند بدء التشغيل.</string>
+    <string name="es_hint_cpu_break_on_unimplemented_instructions">التوقف عند المحمك المضيف (أو التعطل إذا لم يكن هناك محمك متصل) في حالة مواجهة تعليمات PowerPC غير منفذة.</string>
+    <string name="es_hint_cpu_clock_no_scaling">تعطيل كود التحجيم. يتم تجاوز إدارة الوقت والقفل. يتم سحب وقت نظام الضيف مباشرة من المضيف.</string>
+    <string name="es_hint_cpu_clock_source_raw">على x64، استخدم تعليمات RDTSC كمصدر للوقت. يتطلب TSC ثابت. على a64، استخدم سجل CNTVCT_EL0 كمصدر للوقت</string>
+    <string name="es_hint_cpu_cpu">خلفية CPU [any, x64, a64].</string>
+    <string name="es_hint_cpu_debugprint_trap_log">تسجيل عمليات احتيال debugprint إلى المحمك النشط</string>
+    <string name="es_hint_cpu_disable_global_lock">يعطل استخدام القفل العالمي في كود الضيف. لا يؤثر على كود المضيف.</string>
+    <string name="es_hint_cpu_disassemble_functions">تفكيك الدوال أثناء التوليد.</string>
+    <string name="es_hint_cpu_ignore_undefined_externs">عدم الخروج عند استدعاء extern غير معرّف.</string>
+    <string name="es_hint_cpu_inline_mmio_access">عمليات تحميل وتخزين MMIO ثابتة inline.</string>
+    <string name="es_hint_cpu_load_module_map">يحمّل ملف .map لأسماء الرموز وللمقارنة مع قاعدة بيانات الرموز المولدة.</string>
+    <string name="es_hint_cpu_pvr">رقم إصدار المعالج ومراجعته.\nالبتات 0 إلى 15 هي رقم الإصدار.\nالبتات 16 إلى 31 هي رقم المراجعة.\nملاحظة: بعض XEXs (مثل mfgbootlauncher.xex) قد تتحقق من قيمة أقل من 0x710700.</string>
+    <string name="es_hint_cpu_store_all_context_values">لا تقم بإزالة مخازن السياق الميتة للمساعدة في التصحيح.</string>
+    <string name="es_hint_cpu_trace_function_coverage">إنشاء تتبع لإحصائيات تغطية وظائف الدوال.</string>
+    <string name="es_hint_cpu_trace_function_data">إنشاء تتبع لبيانات نتائج الدوال.</string>
+    <string name="es_hint_cpu_trace_function_data_path">الملف لكتابة بيانات التتبع إليه.</string>
+    <string name="es_hint_cpu_trace_function_references">إنشاء تتبع لمراجع عناوين الدوال.</string>
+    <string name="es_hint_cpu_trace_functions">إنشاء تتبع لإحصائيات الدوال.</string>
+    <string name="es_hint_cpu_validate_hir">إجراء تحقق من HIR أثناء الترجمة.</string>
+
+    <string name="es_hint_content_license_mask">تعيين قناع الترخيص للمحتوى المفعّل.\n0 = لا توجد تراخيص مفعّلة.\n1 = تفعيل الترخيص الأول. بشكل عام ترخيص النسخة الكاملة في ألعاب Xbox Live Arcade.\n-1 أو 0xFFFFFFFF = تفعيل جميع التراخيص الممكنة. بشكل عام فكرة سيئة، قد تؤدي إلى سلوك غير معرّف.</string>
+
+    <string name="es_hint_display_fullscreen">ما إذا كان سيتم تشغيل المحاكي في وضع ملء الشاشة.</string>
+    <string name="es_hint_display_host_present_from_non_ui_thread">السماح لخيط محاكاة GPU بتقديم مخرج الضيف إلى سطح المضيف مباشرة بدلاً من طلب خيط UI القيام بذلك من خلال نظام نافذة المضيف.</string>
+    <string name="es_hint_display_postprocess_antialiasing">تأثير ما بعد المعالجة لمكافحة الاستعراب ليتم تطبيقه على إخراج صورة اللعبة.
+يوصى بشدة باستخدام مكافحة الاستعراب بعد المعالجة عندما يكون AMD FidelityFX Contrast Adaptive Sharpening أو Super Resolution 1.0 نشطًا.
+استخدم: [none, fxaa, fxaa_extreme]
+none (أو أي قيمة غير مدرجة هنا): عدم تغيير الصورة الأصلية.
+fxaa: NVIDIA Fast Approximate Anti-Aliasing 3.11، إعداد الجودة العادي (12).
+fxaa_extreme: NVIDIA Fast Approximate Anti-Aliasing 3.11، إعداد الجودة العالي (39).</string>
+    <string name="es_hint_display_postprocess_dither">تشويش إخراج الصورة النهائية من الدقة الداخلية إلى 8 بت لكل قناة حتى تكون التدرجات أكثر سلاسة.\nعلى شاشة 10bpc، سيتم الاحتفاظ بالبتات السفلية 2، ولكن سيتم إضافة ضوضاء إليها - قد يكون التعطيل موصى به لشاشات 10bpc، لكنه يعتمد على قدرات العرض الفعلية للشاشة المستخدمة.</string>
+    <string name="es_hint_display_postprocess_ffx_cas_additional_sharpness">حدة إضافية لـ AMD FidelityFX Contrast Adaptive Sharpening (CAS)، من 0 إلى 1. الأعلى يعني أكثر حدة.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_max_upsampling_passes">الحد الأقصى لعدد مرات تمرير upscale في AMD FidelityFX Super Resolution 1.0 (FSR) قبل العودة إلى الشد الثنائي الخطي بعد التمريرة النهائية.\nكل تمريرة تقوم بتكبير الحجم فقط إلى ما يصل إلى 2x2 من الحجم السابق. إذا كانت اللعبة تنتج صورة 1280x720، فستقوم التمريرة الأولى بتكبيرها إلى ما يصل إلى 2560x1440 (أقل من 4K)، بعد تمريرتين ستتم تكبيرها إلى حد أقصى 5120x2880 (بما في ذلك 3840x2160 لـ 4K)، وهلم جرا.\nهذا المتغير ليس له تأثير إذا لم تكن دقة الشاشة عالية جدًا، ولكن يمكن تقليله في دقات مثل 4K أو 8K في حالة كان تأثير الأداء لعدة تمريرات FSR مرتفعًا جدًا، أو إذا كانت الحواف الأكثر نعومة مرغوبة.\nالقيمة الافتراضية هي الحد الأقصى المدعوم داخليًا بواسطة Xenia.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_sharpness_reduction">تقليل الحدة لـ AMD FidelityFX Super Resolution 1.0 (FSR)، بالوحدات. الأقل يعني أكثر حدة.</string>
+    <string name="es_hint_display_postprocess_scaling_and_sharpening">تأثير ما بعد المعالجة المراد استخدامه لإعادة التشكيل و/أو زيادة الحدة لمخرج العرض النهائي.
+استخدم: [bilinear, cas, fsr]
+bilinear (أو أي قيمة غير مدرجة هنا): الصورة الأصلية عند 1:1، شد ثنائي خطي بسيط لإعادة التشكيل.
+cas: استخدام AMD FidelityFX Contrast Adaptive Sharpening (CAS) لزيادة الحدة في عوامل التحجيم حتى 2x2، مع شد ثنائي خطي إضافي للعوامل الأكبر.
+fsr: استخدام AMD FidelityFX Super Resolution 1.0 (FSR) لأعلى جودة upscale، أو AMD FidelityFX Contrast Adaptive Sharpening لزيادة الحدة دون تكبير أو تصغير.
+للحجيم بأكثر من 2x2، يتم إجراء عدة تمريرات FSR.</string>
+    <string name="es_hint_display_present_letterbox">الحفاظ على نسبة العرض إلى الارتفاع عند التمدد عن طريق عرض أشرطة حول الصورة عندما لا تكون هناك مساحة overscan أكثر للاقتصاص.</string>
+    <string name="es_hint_display_present_render_pass_clear">على الخلفيات الرسومية حيث هذا مدعوم، استخدم عملية تحميل render pass واضحة في التقديم بدلاً من أوامر واضحة تقتصر على منطقة letterbox فقط.</string>
+    <string name="es_hint_display_present_safe_area_x">نسبة مئوية من عرض الصورة التي يمكن الاحتفاظ بها عند التقديم للحفاظ على نسبة العرض إلى الارتفاع بدون letterboxing أو التمدد.</string>
+    <string name="es_hint_display_present_safe_area_y">نسبة مئوية من ارتفاع الصورة التي يمكن الاحتفاظ بها عند التقديم للحفاظ على نسبة العرض إلى الارتفاع بدون letterboxing أو التمدد.</string>
+
+    <string name="es_hint_gpu_clear_memory_page_state">تحديث حالة صفحات الذاكرة لتمكين البيانات المكتوبة بواسطة GPU. (استخدم لألعاب \'Team Ninja\' لإصلاح نماذج الشخصيات المفقودة)</string>
+    <string name="es_hint_gpu_depth_float24_convert_in_pixel_shader">ما إذا كان سيتم تحويل قيم العمق إلى فاصلة عائمة 24 بت (20e4) من دقة المضيف (فاصلة عائمة 32 بت) مباشرة في بكسل شيدر للرسومات الضيف عند استخدام عمق مضيف.\nهذا يمنع التشوهات البصرية إذا فقدت بيانات عمق المضيف كاملة الدقة. هذا خيار مكلف لأنه يجعل GPU غير قادر على استخدام ضغط عمق الذاكرة، وأيضاً مع MSAA، يجبر بكسل شيدر على التشغيل لكل عينة subpixel بدلاً من البكسل الكامل، مما يجعل ظل البكسل أثقل 2 أو 4 مرات حسب عدد عينات MSAA.</string>
+    <string name="es_hint_gpu_depth_float24_round">ما إذا كان سيتم التقريب إلى أقرب زوجي، بدلاً من الاقتطاع (التقريب نحو الصفر)، للعمق عند تحويله إلى فاصلة عائمة 24 بت (20e4) من دقة المضيف (فاصلة عائمة 32 بت) عند استخدام عمق مضيف.\nfalse: موصى به. قد يحرك تحويل قيم العمق بعيدًا عن الكاميرا.\ntrue: للحالات الخاصة فقط من المشاكل الناجمة عن أخطاء تقريب فاصلة عائمة 32 بت بسيطة.</string>
+    <string name="es_hint_gpu_depth_transfer_not_equal_test">عند نقل البيانات بين أهداف تقديم العمق، استخدم اختبار "غير متساوٍ" لتجنب إعادة كتابة العمق عبر مخرج عمق الشيدر إذا كان نفس الموجود حاليًا في عمق الذاكرة في حالة رحلات ذهاب وإياب للبيانات.</string>
+    <string name="es_hint_gpu_disassemble_pm4">لا يفعل شيئًا إلا في إصدارات التصحيح، إذا تم تعيينه سيقوم بتفكيك وتسجيل جميع حزم PM4 المرسلة إلى CP.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_x">مقياس عرض البكسل الصحيح المستخدم لتحجيم دقة التقديم بشكل شفاف للعبة. 1، 2 و 3 قد تكون مدعومة، لكن دعم أي شيء فوق 1 يعتمد على خصائص الجهاز.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_y">مقياس عرض البكسل الصحيح المستخدم لتحجيم دقة التقديم بشكل شفاف للعبة. انظر draw_resolution_scale_x لمزيد من المعلومات.</string>
+    <string name="es_hint_gpu_draw_resolution_scaled_texture_offsets">تطبيق الإزاحات من تعليمات جلب النسيج مع أخذ مقياس الدقة في الاعتبار للنسيج التقديمي، لتصحيح الظلال، التألق، إلخ، في بعض الحالات.</string>
+    <string name="es_hint_gpu_dump_shaders">لتصحيح الشيدر، المسار لإفراغ شيدرات GPU أثناء ترجمتها.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu">تنفيذ shader الرأس للرسومات مع تعطيل القص، بشكل أساسي رسومات مساحة الشاشة (مثل المسح)، على CPU عندما يكون ذلك ممكنًا لتقدير مدى EDRAM المشارك في الرسم.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">إذا كان execute_unclipped_draw_vs_on_cpu ممكّنًا، نفذ shader الرأس للرسومات غير المقصوصة على CPU حتى عند استخدام تنفيذ خلفية التقديم pixel shader interlock (rasterizer-ordered view) على المضيف.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">لا تقيد استخدام execute_unclipped_draw_vs_on_cpu للرسومات غير المقصوصة فقط (مع الجانبين الأيمن والسفلي من مستطيل القص عند 8192 أو أبعد) على الرغم من أنه إذا كان مستطيل القص موجودًا، فهو عادةً كافٍ لتقدير ارتفاع هدف التقديم.</string>
+    <string name="es_hint_gpu_force_convert_line_loops_to_strips">لاختبار دعم واجهة برمجة تطبيقات الرسومية المضيفة للأسفل فقط، فرض تحويل CPU لحلقات الخطوط إلى شرائط خطوط حتى لو كان المضيف يدعم بدائل حلقة الخط أصلاً.</string>
+    <string name="es_hint_gpu_force_convert_quad_lists_to_triangle_lists">لاختبار دعم واجهة برمجة تطبيقات الرسومية المضيفة للأسفل فقط، فرض تحويل CPU لقوائم الرباعي إلى شرائط رباعية حتى لو كان المضيف يدعم بدائل قائمة الرباعي أصلاً أو عبر محاكاة shader الهندسي.</string>
+    <string name="es_hint_gpu_force_convert_triangle_fans_to_lists">لاختبار دعم واجهة برمجة تطبيقات الرسومية المضيفة للأسفل فقط، فرض تحويل CPU لمراوح المثلثات إلى قوائم مثلثات حتى لو كان المضيف يدعم بدائل مروحة المثلثات أصلاً.</string>
+    <string name="es_hint_gpu_framerate_limit">الحد الأقصى للإطارات في الثانية. 0 = إطارات غير محدودة. افتراضيًا 60، عند التعيين إلى 0، وتم تمكين VSYNC.</string>
+    <string name="es_hint_gpu_gamma_render_target_as_srgb">عندما لا يستطيع المضيف كتابة جاما خطي piecewise مباشرة مع مزج صحيح، استخدم إخراج sRGB على المضيف للمزج المفاهيمي الصحيح في مساحة الألوان الخطية مع وجود توزيع دقة مختلف قليلاً في هدف التقديم وقيم غير صحيحة بشدة إذا كانت اللعبة تصل إلى الألوان الناتجة مباشرة كبيانات خام.</string>
+    <string name="es_hint_gpu_gpu">نظام الرسومات. استخدم: [vulkan, null]</string>
+    <string name="es_hint_gpu_gpu_allow_invalid_fetch_constants">السماح بثوابت جلب النسيج والرأس بنوع غير صالح - بشكل عام غير آمن لأن الثابت قد يحتوي على قيم غير صالحة تمامًا، ولكن قد يُستخدم لتجاوز أخطاء نوع ثابت الجلب في ألعاب معينة حتى يتم العثور على السبب الحقيقي لعدم صحتها.</string>
+    <string name="es_hint_gpu_half_pixel_offset">تمكين دعم إزاحة نصف بكسل للرأس (D3D9 PA_SU_VTX_CNTL PIX_CENTER). بشكل عام الألعاب تدرك إزاحة نصف البكسل، ويكون هذا ممكّنًا هو السلوك الصحيح (تعطيل هذا قد يكسر ما بعد المعالجة بشكل كبير في بعض الألعاب).</string>
+    <string name="es_hint_gpu_ignore_32bit_vertex_index_support">لاختبار دعم واجهة برمجة تطبيقات الرسومية المضيفة للأسفل فقط (مفيد فقط لاختبار GPU المضيف Qualcomm Adreno 4xx)، فرض تبديل أو إخفاء مسبق وتبديل مسبق لرؤوس 32 بت كما لو كان المضيف يدعم رؤوس 24 بت فقط.</string>
+    <string name="es_hint_gpu_log_guest_driven_gpu_register_written_values">لا يفعل شيئًا إلا في إصدارات التصحيح، إذا تم تعيينه سيسجل كل كتابة إلى سجل GPU تم إجراؤها بواسطة ضيف.</string>
+    <string name="es_hint_gpu_log_ringbuffer_kickoff_initiator_bts">لا يفعل شيئًا إلا في إصدارات التصحيح، إذا تم تعيينه سيسجل pseudo-stacktrace لخيط الضيف الذي كتب موضع القراءة الجديد.</string>
+    <string name="es_hint_gpu_mrt_edram_used_range_clamp_to_min">مع أهداف التقديم المضيفة، إذا تم ربط أهداف تقديم متعددة، قدّر نطاق EDRAM المعدّل في أي منها ليكون ليس أكبر من المسافة بين أي هدفي تقديم في EDRAM، بدلاً من السماح للأخير بالمطالبة ببقية EDRAM.</string>
+    <string name="es_hint_gpu_native_2x_msaa">استخدام 2x MSAA للمضيف عند توفره. يمكن تعطيله لاختبار scalability على واجهات برمجة تطبيقات GPU المضيفة حيث 2x ليس إلزاميًا، في هذه الحالة، سيتم استخدام 2 عينات من 4x MSAA بدلاً من ذلك (مع جودة مماثلة أو أسوأ واستخدام ذاكرة أعلى).</string>
+    <string name="es_hint_gpu_native_stencil_value_output">استخدام مرجع مخرج stencil shader البكسل حيث يتوفر لأغراض مثل النسخ بين أهداف التقديم. يمكن تعطيله لاختبار scalability، في هذه الحالة، سيتم رسم 8 مربعات أكثر تكلفة بكثير.</string>
+    <string name="es_hint_gpu_non_seamless_cube_map">تعطيل الترشيح بين وجوه الخريطة المكعبة بالقرب من الحواف حيثما أمكن (Vulkan مع VK_EXT_non_seamless_cube_map) لإعادة إنتاج سلوك Direct3D 9.</string>
+    <string name="es_hint_gpu_primitive_processor_cache_min_indices">أصغر عدد من رؤوس الضيف لتخزينها في الذاكرة المؤقتة لمحاولة إعادة استخدامها لاحقًا في نفس الإطار إذا تمت معالجة (مثل تحويل نوع البدائي أو استبدال مؤشر إعادة التعيين). تعيين هذا إلى قيمة عالية جدًا قد يؤدي إلى معالجة CPU مفرطة، بينما قيمة منخفضة جدًا قد تؤدي إلى قفل وبحث مفرط. القيم السالبة تعطل التخزين المؤقت.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_lower_threshold">إذا تم تعيينه إلى -1 لا تُكتب أي أعداد عينات، قد تتعطل الألعاب. وإلا، سيتم زيادة عدد العينات لكل بلاطة في كل EVENT_WRITE_ZPD بهذا الرقم. تعيين هذا إلى 0 يعني الإبلاغ عن كل شيء كمحجوب.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_upper_threshold">تعيين إلى رقم أعلى من query_occlusion_sample_lower_threshold. يتم تجاهل هذه القيمة إذا تم تعيين query_occlusion_sample_lower_threshold إلى -1.</string>
+    <string name="es_hint_gpu_readback_memexport">[D3D12 فقط] قراءة البيانات المكتوبة بتصدير الذاكرة في الشيدرات على CPU. قد يكون هذا ضروريًا في بعض الألعاب (لكن الكثير منها يصل إلى البيانات المصدرة على GPU فقط، ولا يلزم هذا العلم للتعامل مع مثل هذا السلوك)، لكن يسبب مزامنة منتصف الإطار، لذا له تأثير أداء ضخم.</string>
+    <string name="es_hint_gpu_readback_resolve">[D3D12 فقط] قراءة نتائج التقديم للنسيج على CPU. قد يكون هذا ضروريًا في بعض الألعاب، على سبيل المثال، للقطات الشاشة في الألعاب المحفوظة، لكن يسبب مزامنة منتصف الإطار، لذا له تأثير أداء ضخم.</string>
+    <string name="es_hint_gpu_render_target_path_vulkan">مسار محاكاة هدف التقديم لاستخدامه على Vulkan. استخدم: [any, fbo, fsi]\nfbo: إطارات العمل المضيفة والدمج ذو الوظيفة الثابتة واختبار العمق / stencil، النسخ بين أهداف التقديم عند الحاجة. دقة أقل (دقة تنسيق بكسل محدودة).\nfsi: حزمة البكسل اليدوية، الدمج واختبار العمق / stencil، مع تغييرات تخطيط هدف التقديم الحرة. يتطلب GPU يدعم fragment shader interlock. أعلى دقة (جميع تنسيقات البكسل معالجة في البرنامج).</string>
+    <string name="es_hint_gpu_resolve_resolution_scale_fill_half_pixel_offset">عند استخدام تحجيم الدقة، طبق الحيلة التي تمدد أول بكسل مضيف مغطى بالتأكيد في الجوانب اليسرى والعليا من مناطق حل هدف التقديم للقضاء على الفجوة الناجمة عن إزاحة نصف البكسل (هذا ضروري لألعاب معينة لعرض رسومات المشهد).</string>
+    <string name="es_hint_gpu_snorm16_render_target_full_range">عندما لا يمكن للمضيف دعم أهداف التقديم 16_16 و 16_16_16_16 إلا كـ -1...1، أعد تعيين -32...32 إلى -1...1 لاستخدام كامل النطاق الممكن من القيم، على حساب صحة المزج المضاعف.</string>
+    <string name="es_hint_gpu_store_shaders">تخزين الشيدرات بشكل دائم وتحميلها عند تحميل الألعاب لتجنب الارتفاعات والتجميد أثناء اللعب لأول مرة.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_hard">الحد الأقصى لاستخدام ذاكرة النسيج للمضيف (بالميغابايت) الذي فوقه سيتم تدمير الأنسجة في أسرع وقت ممكن.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_render_to_texture">جزء من ميزانية ذاكرة النسيج للمضيف (بالميغابايت) التي سيتم تحجيمها بمقياس دقة الرسم الحالي.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft">الحد الأقصى لاستخدام ذاكرة النسيج للمضيف (بالميغابايت) الذي فوقه سيتم تدمير الأنسجة القديمة.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft_lifetime">الثواني التي يجب أن يظل فيها النسيج غير مستخدم ليعتبر قديمًا بما يكفي لحذفه إذا تجاوز استخدام ذاكرة النسيج texture_cache_memory_limit_soft.</string>
+    <string name="es_hint_gpu_trace_gpu_prefix">مسار البادئ لملفات تتبع GPU.</string>
+    <string name="es_hint_gpu_trace_gpu_stream">تتبع جميع حزم GPU.</string>
+    <string name="es_hint_gpu_vsync">تمكين VSYNC.</string>
+
+    <string name="es_hint_general_allow_plugins">يسمح بتحميل الإضافات/المدربين من plugins\title_id\plugin.xex. الإضافات هي وحدات xex منزلية يمكن استخدامها لإنشاء mods. هذه الميزة تجريبية.</string>
+    <string name="es_hint_general_apply_patches">يمكّن وظيفة التصحيح المخصص</string>
+    <string name="es_hint_general_debug">السماح بالتصحيح والاحتفاظ بمعلومات التصحيح.</string>
+    <string name="es_hint_general_discord">تمكين Discord rich presence</string>
+    <string name="es_hint_general_launch_module">الملف التنفيذي للتشغيل من .iso أو الحزمة بدلاً من default.xex أو الوحدة المحددة بواسطة اللعبة. اتركه فارغًا لتشغيل الوحدة الافتراضية.</string>
+    <string name="es_hint_general_notification_sound_path">المسار (بما في ذلك اسم الملف) لصوت الإشعار المحدد. يجب أن يكون الصوت بتنسيق wav!</string>
+    <string name="es_hint_general_time_scalar">المقياس المستخدم لتسريع أو إبطاء الوقت (1x، 2x، 1/2x، إلخ).</string>
+
+    <string name="es_hint_hid_hid">نظام الإدخال. استخدم: [android, nop]</string>
+    <string name="es_hint_hid_left_stick_deadzone_percentage">يحدد مستوى المنطقة الميتة للعصا اليسرى. النطاق المسموح [0.0-1.0].</string>
+    <string name="es_hint_hid_right_stick_deadzone_percentage">يحدد مستوى المنطقة الميتة للعصا اليمنى. النطاق المسموح [0.0-1.0].</string>
+    <string name="es_hint_hid_vibration">تبديل اهتزاز وحدة التحكم.</string>
+
+    <string name="es_hint_kernel_allow_nui_initialization">تمكين تهيئة NUI. عيّن true فقط عند اختبار ألعاب kinect. قد تتطلب بعض الألعاب تنفيذ avatar.</string>
+    <string name="es_hint_kernel_allow_incompatible_title_update">السماح بتطبيق تحديثات العنوان بتوقيعات غير متطابقة.</string>
+    <string name="es_hint_kernel_apply_title_update">تطبيق تحديثات العنوان.</string>
+    <string name="es_hint_kernel_cl">تحديد سطر أوامر إضافي مقدم للضيف.</string>
+    <string name="es_hint_kernel_default_achievements_backend">يحدد أي خلفية إنجازات يجب استخدامها كافتراضي. الخيارات الممكنة: GPD.</string>
+    <string name="es_hint_kernel_ignore_thread_affinities">يتجاهل تقارب الخيوط المحددة من اللعبة.</string>
+    <string name="es_hint_kernel_ignore_thread_priorities">يتجاهل أولويات الخيوط المحددة من اللعبة.</string>
+    <string name="es_hint_kernel_kernel_build_version">تحديد إصدار النواة الحالي</string>
+    <string name="es_hint_kernel_kernel_cert_monitor">تمكين مراقب cert.</string>
+    <string name="es_hint_kernel_kernel_debug_monitor">تمكين مراقب التصحيح.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_power">جاما الشاشة للاستخدام مع kernel_display_gamma_type 3.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_type">نوع جاما الشاشة: 0 - خطي، 1 - sRGB (CRT)، 2 - BT.709 (HDTV)، 3 - طاقة محددة عبر kernel_display_gamma_power.</string>
+    <string name="es_hint_kernel_kernel_pix">تمكين PIX.</string>
+    <string name="es_hint_kernel_log_high_frequency_kernel_calls">تسجيل مكالمات النواة مع علامة kHighFrequency.</string>
+    <string name="es_hint_kernel_staging_mode">يمكّن وضع المعاينة في لوحات المعلومات لعرض معلومات التصحيح.</string>
+
+    <string name="es_hint_logging_flush_log">ملف سجل الدفع بعد كل دفعة من سطور السجل.</string>
+    <string name="es_hint_logging_log_file">يتم كتابة السجلات إلى الملف المحدد</string>
+    <string name="es_hint_logging_log_level">الحد الأقصى للمستوى الذي سيتم تسجيله. (0=خطأ، 1=تحذير، 2=معلومات، 3=تصحيح)</string>
+    <string name="es_hint_logging_log_mask">يعطل فئات محددة لتسجيل تصحيح أكثر دقة. Kernel = 1، Apu = 2، Cpu = 4.</string>
+    <string name="es_hint_logging_log_string_format_kernel_calls">تسجيل مكالمات النواة مع علامة kHighFrequency.</string>
+    <string name="es_hint_logging_log_to_debugprint">تفريغ السجل إلى DebugPrint.</string>
+    <string name="es_hint_logging_log_to_stdout">كتابة مخرج السجل إلى stdout</string>
+
+    <string name="es_hint_memory_ignore_offset_for_ranged_allocations">يسمح بتجاهل إزاحة 4k للتخصيصات الفيزيائية مع النطاق المقدم. بعض العناوين تتحقق مما إذا كانت النتيجة تطابق النطاق السفلي المقدم.</string>
+    <string name="es_hint_memory_mmap_address_high">1-124</string>
+    <string name="es_hint_memory_protect_on_release">حماية الذاكرة المُصدَرة لمنع الوصول.</string>
+    <string name="es_hint_memory_protect_zero">حماية الصفحة الصفرية من القراءات والكتابات.</string>
+    <string name="es_hint_memory_scribble_heap">كتابة 0xCD في جميع ذاكرة الـ heap المخصصة.</string>
+    <string name="es_hint_memory_writable_executable_memory">السماح بتعيين الذاكرة بكل من وصول الكتابة والتنفيذ، لمحاكاة السلوك على المنصات حيث لا يكون ذلك مدعومًا</string>
+
+    <string name="es_hint_profiles_logged_profile_slot_0_xuid">XUID للملف الشخصي المراد تحميله عند التمهيد في الفتحة 0</string>
+    <string name="es_hint_profiles_logged_profile_slot_1_xuid">XUID للملف الشخصي المراد تحميله عند التمهيد في الفتحة 1</string>
+    <string name="es_hint_profiles_logged_profile_slot_2_xuid">XUID للملف الشخصي المراد تحميله عند التمهيد في الفتحة 2</string>
+    <string name="es_hint_profiles_logged_profile_slot_3_xuid">XUID للملف الشخصي المراد تحميله عند التمهيد في الفتحة 3</string>
+
+    <string name="es_hint_storage_cache_root">مسار الجذر للملفات المستخدمة لتسريع أجزاء معينة من المحاكي أو اللعبة. قد تكون هذه الملفات دائمة، ولكن يمكن حذفها بدون آثار جانبية كبيرة مثل فقدان التقدم. إذا كان فارغًا، سيتم استخدام مجلد الذاكرة المؤقتة تحت جذر التخزين، أو، إذا كان متاحًا، دليل الذاكرة المؤقتة المفضل لنظام التشغيل.</string>
+    <string name="es_hint_storage_content_root">مسار الجذر لتخزين محتوى الضيف (حفظ، إلخ)، أو فارغ لاستخدام مجلد المحتوى تحت جذر التخزين.</string>
+    <string name="es_hint_storage_mount_cache">تمكين تركيب الذاكرة المؤقتة</string>
+    <string name="es_hint_storage_mount_scratch">تمكين تركيب scratch</string>
+    <string name="es_hint_storage_storage_root">مسار الجذر للتخزين الداخلي الدائم للبيانات (الإعدادات، إلخ)، أو فارغ لاستخدام المسار المفضل لنظام التشغيل، مثل مجلد المستندات، أو دليل المحاكي التنفيذي إذا كان portable.txt موجودًا فيه.</string>
+
+    <string name="es_hint_ui_headless">عدم عرض أي واجهة مستخدم، باستخدام القيم الافتراضية للمطالبات عند الحاجة.</string>
+    <string name="es_hint_ui_profiler_dpi_scaling">تطبيق تحجيم DPI النافذة على المحلل.</string>
+    <string name="es_hint_ui_show_achievement_notification">عرض إشعار الإنجاز على الشاشة.</string>
+    <string name="es_hint_ui_show_profiler">عرض واجهة التحليل بشكل افتراضي.</string>
+    <string name="es_hint_ui_storage_selection_dialog">عرض مربع حوار اختيار جهاز التخزين عندما تطلب اللعبة ذلك.</string>
+
+    <string name="es_hint_video_avpack">أوضاع الفيديو
+0 = PAL-60 مكون (SD)
+1 = غير مستخدم
+2 = PAL-60 SCART
+3 = 480p مكون (HD)
+4 = HDMI+A
+5 = PAL-60 مركب/S-Video
+6 = VGA
+7 = TV PAL-60
+8 = HDMI (افتراضي)</string>
+    <string name="es_hint_video_enable_3d_mode">يتيح استخدام الوضع المجسم في العناوين.</string>
+    <string name="es_hint_video_interlaced">يبدل الوضع المشبك.</string>
+    <string name="es_hint_video_internal_display_resolution">السماح للألعاب التي تدعم دقات مختلفة بالعرض بدقة محددة. هذا لا يضمن العمل مع جميع الألعاب أو تحسين الأداء.\n0=640x480, 1=640x576, 2=720x480, 3=720x576, 4=800x600, 5=848x480, 6=1024x768, 7=1152x864, 8=1280x720 (افتراضي), 9=1280x768, 10=1280x960, 11=1280x1024, 12=1360x768, 13=1440x900, 14=1680x1050, 15=1920x540, 16=1920x1080, 17=internal_display_resolution_x/y</string>
+    <string name="es_hint_video_internal_display_resolution_x">عرض مخصص. راجع internal_display_resolution. النطاق 1-1920.</string>
+    <string name="es_hint_video_internal_display_resolution_y">ارتفاع مخصص. راجع internal_display_resolution. النطاق 1-1080.</string>
+    <string name="es_hint_video_use_50Hz_mode">يتيح استخدام وضع PAL-50.</string>
+    <string name="es_hint_video_video_standard">يتيح التبديل بين إشارات الفيديو المختلفة. 1=NTSC, 2=NTSC-J, 3=PAL</string>
+    <string name="es_hint_video_widescreen">يبدل بين نسبة العرض إلى الارتفاع 16:9 و 4:3.</string>
+
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_fifo_relaxed">عند التوفر، السماح بوضع التقديم الأول في الأول المريح (الأولوية الثالثة)، الذي يسبب الانتظار لمزامنة رأسية لعرض المضيف، ولكن قد يقدم مع تمزيق إذا لم تلب الإطارات معدل تحديث عرض المضيف.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_immediate">عند التوفر، السماح بوضع التقديم الفوري (الأولوية الأولى)، offering أدنى زمن انتقال مع إمكانية التمزيق في حالات معينة، واعتمادًا على التكوين، معدل تحديث متغير.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_mailbox">عند التوفر، السماح بوضع تقديم صندوق البريد (الأولوية الثانية)، offering زمن انتقال منخفض بدون إمكانية التمزيق.</string>
+    <string name="es_hint_vulkan_vulkan_device">فهرس الجهاز المادي Vulkan المفضل، أو -1 لاستخدام أي جهاز متوافق.</string>
+    <string name="es_hint_vulkan_vulkan_log_debug_messages">كتابة رسائل VK_EXT_debug_utils لـ Vulkan إلى سجل Xenia، بدلاً من إخراج تصحيح نظام التشغيل.</string>
+    <string name="es_hint_vulkan_vulkan_sparse_shared_memory">تفعيل الربط المتقطع لمحاكاة الذاكرة المشتركة. تعطيله يزيد استخدام ذاكرة الفيديو - يتم إنشاء مخزن مؤقت 512 ميجابايت - ولكن يسمح لأدوات تصحيح الرسومات التي لا تدعم الربط المتقطع بالعمل.</string>
+    <string name="es_hint_vulkan_vulkan_validation">تفعيل طبقة التحقق من Vulkan (VK_LAYER_KHRONOS_validation). سيتم كتابة الرسائل إلى سجل Xenia إذا كان \'vulkan_log_debug_messages\' مفعلًا، أو إلى إخراج تصحيح نظام التشغيل خلاف ذلك.</string>
+
+    <string name="es_hint_xconfig_audio_flag">وضع الصوت التناظري.
+0x00000001 = Dolby Pro Logic
+0x00000002 = أحادي التناظرية
+وضع الصوت الرقمي.
+0x00000000 = ستيريو رقمي (اختر واحدًا مما سبق بمفرده)
+0x00010000 = Dolby Digital
+0x00030000 = Dolby Digital مع WMA PRO
+أعلام خاصة.
+0x00000003 = تجاوز ستيريو
+0x80000000 = زمن انتقال منخفض
+يتطلب هذا التكوين pairing علم تناظري ورقمي معًا بينما يتطلب الستيريو الرقمي علم تناظري فقط. الأعلام الإضافية اختيارية. مثال) 0x00010001</string>
+    <string name="es_hint_xconfig_user_country">معرف بلد المستخدم.
+1=AE 2=AL 3=AM 4=AR 5=AT 6=AU 7=AZ 8=BE 9=BH
+10=BH 11=BN 12=BO 13=BR 14=BY 15=BZ 16=CA 18=CH 19=CL
+20=CN 21=CO 22=CR 23=CZ 24=DE 25=DK 26=DO 27=DZ 28=EC
+29=EE 30=EG 31=ES 32=FI 33=FO 34=FR 35=GB 36=GE 37=GR
+38=GT 39=HK 40=HN 41=HR 42=HU 43=ID 44=IE 45=IL 46=IN
+47=IQ 48=IR 49=IS 50=IT 51=JM 52=JO 53=JP 54=KE 55=KG
+56=KR 57=KW 58=KZ 59=LB 60=LI 61=LT 62=LU 63=LV 64=LY
+65=MA 66=MC 67=MK 68=MN 69=MO 70=MV 71=MX 72=MY 73=NI
+74=NL 75=NO 76=NZ 77=OM 78=PA 79=PE 80=PH 81=PK 82=PL
+83=PR 84=PT 85=PY 86=QA 87=RO 88=RU 89=SA 90=SE 91=SG
+92=SI 93=SK 95=SV 96=SY 97=TH 98=TN 99=TR 100=TT 101=TW
+102=UA 103=US 104=UY 105=UZ 106=VE 107=VN 108=YE 109=ZA</string>
+    <string name="es_hint_xconfig_user_language">معرف لغة المستخدم.\n1=en 2=ja 3=de 4=fr 5=es 6=it 7=ko 8=zh\n9=pt 11=pl 12=ru 13=sv 14=tr 15=nb 16=nl 17=zh</string>
+
+    <string name="es_hint_a64_a64_extension_mask">السماح باكتشاف واستخدام ميزات مجموعة تعليمات محددة.
+0 = armv8.0
+1 = LSE
+2 = F16C
+-1 = اكتشاف واستخدام جميع ميزات المعالج الممكنة</string>
+
+
+</resources>

@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="es_apu_xma_decoder">Penyahkod Xma</string>
+    <string name="es_cpu_disable_context_promotion">Lumpuhkan Promosi Konteks</string>
+    <string name="es_cpu_disable_instruction_infocache">Lumpuhkan Infocache Arahan</string>
+    <string name="es_cpu_disable_prefetch_and_cachecontrol">Lumpuhkan Prefetch dan Kawalan Cache</string>
+    <string name="es_cpu_dump_translated_hir_functions">Longgokkan Fungsi HIR yang Diterjemahkan</string>
+    <string name="es_cpu_emit_inline_mmio_checks">Keluarkan Pemeriksaan MMIO Dalam Talian</string>
+    <string name="es_cpu_emit_mmio_aware_stores_for_recorded_exception_addresses">Keluarkan Stor Sedar MMIO untuk Alamat Pengecualian Direkodkan</string>
+    <string name="es_cpu_enable_early_precompilation">Dayakan Prakompilasi Awal</string>
+    <string name="es_cpu_full_optimization_even_with_debug">Pengoptimuman Penuh Walaupun dengan Nyahpepijat</string>
+    <string name="es_cpu_ignore_trap_instructions">Abaikan Arahan Perangkap</string>
+    <string name="es_cpu_no_reserved_ops">Tiada Operasi Terpelihara</string>
+    <string name="es_cpu_permit_float_constant_evaluation">Benarkan Penilaian Pemalar Float</string>
+    <string name="es_cpu_record_mmio_access_exceptions">Rekodkan Pengecualian Capaian MMIO</string>
+    <string name="es_cpu_writable_code_segments">Segmen Kod Boleh Tulis</string>
+    <string name="es_gpu_gpu_allow_invalid_upload_range">GPU Benarkan Julat Muat Naik Tidak Sah</string>
+    <string name="es_gpu_target_trace_file">Fail Jejak Sasaran</string>
+    <string name="es_gpu_trace_dump_path">Laluan Longgokan Jejak</string>
+    <string name="es_general_allow_game_relative_writes">Benarkan Penulisan Relatif Permainan</string>
+    <string name="es_general_controller_hotkeys">Kekunci Pintasan Kawalan</string>
+    <string name="es_general_disable_doubleclick_fullscreen">Lumpuhkan Skrin Penuh Dwi-klik</string>
+    <string name="es_hid_guide_button">Butang Panduan</string>
+    <string name="es_kernel_allow_avatar_initialization">Benarkan Pengawalan Avatar</string>
+    <string name="es_storage_force_mount_devkit">Paksa Lekapkan Devkit</string>
+    <string name="es_storage_mount_memory_unit">Lekapkan Unit Memori</string>
+    <string name="es_ui_custom_font_path">Laluan Fon Tersuai</string>
+
+    <string name="_default">Lalai</string>
+    <string name="driver_library_path_dialog_add_hint">Tambah Pemacu Tersuai (*.zip)</string>
+    <string name="es_vulkan_vulkan_lib_path">Laluan Pustaka Pemacu Tersuai</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">Pemacu Tersuai Paksa Jam Maksimum</string>
+
+    <string name="create_shortcut">Buat Pintasan</string>
+    <string name="disable_virtual_keyboard">Matikan papan kekunci maya</string>
+    <string name="joystick">Kayu Bedik</string>
+
+    <string name="dpad">Dpad</string>
+    <string name="abxy">ABXY</string>
+    <string name="lr">LR</string>
+    <string name="start_back">Mula/Balik</string>
+
+    <string name="save_and_quit">Simpan &amp; Keluar</string>
+    <string name="scale_rate">Kadar Skala</string>
+
+    <string name="refresh_list">Segar Semula Senarai</string>
+    <string name="about">Mengenai</string>
+    <string name="gratitude">Ucapan Terima Kasih</string>
+    <string name="update_log">Log Kemas Kini</string>
+    <string name="device_info">Maklumat Peranti</string>
+    <string name="open_source_licenses">Lesen Sumber Terbuka</string>
+
+    <string name="open_file_manager">Buka Pengurus Fail</string>
+    <string name="game_list_loading">Senarai permainan sedang dimuatkan...</string>
+    <string name="quit">Keluar</string>
+    <string name="device_unsupport_vulkan_msg">Peranti anda tidak menyokong Vulkan dan tidak dapat memenuhi syarat minimum untuk menjalankan aplikasi ini, sila keluar.</string>
+
+    <string name="loading">Memuatkan...</string>
+    <string name="msg_processing">Memproses...</string>
+    <string name="empty_game_list">Senarai permainan kosong, sila tetapkan direktori permainan</string>
+
+    <string name="enable_vibrator">Aktifkan Getaran</string>
+
+    <string name="set_game_dir">Tetapkan Direktori Permainan</string>
+
+    <string name="clear">Kosongkan</string>
+    <string name="press_a_key">Tekan mana-mana kekunci untuk teruskan...</string>
+
+    <string name="reset_as_default">Tetapkan Semula sebagai Lalai</string>
+    <string name="key_mappers">Pemeta Kekunci</string>
+
+    <string name="virtual_pad_edit">Sunting Pad Maya</string>
+
+    <string name="left">kiri</string>
+    <string name="up">atas</string>
+    <string name="right">kanan</string>
+    <string name="down">bawah</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+
+    <string name="lshoulder">LShoulder</string>
+    <string name="lthumbpress">LThumbPress</string>
+    <string name="ltrigger">LTrigger</string>
+
+    <string name="rshoulder">RShoulder</string>
+    <string name="rthumbpress">RThumbPress</string>
+    <string name="rtrigger">RTrigger</string>
+
+    <string name="start">mula</string>
+    <string name="back">Balik</string>
+
+    <string name="use_global_config">Gunakan Konfigurasi Global</string>
+
+    <string name="settings">Tetapan</string>
+
+
+    <string name="gratitude_content">Terima kasih Ruban atas semua IKON\n\n
+		Terima kasih kepada SRC267 (Sting) kerana menguruskan reddit/discord\n\n
+		Terima kasih kepada 妖妖 untuk ujian\n\n
+		Terima kasih kepada 再见某人 \n\n
+        Terima kasih kepada 再见某人 \n\n
+        Terima kasih kepada 再见某人 \n\n
+        \n\n
+        		Berdasarkan pengoptimuman transplantasi Xenia, terima kasih kepada semua peserta projek Xenia\n\n
+    </string>
+
+    <string name="es_apu">APU</string>
+<string name="es_apu_apu">Sistem Audio</string>
+<string name="es_apu_apu_max_queued_frames">Bingkai Dibariskan Maksimum</string>
+<string name="es_apu_enable_xmp">Dayakan Pemain Muzik</string>
+<string name="es_apu_ffmpeg_verbose">Output Terperinci FFmpeg</string>
+<string name="es_apu_mute">Senyapkan Semua Audio</string>
+<string name="es_apu_use_dedicated_xma_thread">Benang XMA Khusus</string>
+<string name="es_apu_use_new_decoder">Guna Penyahkod XMA Baharu</string>
+<string name="es_apu_xmp_default_volume">Kelantangan Muzik Lalai</string>
+
+<string name="es_cpu">CPU</string>
+<string name="es_cpu_break_condition_gpr">Syarat Henti GPR</string>
+<string name="es_cpu_break_condition_op">Operator Syarat Henti</string>
+<string name="es_cpu_break_condition_truncate">Potong Nilai kepada 32-bit</string>
+<string name="es_cpu_break_condition_value">Nilai Syarat Henti</string>
+<string name="es_cpu_break_on_debugbreak">Henti pada Debugbreak</string>
+<string name="es_cpu_break_on_instruction">Henti pada Arahan</string>
+<string name="es_cpu_break_on_start">Henti pada Mula</string>
+<string name="es_cpu_break_on_unimplemented_instructions">Henti pada Arahan Tidak Dilaksanakan</string>
+<string name="es_cpu_clock_no_scaling">Lumpuhkan Penskalaan Jam</string>
+<string name="es_cpu_clock_source_raw">Guna Sumber Jam Mentah</string>
+<string name="es_cpu_cpu">Bahagian Belakang CPU</string>
+<string name="es_cpu_debugprint_trap_log">Log Perangkap Debugprint</string>
+<string name="es_cpu_disable_global_lock">Lumpuhkan Kunci Global</string>
+<string name="es_cpu_disassemble_functions">Nyahhimpun Fungsi</string>
+<string name="es_cpu_ignore_undefined_externs">Abaikan Luaran Tidak Ditakrif</string>
+<string name="es_cpu_inline_mmio_access">Akses MMIO Dalam Talian</string>
+<string name="es_cpu_load_module_map">Muatkan Peta Modul</string>
+<string name="es_cpu_pvr">Versi/Pindaan Pemproses</string>
+<string name="es_cpu_store_all_context_values">Simpan Semua Nilai Konteks</string>
+<string name="es_cpu_trace_function_coverage">Jejak Liputan Fungsi</string>
+<string name="es_cpu_trace_function_data">Jejak Data Fungsi</string>
+<string name="es_cpu_trace_function_data_path">Laluan Jejak Data Fungsi</string>
+<string name="es_cpu_trace_function_references">Jejak Rujukan Fungsi</string>
+<string name="es_cpu_trace_functions">Jejak Fungsi</string>
+<string name="es_cpu_validate_hir">Sahkan HIR</string>
+
+<string name="es_content">Kandungan</string>
+<string name="es_content_license_mask">Topeng Lesen</string>
+
+<string name="es_display">Paparan</string>
+<string name="es_display_fullscreen">Mod Skrin Penuh</string>
+<string name="es_display_host_present_from_non_ui_thread">Persembahan Terus dari Benang Bukan UI</string>
+<string name="es_display_postprocess_antialiasing">Anti-aliasing Pasca-proses</string>
+<string name="es_display_postprocess_dither">Dithering Pasca-proses</string>
+<string name="es_display_postprocess_ffx_cas_additional_sharpness">Ketajaman Tambahan CAS</string>
+<string name="es_display_postprocess_ffx_fsr_max_upsampling_passes">Lulusan Menaik Sampel Maks FSR</string>
+<string name="es_display_postprocess_ffx_fsr_sharpness_reduction">Pengurangan Ketajaman FSR</string>
+<string name="es_display_postprocess_scaling_and_sharpening">Penskalaan dan Penajaman</string>
+<string name="es_display_present_letterbox">Persembahan Peti Surat</string>
+<string name="es_display_present_render_pass_clear">Kosongkan Laluan Render</string>
+<string name="es_display_present_safe_area_x">Kawasan Selamat X</string>
+<string name="es_display_present_safe_area_y">Kawasan Selamat Y</string>
+
+<string name="es_gpu">GPU</string>
+<string name="es_gpu_clear_memory_page_state">Kosongkan Keadaan Halaman Memori</string>
+<string name="es_gpu_depth_float24_convert_in_pixel_shader">Tukar Kedalaman dalam Pelorek Piksel</string>
+<string name="es_gpu_depth_float24_round">Bulatkan Penukaran Kedalaman</string>
+<string name="es_gpu_depth_transfer_not_equal_test">Ujian Pemindahan Kedalaman Tidak Sama</string>
+<string name="es_gpu_disassemble_pm4">Nyahhimpun Paket PM4</string>
+<string name="es_gpu_draw_resolution_scale_x">Skala Resolusi Lukisan X</string>
+<string name="es_gpu_draw_resolution_scale_y">Skala Resolusi Lukisan Y</string>
+<string name="es_gpu_draw_resolution_scaled_texture_offsets">Ofset Tekstur Berskala</string>
+<string name="es_gpu_dump_shaders">Laluan Longgokkan Pelorek</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu">Laksanakan VS pada CPU untuk Lukisan Tidak Dipotong</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Laksanakan VS pada CPU untuk Bahagian Belakang PSI</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Laksanakan VS pada CPU dengan Gunting</string>
+<string name="es_gpu_force_convert_line_loops_to_strips">Paksa Tukar Gelung Garisan kepada Jalur</string>
+<string name="es_gpu_force_convert_quad_lists_to_triangle_lists">Paksa Tukar Senarai Sisi Empat kepada Senarai Segitiga</string>
+<string name="es_gpu_force_convert_triangle_fans_to_lists">Paksa Tukar Kipas Segitiga kepada Senarai</string>
+<string name="es_gpu_framerate_limit">Had Kadar Bingkai</string>
+<string name="es_gpu_gamma_render_target_as_srgb">RT Gamma sebagai sRGB</string>
+<string name="es_gpu_gpu">Sistem Grafik</string>
+<string name="es_gpu_gpu_allow_invalid_fetch_constants">Benarkan Pemalar Ambil Tidak Sah</string>
+<string name="es_gpu_half_pixel_offset">Ofset Separuh Piksel</string>
+<string name="es_gpu_ignore_32bit_vertex_index_support">Abaikan Sokongan Indeks Vertex 32-bit</string>
+<string name="es_gpu_log_guest_driven_gpu_register_written_values">Log Penulisan Daftar GPU</string>
+<string name="es_gpu_log_ringbuffer_kickoff_initiator_bts">Log Permulaan Ringbuffer</string>
+<string name="es_gpu_mrt_edram_used_range_clamp_to_min">Klem MRT EDRAM kepada Min</string>
+<string name="es_gpu_native_2x_msaa">MSAA Asli 2x</string>
+<string name="es_gpu_native_stencil_value_output">Output Nilai Stensil Asli</string>
+<string name="es_gpu_non_seamless_cube_map">Peta Kiub Tidak Berjahit</string>
+<string name="es_gpu_primitive_processor_cache_min_indices">Indeks Min Cache Primitif</string>
+<string name="es_gpu_query_occlusion_sample_lower_threshold">Ambang Bawah Sampel Penghadaman</string>
+<string name="es_gpu_query_occlusion_sample_upper_threshold">Ambang Atas Sampel Penghadaman</string>
+<string name="es_gpu_readback_memexport">Baca Balik Eksport Memori</string>
+<string name="es_gpu_readback_resolve">Baca Balik Selesaikan</string>
+<string name="es_gpu_render_target_path_vulkan">Laluan Sasaran Render (Vulkan)</string>
+<string name="es_gpu_resolve_resolution_scale_fill_half_pixel_offset">Ofset Separuh Piksel Isi Skala Selesaikan</string>
+<string name="es_gpu_snorm16_render_target_full_range">Julat Penuh RT SNORM16</string>
+<string name="es_gpu_store_shaders">Simpan Pelorek</string>
+<string name="es_gpu_texture_cache_memory_limit_hard">Had Keras Cache Tekstur</string>
+<string name="es_gpu_texture_cache_memory_limit_render_to_texture">Had RTT Cache Tekstur</string>
+<string name="es_gpu_texture_cache_memory_limit_soft">Had Lembut Cache Tekstur</string>
+<string name="es_gpu_texture_cache_memory_limit_soft_lifetime">Jangka Hayat Lembut Cache Tekstur</string>
+<string name="es_gpu_trace_gpu_prefix">Awalan Jejak GPU</string>
+<string name="es_gpu_trace_gpu_stream">Jejak Aliran GPU</string>
+<string name="es_gpu_vsync">VSYNC</string>
+
+<string name="es_general">Am</string>
+<string name="es_general_allow_plugins">Benarkan Pemalam</string>
+<string name="es_general_apply_patches">Guna Patch</string>
+<string name="es_general_debug">Mod Nyahpepijat</string>
+<string name="es_general_discord">Kehadiran Kaya Discord</string>
+<string name="es_general_launch_module">Modul Pelancaran</string>
+<string name="es_general_notification_sound_path">Laluan Bunyi Pemberitahuan</string>
+<string name="es_general_time_scalar">Skalar Masa</string>
+
+<string name="es_hid">HID</string>
+<string name="es_hid_hid">Sistem Input</string>
+<string name="es_hid_left_stick_deadzone_percentage">Zon Mati Stick Kiri</string>
+<string name="es_hid_right_stick_deadzone_percentage">Zon Mati Stick Kanan</string>
+<string name="es_hid_vibration">Getaran Kawalan</string>
+
+<string name="es_kernel">Kernel</string>
+<string name="es_kernel_allow_nui_initialization">Benarkan Pengawalan NUI</string>
+<string name="es_kernel_allow_incompatible_title_update">Benarkan Kemas Kini Tajuk Tidak Serasi</string>
+<string name="es_kernel_apply_title_update">Guna Kemas Kini Tajuk</string>
+<string name="es_kernel_cl">Argumen Baris Arahan</string>
+<string name="es_kernel_default_achievements_backend">Bahagian Belakang Pencapaian</string>
+<string name="es_kernel_ignore_thread_affinities">Abaikan Afiniti Benang</string>
+<string name="es_kernel_ignore_thread_priorities">Abaikan Keutamaan Benang</string>
+<string name="es_kernel_kernel_build_version">Versi Binaan Kernel</string>
+<string name="es_kernel_kernel_cert_monitor">Pemantau Sijil</string>
+<string name="es_kernel_kernel_debug_monitor">Pemantau Nyahpepijat</string>
+<string name="es_kernel_kernel_display_gamma_power">Kuasa Gamma Paparan</string>
+<string name="es_kernel_kernel_display_gamma_type">Jenis Gamma Paparan</string>
+<string name="es_kernel_kernel_pix">PIX</string>
+<string name="es_kernel_log_high_frequency_kernel_calls">Log Panggilan Kekerapan Tinggi</string>
+<string name="es_kernel_staging_mode">Mod Pementasan</string>
+
+<string name="es_logging">Pengelogan</string>
+<string name="es_logging_flush_log">Basuh Log</string>
+<string name="es_logging_log_file">Laluan Fail Log</string>
+<string name="es_logging_log_level">Tahap Log</string>
+<string name="es_logging_log_mask">Topeng Log</string>
+<string name="es_logging_log_string_format_kernel_calls">Log Panggilan Kernel</string>
+<string name="es_logging_log_to_debugprint">Log ke DebugPrint</string>
+<string name="es_logging_log_to_stdout">Log ke Stdout</string>
+
+<string name="es_memory">Memori</string>
+<string name="es_memory_ignore_offset_for_ranged_allocations">Abaikan Ofset untuk Peruntukan Berjarak</string>
+<string name="es_memory_mmap_address_high">Alamat MMAP Tinggi</string>
+<string name="es_memory_protect_on_release">Lindungi Memori yang Dilepaskan</string>
+<string name="es_memory_protect_zero">Lindungi Halaman Sifar</string>
+<string name="es_memory_scribble_heap">Timbunan Coretan</string>
+<string name="es_memory_writable_executable_memory">Memori Boleh Laksana Boleh Tulis</string>
+
+<string name="es_profiles">Profil</string>
+<string name="es_profiles_logged_profile_slot_0_xuid">Slot Profil 0 XUID</string>
+<string name="es_profiles_logged_profile_slot_1_xuid">Slot Profil 1 XUID</string>
+<string name="es_profiles_logged_profile_slot_2_xuid">Slot Profil 2 XUID</string>
+<string name="es_profiles_logged_profile_slot_3_xuid">Slot Profil 3 XUID</string>
+
+<string name="es_storage">Storan</string>
+<string name="es_storage_cache_root">Laluan Punca Cache</string>
+<string name="es_storage_content_root">Laluan Punca Kandungan</string>
+<string name="es_storage_mount_cache">Lekap Cache</string>
+<string name="es_storage_mount_scratch">Lekap Scratch</string>
+<string name="es_storage_storage_root">Laluan Punca Storan</string>
+
+<string name="es_ui">UI</string>
+<string name="es_ui_headless">Mod Tanpa Kepala</string>
+<string name="es_ui_profiler_dpi_scaling">Penskalaan DPI Pemprofil</string>
+<string name="es_ui_show_achievement_notification">Tunjuk Pemberitahuan Pencapaian</string>
+<string name="es_ui_show_profiler">Tunjuk Pemprofil</string>
+<string name="es_ui_storage_selection_dialog">Dialog Pemilihan Storan</string>
+
+<string name="es_video">Video</string>
+<string name="es_video_avpack">Pek AV</string>
+<string name="es_video_enable_3d_mode">Dayakan Mod 3D</string>
+<string name="es_video_interlaced">Mod Berjalin</string>
+<string name="es_video_internal_display_resolution">Resolusi Paparan Dalaman</string>
+<string name="es_video_internal_display_resolution_x">Lebar Paparan Tersuai</string>
+<string name="es_video_internal_display_resolution_y">Tinggi Paparan Tersuai</string>
+<string name="es_video_use_50Hz_mode">Guna Mod 50Hz</string>
+<string name="es_video_video_standard">Piawai Video</string>
+<string name="es_video_widescreen">Mod Skrin Lebar</string>
+
+<string name="es_vulkan">Vulkan</string>
+<string name="es_vulkan_vulkan_allow_present_mode_fifo_relaxed">Benarkan Mod Persembahan FIFO Santai</string>
+<string name="es_vulkan_vulkan_allow_present_mode_immediate">Benarkan Mod Persembahan Segera</string>
+<string name="es_vulkan_vulkan_allow_present_mode_mailbox">Benarkan Mod Persembahan Peti Mel</string>
+<string name="es_vulkan_vulkan_device">Indeks Peranti Vulkan</string>
+<string name="es_vulkan_vulkan_log_debug_messages">Log Mesej Nyahpepijat Vulkan</string>
+<string name="es_vulkan_vulkan_sparse_shared_memory">Memori Kongsi Jarang</string>
+<string name="es_vulkan_vulkan_validation">Lapisan Pengesahan Vulkan</string>
+
+<string name="es_xconfig">XConfig</string>
+<string name="es_xconfig_audio_flag">Bendera Audio</string>
+<string name="es_xconfig_user_country">Negara Pengguna</string>
+<string name="es_xconfig_user_language">Bahasa Pengguna</string>
+
+<string name="es_a64">a64</string>
+<string name="es_a64_a64_extension_mask">Topeng Sambungan A64</string>
+
+    <string name="es_hint_apu_apu">Sistem audio. Guna: [any, nop, opensles, aaudio]</string>
+    <string name="es_hint_apu_apu_max_queued_frames">Membolehkan perubahan bingkai audio buffer maksimum untuk mengurangkan kelewatan audio. Menurunkan nilai ini mungkin menyebabkan isu prestasi. Julat nilai: [4-64]</string>
+    <string name="es_hint_apu_enable_xmp">Membolehkan main balik Pemain Muzik.</string>
+    <string name="es_hint_apu_ffmpeg_verbose">Output FFmpeg verbose (nyahpepijat dan di atasnya)</string>
+    <string name="es_hint_apu_mute">Memekatkan semua output audio.</string>
+    <string name="es_hint_apu_use_dedicated_xma_thread">Membolehkan penyahkodan XMA pada benang berasingan. Dilumpuhkan sepatutnya menghasilkan hasil yang lebih baik, tetapi mengurangkan prestasi sedikit.</string>
+    <string name="es_hint_apu_use_new_decoder">Membolehkan penggunaan penyahkod audio XMA eksperimen baru.</string>
+    <string name="es_hint_apu_xmp_default_volume">Volum muzik lalai jika permainan tidak menetapkannya [0-100].</string>
+
+    <string name="es_hint_cpu_break_condition_gpr">GPR dibandingkan dengan</string>
+    <string name="es_hint_cpu_break_condition_op">operator perbandingan</string>
+    <string name="es_hint_cpu_break_condition_truncate">potong nilai kepada 32-bit</string>
+    <string name="es_hint_cpu_break_condition_value">nilai yang dibandingkan</string>
+    <string name="es_hint_cpu_break_on_debugbreak">int3 pada permintaan __debugbreak JITed.</string>
+    <string name="es_hint_cpu_break_on_instruction">int3 sebelum alamat tetamu yang diberikan dilaksanakan.</string>
+    <string name="es_hint_cpu_break_on_start">Masuk ke dalam penyahpepijat semasa permulaan.</string>
+    <string name="es_hint_cpu_break_on_unimplemented_instructions">Break ke penyahpepijat hos (atau crash jika tiada penyahpepijat dilampirkan) jika arahan PowerPC yang tidak dilaksanakan ditemui.</string>
+    <string name="es_hint_cpu_clock_no_scaling">Lumpuhkan kod penskalaan. Pengurusan masa dan penguncian dipintas. Masa sistem tetamu ditarik terus dari hos.</string>
+    <string name="es_hint_cpu_clock_source_raw">Pada x64, Guna arahan RDTSC sebagai sumber masa. Memerlukan TSC invarian. Pada a64, Guna register CNTVCT_EL0 sebagai sumber masa</string>
+    <string name="es_hint_cpu_cpu">Backend CPU [any, x64, a64].</string>
+    <string name="es_hint_cpu_debugprint_trap_log">Log trap debugprint ke penyahpepijat aktif</string>
+    <string name="es_hint_cpu_disable_global_lock">Melumpuhkan penggunaan kunci global dalam kod tetamu. Tidak menjejaskan kod hos.</string>
+    <string name="es_hint_cpu_disassemble_functions">Nyahhimpun fungsi semasa penjanaan.</string>
+    <string name="es_hint_cpu_ignore_undefined_externs">Jangan keluar apabila extern undefined dipanggil.</string>
+    <string name="es_hint_cpu_inline_mmio_access">Muatan dan storan MMIO malar sebaris.</string>
+    <string name="es_hint_cpu_load_module_map">Memuatkan .map untuk nama simbol dan untuk membezakan dengan pangkalan data simbol yang dijana.</string>
+    <string name="es_hint_cpu_pvr">Nombor versi dan revisi pemproses.\nBit 0 hingga 15 ialah nombor versi.\nBit 16 hingga 31 ialah nombor revisi.\nNota: Sesetengah XEX (seperti mfgbootlauncher.xex) mungkin memeriksa nilai yang kurang daripada 0x710700.</string>
+    <string name="es_hint_cpu_store_all_context_values">Jangan buang store konteks mati untuk membantu penyahpepijatan.</string>
+    <string name="es_hint_cpu_trace_function_coverage">Jana penjejakan untuk statistik liputan arahan fungsi.</string>
+    <string name="es_hint_cpu_trace_function_data">Jana penjejakan untuk data hasil fungsi.</string>
+    <string name="es_hint_cpu_trace_function_data_path">Fail untuk menulis data jejak.</string>
+    <string name="es_hint_cpu_trace_function_references">Jana penjejakan untuk rujukan alamat fungsi.</string>
+    <string name="es_hint_cpu_trace_functions">Jana penjejakan untuk statistik fungsi.</string>
+    <string name="es_hint_cpu_validate_hir">Lakukan pemeriksaan pengesahan pada HIR semasa kompilasi.</string>
+
+    <string name="es_hint_content_license_mask">Tetapkan topeng lesen untuk kandungan yang diaktifkan.\n0 = Tiada lesen didayakan.\n1 = Lesen pertama didayakan. Umumnya lesen versi penuh dalam tajuk Xbox Live Arcade.\n-1 atau 0xFFFFFFFF = Semua kemungkinan lesen didayakan. Umumnya idea buruk, boleh membawa kepada tingkah laku undefined.</string>
+
+    <string name="es_hint_display_fullscreen">Sama ada untuk melancarkan emulator dalam skrin penuh.</string>
+    <string name="es_hint_display_host_present_from_non_ui_thread">Benarkan benang emulasi GPU mempersembahkan output tetamu ke permukaan hos secara langsung dan bukannya meminta benang UI melakukannya melalui sistem tetingkap hos.</string>
+    <string name="es_hint_display_postprocess_antialiasing">Kesan anti-aliasing pasca pemprosesan untuk digunakan pada output imej permainan.
+Menggunakan anti-aliasing pasca proses sangat disyorkan apabila AMD FidelityFX Contrast Adaptive Sharpening atau Super Resolution 1.0 aktif.
+Guna: [none, fxaa, fxaa_extreme]
+none (atau mana-mana nilai yang tidak disenaraikan di sini): Jangan ubah imej asal.
+fxaa: NVIDIA Fast Approximate Anti-Aliasing 3.11, preset kualiti biasa (12).
+fxaa_extreme: NVIDIA Fast Approximate Anti-Aliasing 3.11, preset kualiti melampau (39).</string>
+    <string name="es_hint_display_postprocess_dither">Dither output imej akhir dari ketepatan dalaman kepada 8 bit per saluran supaya gradien lebih lancar.\nPada paparan 10bpc, 2 bit bawah akan disimpan, tetapi hingar akan ditambah - menyahdaya mungkin disyorkan untuk 10bpc, tetapi ia bergantung pada keupayaan paparan 10bpc paparan sebenar yang digunakan.</string>
+    <string name="es_hint_display_postprocess_ffx_cas_additional_sharpness">Ketajaman tambahan untuk AMD FidelityFX Contrast Adaptive Sharpening (CAS), dari 0 hingga 1. Lebih tinggi lebih tajam.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_max_upsampling_passes">Bilangan maksimum lepas upsampling yang dilakukan dalam AMD FidelityFX Super Resolution 1.0 (FSR) sebelum kembali ke regangan bilinear selepas lepas akhir.\nSetiap lepas hanya menskalakan sehingga 2x2 saiz sebelumnya. Jika permainan mengeluarkan imej 1280x720, 1 lepas akan menskalakannya sehingga 2560x1440 (bawah 4K), selepas 2 lepas ia akan diskalakan sehingga maksimum 5120x2880 (termasuk 3840x2160 untuk 4K), dan seterusnya.\nPembolehubah ini tidak mempunyai kesan jika resolusi paparan tidak terlalu tinggi, tetapi boleh dikurangkan pada resolusi seperti 4K atau 8K sekiranya kesan prestasi beberapa lepas upsampling FSR terlalu tinggi, atau jika tepi yang lebih lembut diinginkan.\nNilai lalai ialah maksimum yang disokong secara dalaman oleh Xenia.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_sharpness_reduction">Pengurangan ketajaman untuk AMD FidelityFX Super Resolution 1.0 (FSR), dalam stop. Lebih rendah lebih tajam.</string>
+    <string name="es_hint_display_postprocess_scaling_and_sharpening">Kesan pasca pemprosesan untuk digunakan untuk pensampelan semula dan/atau penajaman output paparan akhir.
+Guna: [bilinear, cas, fsr]
+bilinear (atau mana-mana nilai yang tidak disenaraikan di sini): Imej asal pada 1:1, regangan bilinear mudah untuk pensampelan semula.
+cas: Guna AMD FidelityFX Contrast Adaptive Sharpening (CAS) untuk penajaman pada faktor penskalaan sehingga 2x2, dengan regangan bilinear tambahan untuk faktor yang lebih besar.
+fsr: Guna AMD FidelityFX Super Resolution 1.0 (FSR) untuk penskalaan naik berkualiti tertinggi, atau AMD FidelityFX Contrast Adaptive Sharpening untuk penajaman tanpa penskalaan atau pensampelan turun.
+Untuk penskalaan dengan faktor lebih daripada 2x2, beberapa lepas FSR dilakukan.</string>
+    <string name="es_hint_display_present_letterbox">Kekalkan nisbah aspek apabila meregang dengan memaparkan bar di sekeliling imej apabila tiada lagi kawasan overscan untuk dipotong.</string>
+    <string name="es_hint_display_present_render_pass_clear">Pada backend grafik di mana ini disokong, guna operasi beban lepas render clear dalam persembahan dan bukannya arahan clear yang hanya mengosongkan kawasan letterbox.</string>
+    <string name="es_hint_display_present_safe_area_x">Peratusan lebar imej yang boleh dikekalkan semasa mempersembahkan untuk mengekalkan nisbah aspek tanpa letterboxing atau regangan.</string>
+    <string name="es_hint_display_present_safe_area_y">Peratusan tinggi imej yang boleh dikekalkan semasa mempersembahkan untuk mengekalkan nisbah aspek tanpa letterboxing atau regangan.</string>
+
+    <string name="es_hint_gpu_clear_memory_page_state">Segar semula state halaman memori untuk mendayakan data yang ditulis gpu. (Guna untuk Permainan \'Team Ninja\' untuk membetulkan model watak yang hilang)</string>
+    <string name="es_hint_gpu_depth_float24_convert_in_pixel_shader">Sama ada untuk menukar nilai kedalaman kepada floating-point 24-bit (20e4) dari ketepatan hos (floating-point 32-bit) secara langsung dalam pixel shader lukisan tetamu apabila menggunakan buffer kedalaman hos.\nIni menghalang artifak visual jika data kedalaman ketepatan hos penuh hilang. Ini ialah pilihan mahal kerana ia menjadikan GPU tidak dapat menggunakan mampatan buffer kedalaman, dan juga dengan MSAA, memaksa pixel shader berjalan untuk setiap sampel subpixel dan bukannya untuk keseluruhan pixel, menjadikan peneduhan pixel 2 atau 4 kali lebih berat bergantung pada kiraan sampel MSAA.</string>
+    <string name="es_hint_gpu_depth_float24_round">Sama ada untuk membulatkan kepada genap terdekat, dan bukannya memotong (membundarkan ke sifar), kedalaman apabila menukarkannya kepada floating-point 24-bit (20e4) dari ketepatan hos (floating-point 32-bit) apabila menggunakan buffer kedalaman hos.\nfalse: Disyorkan. Penukaran mungkin mengalihkan nilai kedalaman lebih jauh dari kamera.\ntrue: Hanya untuk kes istimewa isu yang disebabkan oleh ralat pembundaran floating-point 32-bit kecil.</string>
+    <string name="es_hint_gpu_depth_transfer_not_equal_test">Apabila memindahkan data antara render target kedalaman, guna ujian "tidak sama" untuk mengelakkan penulisan semula kedalaman melalui output depth shader jika ia sama dengan yang kini dalam buffer kedalaman sekiranya perjalanan balik data.</string>
+    <string name="es_hint_gpu_disassemble_pm4">Hanya melakukan sesuatu dalam build nyahpepijat, jika ditetapkan akan nyahhimpun dan log semua paket PM4 yang dihantar ke CP.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_x">Skala lebar piksel integer yang digunakan untuk penskalaan resolusi rendering secara opaque kepada permainan. 1, 2 dan 3 mungkin disokong, tetapi sokongan apa-apa di atas 1 bergantung pada sifat peranti.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_y">Skala lebar piksel integer yang digunakan untuk penskalaan resolusi rendering secara opaque kepada permainan. Lihat draw_resolution_scale_x untuk maklumat lanjut.</string>
+    <string name="es_hint_gpu_draw_resolution_scaled_texture_offsets">Gunakan offset dari arahan fetch tekstur dengan mengambil kira skala resolusi untuk render-to-texture, untuk penapisan bayang, bloom, dll yang lebih betul, dalam sesetengah kes.</string>
+    <string name="es_hint_gpu_dump_shaders">Untuk nyahpepijatan shader, laluan untuk dump shader GPU semasa ia dikompilasi.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu">Laksanakan vertex shader untuk lukisan dengan clipping dilumpuhkan, terutamanya lukisan screen-space (seperti clears), pada CPU apabila boleh untuk menganggarkan extents EDRAM yang terlibat dalam lukisan.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Jika execute_unclipped_draw_vs_on_cpu didayakan, laksanakan vertex shader untuk lukisan tidak clipped pada CPU walaupun apabila menggunakan pelaksanaan pixel shader interlock (pandangan rasterizer-ordered) dari render backend pada hos.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Jangan hadkan penggunaan execute_unclipped_draw_vs_on_cpu kepada lukisan bukan scissored sahaja (dengan sisi kanan dan bawah rectangle scissor pada 8192 atau lebih jauh) walaupun jika rectangle scissor hadir, ia biasanya mencukupi untuk menganggarkan ketinggian render target.</string>
+    <string name="es_hint_gpu_force_convert_line_loops_to_strips">Hanya untuk ujian sokongan downlevel API grafik hos, paksa penukaran CPU line loops ke line strips walaupun hos menyokong primitif line loop secara asli.</string>
+    <string name="es_hint_gpu_force_convert_quad_lists_to_triangle_lists">Hanya untuk ujian sokongan downlevel API grafik hos, paksa penukaran CPU quad lists ke quad strips walaupun hos menyokong primitif quad list secara asli atau melalui emulasi geometry shader.</string>
+    <string name="es_hint_gpu_force_convert_triangle_fans_to_lists">Hanya untuk ujian sokongan downlevel API grafik hos, paksa penukaran CPU triangle fans ke triangle lists walaupun hos menyokong primitif triangle fan secara asli.</string>
+    <string name="es_hint_gpu_framerate_limit">Maksimum bingkai sesaat. 0 = Bingkai tanpa had. Lalai kepada 60, apabila ditetapkan kepada 0, dan VSYNC didayakan.</string>
+    <string name="es_hint_gpu_gamma_render_target_as_srgb">Apabila hos tidak boleh menulis gamma linear piecewise secara langsung dengan blending yang betul, guna output sRGB pada hos untuk blending yang betul secara konseptual dalam ruang warna linear sambil mempunyai taburan ketepatan yang sedikit berbeza dalam render target dan nilai yang sangat tidak betul jika permainan mengakses warna yang terhasil secara langsung sebagai data mentah.</string>
+    <string name="es_hint_gpu_gpu">Sistem grafik. Guna: [vulkan, null]</string>
+    <string name="es_hint_gpu_gpu_allow_invalid_fetch_constants">Benarkan pemalar fetch tekstur dan vertex dengan jenis tidak sah - umumnya tidak selamat kerana pemalar mungkin mengandungi nilai yang tidak sah sepenuhnya, tetapi boleh digunakan untuk memintas ralat jenis pemalar fetch dalam permainan tertentu sehingga sebab sebenar mengapa ia tidak sah ditemui.</string>
+    <string name="es_hint_gpu_half_pixel_offset">Dayakan sokongan vertex half-pixel offset (D3D9 PA_SU_VTX_CNTL PIX_CENTER). Umumnya permainan sedar tentang half-pixel offset, dan mempunyai ini didayakan ialah tingkah laku yang betul (melumpuhkan ini mungkin merosakkan pasca pemprosesan dengan ketara dalam sesetengah permainan).</string>
+    <string name="es_hint_gpu_ignore_32bit_vertex_index_support">Hanya untuk ujian downlevel API grafik hos (berguna hanya untuk ujian GPU hos tahap Qualcomm Adreno 4xx), paksa indirection atau pre-masking dan pre-swapping indeks vertex 32-bit seolah-olah hos hanya menyokong indeks 24-bit.</string>
+    <string name="es_hint_gpu_log_guest_driven_gpu_register_written_values">Hanya melakukan sesuatu dalam build nyahpepijat, jika ditetapkan akan log setiap tulisan ke register gpu yang dilakukan oleh tetamu.</string>
+    <string name="es_hint_gpu_log_ringbuffer_kickoff_initiator_bts">Hanya melakukan sesuatu dalam build nyahpepijat, jika ditetapkan akan log pseudo-stacktrace benang tetamu yang menulis kedudukan baca baharu.</string>
+    <string name="es_hint_gpu_mrt_edram_used_range_clamp_to_min">Dengan render target hos, jika berbilang render target diikat, anggar julat EDRAM yang diubah suai dalam mana-mana daripadanya tidak lebih besar daripada jarak antara mana-mana dua render target dalam EDRAM, dan bukannya membenarkan yang terakhir menuntut selebihnya EDRAM.</string>
+    <string name="es_hint_gpu_native_2x_msaa">Guna 2x MSAA hos apabila tersedia. Boleh dilumpuhkan untuk ujian kebolehskalaan pada API GPU hos di mana 2x tidak wajib, dalam kes ini, 2 sampel 4x MSAA akan digunakan sebaliknya (dengan kualiti serupa atau lebih teruk dan penggunaan memori yang lebih tinggi).</string>
+    <string name="es_hint_gpu_native_stencil_value_output">Guna output rujukan stencil pixel shader di mana tersedia untuk tujuan seperti menyalin antara render target. Boleh dilumpuhkan untuk ujian kebolehskalaan, dalam kes ini, lukisan 8 quads yang jauh lebih mahal akan dilakukan.</string>
+    <string name="es_hint_gpu_non_seamless_cube_map">Lumpuhkan penapisan antara muka cube map berhampiran tepi di mana boleh (Vulkan dengan VK_EXT_non_seamless_cube_map) untuk menghasilkan semula tingkah laku Direct3D 9.</string>
+    <string name="es_hint_gpu_primitive_processor_cache_min_indices">Bilangan terkecil indeks tetamu untuk disimpan dalam cache untuk cuba guna semula kemudian dalam bingkai yang sama jika pemprosesan (seperti penukaran jenis primitif atau penggantian indeks reset) dilakukan. Menetapkan ini kepada nilai yang sangat tinggi mungkin mengakibatkan pemprosesan CPU yang berlebihan, manakala nilai yang sangat rendah mungkin mengakibatkan penguncian dan carian yang berlebihan. Nilai negatif melumpuhkan caching.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_lower_threshold">Jika ditetapkan kepada -1 tiada kiraan sampel ditulis, permainan mungkin tergantung. Jika tidak, kiraan sampel setiap jubin akan ditambah pada setiap EVENT_WRITE_ZPD dengan nombor ini. Menetapkan ini kepada 0 bermakna segala-galanya dilaporkan sebagai terhalang.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_upper_threshold">Tetapkan kepada nombor yang lebih tinggi daripada query_occlusion_sample_lower_threshold. Nilai ini diabaikan jika query_occlusion_sample_lower_threshold ditetapkan kepada -1.</string>
+    <string name="es_hint_gpu_readback_memexport">[Hanya D3D12] Baca data yang ditulis oleh memory export dalam shader pada CPU. Ini mungkin diperlukan dalam sesetengah permainan (tetapi ramai hanya mengakses data dieksport pada GPU, dan flag ini tidak diperlukan untuk mengendalikan tingkah laku sedemikian), tetapi menyebabkan penyelarasan mid-frame, jadi ia mempunyai kesan prestasi yang besar.</string>
+    <string name="es_hint_gpu_readback_resolve">[Hanya D3D12] Baca hasil render-to-texture pada CPU. Ini mungkin diperlukan dalam sesetengah permainan, contohnya, untuk tangkapan skrin dalam permainan yang disimpan, tetapi menyebabkan penyelarasan mid-frame, jadi ia mempunyai kesan prestasi yang besar.</string>
+    <string name="es_hint_gpu_render_target_path_vulkan">Laluan emulasi render target untuk digunakan pada Vulkan. Guna: [any, fbo, fsi]\nfbo: Framebuffer hos dan blending fixed-function dan ujian kedalaman/stencil, menyalin antara render target apabila diperlukan. Ketepatan lebih rendah (sokongan format piksel terhad).\nfsi: Packing piksel manual, blending dan ujian kedalaman/stencil, dengan perubahan susun atur render target bebas. Memerlukan GPU yang menyokong fragment shader interlock. Ketepatan tertinggi (semua format piksel dikendalikan dalam perisian).</string>
+    <string name="es_hint_gpu_resolve_resolution_scale_fill_half_pixel_offset">Apabila menggunakan penskalaan resolusi, guna hack yang meregangkan hos piksel pasti ditutup pertama di sisi kiri dan atas kawasan resolve render target untuk menghapuskan jurang yang disebabkan oleh half-pixel offset (ini perlu untuk permainan tertentu memaparkan grafik scene).</string>
+    <string name="es_hint_gpu_snorm16_render_target_full_range">Apabila hos hanya boleh menyokong render target 16_16 dan 16_16_16_16 sebagai -1...1, peta semula -32...32 kepada -1...1 untuk menggunakan julat nilai penuh yang mungkin, dengan mengorbankan ketepatan blending pendaraban.</string>
+    <string name="es_hint_gpu_store_shaders">Simpan shader secara berterusan dan muatkannya semasa memuatkan permainan untuk mengelakkan lonjakan runtime dan beku semasa bermain permainan bukan untuk kali pertama.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_hard">Penggunaan memori tekstur hos maksimum (dalam megabait) di atas yang tekstur akan dimusnahkan secepat mungkin.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_render_to_texture">Sebahagian daripada belanjawan memori tekstur hos (dalam megabait) yang akan diskalakan oleh skala resolusi lukisan semasa.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft">Penggunaan memori tekstur hos maksimum (dalam megabait) di atas yang tekstur lama akan dimusnahkan.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft_lifetime">Saat tekstur hendaklah tidak digunakan untuk dianggap cukup lama untuk dipadam jika penggunaan memori tekstur melebihi texture_cache_memory_limit_soft.</string>
+    <string name="es_hint_gpu_trace_gpu_prefix">Laluan prefix untuk fail jejak GPU.</string>
+    <string name="es_hint_gpu_trace_gpu_stream">Jejak semua paket GPU.</string>
+    <string name="es_hint_gpu_vsync">Dayakan VSYNC.</string>
+
+    <string name="es_hint_general_allow_plugins">Membolehkan pemuatan plugin/trainer dari plugins\title_id\plugin.xex. Plugin ialah modul homebrew xex yang boleh digunakan untuk membuat mod. Ciri ini adalah eksperimen.</string>
+    <string name="es_hint_general_apply_patches">Membolehkan fungsi patching tersuai</string>
+    <string name="es_hint_general_debug">Benarkan penyahpepijatan dan kekalkan maklumat nyahpepijat.</string>
+    <string name="es_hint_general_discord">Dayakan Discord rich presence</string>
+    <string name="es_hint_general_launch_module">Executable untuk dilancarkan dari .iso atau pakej dan bukannya default.xex atau modul yang ditentukan oleh permainan. Biarkan kosong untuk melancarkan modul lalai.</string>
+    <string name="es_hint_general_notification_sound_path">Laluan (termasuk nama fail) ke bunyi pemberitahuan yang dipilih. Bunyi MESTI dalam format wav!</string>
+    <string name="es_hint_general_time_scalar">Scalar yang digunakan untuk mempercepat atau memperlahankan masa (1x, 2x, 1/2x, dll).</string>
+
+    <string name="es_hint_hid_hid">Sistem input. Guna: [android, nop]</string>
+    <string name="es_hint_hid_left_stick_deadzone_percentage">Menentukan tahap deadzone untuk stick kiri. Julat yang dibenarkan [0.0-1.0].</string>
+    <string name="es_hint_hid_right_stick_deadzone_percentage">Menentukan tahap deadzone untuk stick kanan. Julat yang dibenarkan [0.0-1.0].</string>
+    <string name="es_hint_hid_vibration">Suis getaran pengawal.</string>
+
+    <string name="es_hint_kernel_allow_nui_initialization">Dayakan inisialisasi NUI. Hanya tetapkan benar apabila menguji permainan kinect. Permainan tertentu mungkin memerlukan pelaksanaan avatar.</string>
+    <string name="es_hint_kernel_allow_incompatible_title_update">Benarkan kemas kini tajuk dengan tandatangan tidak sepadan untuk digunakan.</string>
+    <string name="es_hint_kernel_apply_title_update">Gunakan kemas kini tajuk.</string>
+    <string name="es_hint_kernel_cl">Tentukan command-line tambahan yang disediakan kepada tetamu.</string>
+    <string name="es_hint_kernel_default_achievements_backend">Menentukan backend achievements mana yang patut digunakan sebagai lalai. Pilihan yang mungkin: GPD.</string>
+    <string name="es_hint_kernel_ignore_thread_affinities">Abaikan affiniti benang yang ditentukan permainan.</string>
+    <string name="es_hint_kernel_ignore_thread_priorities">Abaikan keutamaan benang yang ditentukan permainan.</string>
+    <string name="es_hint_kernel_kernel_build_version">Takrifkan versi kernel semasa</string>
+    <string name="es_hint_kernel_kernel_cert_monitor">Dayakan monitor cert.</string>
+    <string name="es_hint_kernel_kernel_debug_monitor">Dayakan monitor nyahpepijat.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_power">Gamma paparan untuk digunakan dengan kernel_display_gamma_type 3.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_type">Jenis gamma paparan: 0 - linear, 1 - sRGB (CRT), 2 - BT.709 (HDTV), 3 - kuasa ditentukan melalui kernel_display_gamma_power.</string>
+    <string name="es_hint_kernel_kernel_pix">Dayakan PIX.</string>
+    <string name="es_hint_kernel_log_high_frequency_kernel_calls">Log panggilan kernel dengan tag kHighFrequency.</string>
+    <string name="es_hint_kernel_staging_mode">Membolehkan mod pratonton dalam dashboard untuk rendre maklumat nyahpepijat.</string>
+
+    <string name="es_hint_logging_flush_log">Flush fail log selepas setiap batch baris log.</string>
+    <string name="es_hint_logging_log_file">Log ditulis ke fail yang diberikan</string>
+    <string name="es_hint_logging_log_level">Tahap maksimum untuk direkodkan. (0=error, 1=warning, 2=info, 3=debug)</string>
+    <string name="es_hint_logging_log_mask">Melumpuhkan kategori khusus untuk logging nyahpepijat yang lebih granular. Kernel = 1, Apu = 2, Cpu = 4.</string>
+    <string name="es_hint_logging_log_string_format_kernel_calls">Log panggilan kernel dengan tag kHighFrequency.</string>
+    <string name="es_hint_logging_log_to_debugprint">Dump log ke DebugPrint.</string>
+    <string name="es_hint_logging_log_to_stdout">Tulis output log ke stdout</string>
+
+    <string name="es_hint_memory_ignore_offset_for_ranged_allocations">Membolehkan untuk mengabaikan offset 4k untuk peruntukan fizikal dengan julat yang disediakan. Tajuk tertentu memeriksa sama ada hasil sepadan dengan julat bawah yang disediakan.</string>
+    <string name="es_hint_memory_mmap_address_high">1-124</string>
+    <string name="es_hint_memory_protect_on_release">Lindungi memori yang dibebaskan untuk mencegah akses.</string>
+    <string name="es_hint_memory_protect_zero">Lindungi halaman sifar dari bacaan dan tulisan.</string>
+    <string name="es_hint_memory_scribble_heap">Scribble 0xCD ke semua memori heap yang diperuntukkan.</string>
+    <string name="es_hint_memory_writable_executable_memory">Benarkan pemetaan memori dengan kedua-dua akses tulis dan laksana, untuk mensimulasikan tingkah laku pada platform di mana ia tidak disokong</string>
+
+    <string name="es_hint_profiles_logged_profile_slot_0_xuid">XUID profil untuk dimuatkan semasa boot dalam slot 0</string>
+    <string name="es_hint_profiles_logged_profile_slot_1_xuid">XUID profil untuk dimuatkan semasa boot dalam slot 1</string>
+    <string name="es_hint_profiles_logged_profile_slot_2_xuid">XUID profil untuk dimuatkan semasa boot dalam slot 2</string>
+    <string name="es_hint_profiles_logged_profile_slot_3_xuid">XUID profil untuk dimuatkan semasa boot dalam slot 3</string>
+
+    <string name="es_hint_storage_cache_root">Laluan root untuk fail yang digunakan untuk mempercepatkan bahagian tertentu emulator atau permainan. Fail ini mungkin berterusan, tetapi ia boleh dipadam tanpa kesan sampingan utama seperti kehilangan kemajuan. Jika kosong, folder cache di bawah storage root, atau, jika tersedia, direktori cache yang diutamakan untuk OS, akan digunakan.</string>
+    <string name="es_hint_storage_content_root">Laluan root untuk storan kandungan tetamu (simpanan, dll), atau kosong untuk menggunakan folder content di bawah storage root.</string>
+    <string name="es_hint_storage_mount_cache">Dayakan mount cache</string>
+    <string name="es_hint_storage_mount_scratch">Dayakan mount scratch</string>
+    <string name="es_hint_storage_storage_root">Laluan root untuk storan data dalaman berterusan (konfigurasi, dll), atau kosong untuk menggunakan laluan yang diutamakan untuk OS, seperti folder dokumen, atau direktori executable emulator jika portable.txt terdapat di dalamnya.</string>
+
+    <string name="es_hint_ui_headless">Jangan papar mana-mana UI, guna lalai untuk prompt sebagaimana diperlukan.</string>
+    <string name="es_hint_ui_profiler_dpi_scaling">Gunakan penskalaan DPI tetingkap kepada profiler.</string>
+    <string name="es_hint_ui_show_achievement_notification">Papar pemberitahuan achievement pada skrin.</string>
+    <string name="es_hint_ui_show_profiler">Papar UI profiling secara lalai.</string>
+    <string name="es_hint_ui_storage_selection_dialog">Papar dialog pemilihan peranti storan apabila permainan memintanya.</string>
+
+        <string name="es_hint_video_avpack">Mod video
+0 = PAL-60 Component (SD)
+1 = Tidak digunakan
+2 = PAL-60 SCART
+3 = 480p Component (HD)
+4 = HDMI+A
+5 = PAL-60 Composite/S-Video
+6 = VGA
+7 = TV PAL-60
+8 = HDMI (lalai)</string>
+    <string name="es_hint_video_enable_3d_mode">Membolehkan penggunaan mod stereoskopik dalam tajuk.</string>
+    <string name="es_hint_video_interlaced">Suis mod interlaced.</string>
+    <string name="es_hint_video_internal_display_resolution">Benarkan permainan yang menyokong resolusi berbeza untuk render dalam resolusi tertentu. Ini tidak dijamin berfungsi dengan semua permainan atau meningkatkan prestasi.\n0=640x480, 1=640x576, 2=720x480, 3=720x576, 4=800x600, 5=848x480, 6=1024x768, 7=1152x864, 8=1280x720 (Lalai), 9=1280x768, 10=1280x960, 11=1280x1024, 12=1360x768, 13=1440x900, 14=1680x1050, 15=1920x540, 16=1920x1080, 17=internal_display_resolution_x/y</string>
+    <string name="es_hint_video_internal_display_resolution_x">Lebar tersuai. Lihat internal_display_resolution. Julat 1-1920.</string>
+    <string name="es_hint_video_internal_display_resolution_y">Tinggi tersuai. Lihat internal_display_resolution. Julat 1-1080.</string>
+    <string name="es_hint_video_use_50Hz_mode">Membolehkan penggunaan mod PAL-50.</string>
+    <string name="es_hint_video_video_standard">Membolehkan pertukaran antara isyarat video berbeza. 1=NTSC, 2=NTSC-J, 3=PAL</string>
+    <string name="es_hint_video_widescreen">Suis antara nisbah aspek 16:9 dan 4:3.</string>
+
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_fifo_relaxed">Apabila tersedia, benarkan mod pembentangan relaxed first-in-first-out (keutamaan ke-3), yang menyebabkan menunggu sync menegak paparan hos, tetapi mungkin membentang dengan koyakan jika bingkai tidak memenuhi kadar penyegaran paparan hos.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_immediate">Apabila tersedia, benarkan mod pembentangan immediate (keutamaan ke-1), menawarkan latensi terendah dengan kemungkinan koyakan dalam kes tertentu, dan, bergantung pada konfigurasi, kadar penyegaran boleh ubah.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_mailbox">Apabila tersedia, benarkan mod pembentangan mailbox (keutamaan ke-2), menawarkan latensi rendah tanpa kemungkinan koyakan.</string>
+    <string name="es_hint_vulkan_vulkan_device">Indeks peranti fizikal Vulkan yang dipilih, atau -1 untuk menggunakan mana-mana peranti yang serasi.</string>
+    <string name="es_hint_vulkan_vulkan_log_debug_messages">Tulis mesej VK_EXT_debug_utils Vulkan ke log Xenia, berbanding dengan output debug OS.</string>
+    <string name="es_hint_vulkan_vulkan_sparse_shared_memory">Dayakan pengikatan sparse untuk emulasi memori kongsi. Melumpuhkannya meningkatkan penggunaan memori video - penimbal 512 MB diciptakan - tetapi membolehkan debugger grafik yang tidak menyokong pengikatan sparse berfungsi.</string>
+    <string name="es_hint_vulkan_vulkan_validation">Dayakan lapisan pengesahan Vulkan (VK_LAYER_KHRONOS_validation). Mesej akan ditulis ke log Xenia jika \'vulkan_log_debug_messages\' didayakan, atau ke output debug OS jika tidak.</string>
+
+    <string name="es_hint_xconfig_audio_flag">Mod Audio Analog.
+0x00000001 = Dolby Pro Logic
+0x00000002 = Mono Analog
+Mod Audio Digital.
+0x00000000 = Stereo Digital (pilih salah satu daripada atas dengan sendiri)
+0x00010000 = Dolby Digital
+0x00030000 = Dolby Digital dengan WMA PRO
+Bendera Khas.
+0x00000003 = Stereo Bypass
+0x80000000 = Latensi Rendah
+Konfigur ini memerlukan anda memasangkan bendera analog dan digital bersama manakala stereo digital hanya memerlukan bendera analog. Bendera bonus adalah pilihan. Cth) 0x00010001</string>
+    <string name="es_hint_xconfig_user_country">ID negara pengguna.
+1=AE 2=AL 3=AM 4=AR 5=AT 6=AU 7=AZ 8=BE 9=BG
+10=BH 11=BN 12=BO 13=BR 14=BY 15=BZ 16=CA 18=CH 19=CL
+20=CN 21=CO 22=CR 23=CZ 24=DE 25=DK 26=DO 27=DZ 28=EC
+29=EE 30=EG 31=ES 32=FI 33=FO 34=FR 35=GB 36=GE 37=GR
+38=GT 39=HK 40=HN 41=HR 42=HU 43=ID 44=IE 45=IL 46=IN
+47=IQ 48=IR 49=IS 50=IT 51=JM 52=JO 53=JP 54=KE 55=KG
+56=KR 57=KW 58=KZ 59=LB 60=LI 61=LT 62=LU 63=LV 64=LY
+65=MA 66=MC 67=MK 68=MN 69=MO 70=MV 71=MX 72=MY 73=NI
+74=NL 75=NO 76=NZ 77=OM 78=PA 79=PE 80=PH 81=PK 82=PL
+83=PR 84=PT 85=PY 86=QA 87=RO 88=RU 89=SA 90=SE 91=SG
+92=SI 93=SK 95=SV 96=SY 97=TH 98=TN 99=TR 100=TT 101=TW
+102=UA 103=US 104=UY 105=UZ 106=VE 107=VN 108=YE 109=ZA</string>
+    <string name="es_hint_xconfig_user_language">ID bahasa pengguna.\n1=en 2=ja 3=de 4=fr 5=es 6=it 7=ko 8=zh\n9=pt 11=pl 12=ru 13=sv 14=tr 15=nb 16=nl 17=zh</string>
+
+    <string name="es_hint_a64_a64_extension_mask">Benarkan pengesanan dan pemanfaatan ciri set arahan khusus.
+0 = armv8.0
+1 = LSE
+2 = F16C
+-1 = Kes dan manfaatkan semua ciri pemproses yang mungkin</string>
+
+
+</resources>

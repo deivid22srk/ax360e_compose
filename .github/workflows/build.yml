@@ -1,0 +1,111 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Install NDK 27
+        run: |
+          echo "Installing NDK 27.2.12479018"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.2.12479018" || true
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.2.12479018" >> $GITHUB_ENV
+
+      - name: Install Vulkan SDK tools
+        run: |
+          VK_SDK_VER="1.4.309.0"
+          wget -q "https://sdk.lunarg.com/sdk/download/${VK_SDK_VER}/linux/vulkansdk-linux-x86_64-${VK_SDK_VER}.tar.xz" -O /tmp/vulkansdk.tar.xz
+          tar xJf /tmp/vulkansdk.tar.xz -C /tmp "${VK_SDK_VER}/x86_64/bin/glslang" "${VK_SDK_VER}/x86_64/bin/spirv-opt" "${VK_SDK_VER}/x86_64/bin/spirv-dis"
+          sudo cp /tmp/${VK_SDK_VER}/x86_64/bin/glslang /usr/local/bin/
+          sudo cp /tmp/${VK_SDK_VER}/x86_64/bin/spirv-opt /usr/local/bin/
+          sudo cp /tmp/${VK_SDK_VER}/x86_64/bin/spirv-dis /usr/local/bin/
+          sudo chmod +x /usr/local/bin/glslang /usr/local/bin/spirv-opt /usr/local/bin/spirv-dis
+          sudo ln -sf /usr/local/bin/glslang /usr/local/bin/glslangValidator
+          which glslangValidator spirv-opt spirv-dis
+
+      - name: Fix snappy cmake config
+        run: |
+          SNAPPY_DIR="app/src/main/cpp/xenia-canary/third_party/snappy"
+          mkdir -p "${SNAPPY_DIR}/cmake"
+          cat > "${SNAPPY_DIR}/cmake/config.h.in" << 'EOF'
+          #ifndef THIRD_PARTY_SNAPPY_OPENSOURCE_CMAKE_CONFIG_H_
+          #define THIRD_PARTY_SNAPPY_OPENSOURCE_CMAKE_CONFIG_H_
+
+          #define HAVE_ATTRIBUTE_ALWAYS_INLINE @HAVE_ATTRIBUTE_ALWAYS_INLINE@
+          #define HAVE_BUILTIN_CTZ @HAVE_BUILTIN_CTZ@
+          #define HAVE_BUILTIN_EXPECT @HAVE_BUILTIN_EXPECT@
+          #define HAVE_BUILTIN_PREFETCH @HAVE_BUILTIN_PREFETCH@
+          #define HAVE_FUNC_MMAP @HAVE_FUNC_MMAP@
+          #define HAVE_FUNC_SYSCONF @HAVE_FUNC_SYSCONF@
+          #define HAVE_LIBLZO2 @HAVE_LIBLZO2@
+          #define HAVE_LIBZ @HAVE_LIBZ@
+          #define HAVE_LIBLZ4 @HAVE_LIBLZ4@
+          #define HAVE_SYS_MMAN_H @HAVE_SYS_MMAN_H@
+          #define HAVE_SYS_RESOURCE_H @HAVE_SYS_RESOURCE_H@
+          #define HAVE_SYS_TIME_H @HAVE_SYS_TIME_H@
+          #define HAVE_SYS_UIO_H @HAVE_SYS_UIO_H@
+          #define HAVE_UNISTD_H @HAVE_UNISTD_H@
+          #define HAVE_WINDOWS_H @HAVE_WINDOWS_H@
+          #define SNAPPY_HAVE_SSSE3 @SNAPPY_HAVE_SSSE3@
+          #define SNAPPY_HAVE_X86_CRC32 @SNAPPY_HAVE_X86_CRC32@
+          #define SNAPPY_HAVE_BMI2 @SNAPPY_HAVE_BMI2@
+          #define SNAPPY_HAVE_NEON @SNAPPY_HAVE_NEON@
+          #define SNAPPY_HAVE_NEON_CRC32 @SNAPPY_HAVE_NEON_CRC32@
+          #define SNAPPY_IS_BIG_ENDIAN @SNAPPY_IS_BIG_ENDIAN@
+
+          #endif
+          EOF
+          cat > "${SNAPPY_DIR}/cmake/SnappyConfig.cmake.in" << 'EOF'
+          @PACKAGE_INIT@
+          set_and_check(SNAPPY_INCLUDE_DIR "@PACKAGE_INCLUDE_DIR@")
+          set_and_check(SNAPPY_LIB_DIR "@PACKAGE_LIB_DIR@")
+          include("${CMAKE_CURRENT_LIST_DIR}/SnappyTargets.cmake")
+          EOF
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK (Compose + Material 3 Expressive)
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ax360e-compose-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Upload build reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports
+          path: |
+            app/build/reports/
+            build/reports/
+            *.log

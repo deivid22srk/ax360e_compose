@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="es_arr_v_video_video_standard">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="es_arr_video_video_standard">
+        <item>NTSC</item>
+        <item>NTSC-J</item>
+        <item>PAL-60</item>
+    </string-array>
+    <string-array name="es_arr_v_video_internal_display_resolution">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+    </string-array>
+    <string-array name="es_arr_video_internal_display_resolution">
+        <item>640x480</item>
+        <item>640x576</item>
+        <item>720x480</item>
+        <item>720x576</item>
+        <item>800x600</item>
+        <item>848x480</item>
+        <item>1024x768</item>
+        <item>1152x864</item>
+        <item>1280x720</item>
+        <item>1280x768</item>
+        <item>1280x960</item>
+        <item>1280x1024</item>
+        <item>1360x768</item>
+        <item>1440x900</item>
+        <item>1680x1050</item>
+        <item>1920x540</item>
+        <item>1920x1080</item>
+    </string-array>
+    <string-array name="es_arr_v_video_avpack">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </string-array>
+    <string-array name="es_arr_video_avpack">
+        <item>PAL-60 Component (SD)</item>
+        <item>Unused</item>
+        <item>PAL-60 SCART</item>
+        <item>480p Component (HD)</item>
+        <item>HDMI+A</item>
+        <item>PAL-60 Composite/S-Video</item>
+        <item>VGA</item>
+        <item>TV PAL-60</item>
+        <item>HDMI</item>
+    </string-array>
+    <string-array name="es_arr_v_xconfig_user_language">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+    </string-array>
+
+
+    <string-array name="es_arr_v_xconfig_user_country">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
+        <item>33</item>
+        <item>34</item>
+        <item>35</item>
+        <item>36</item>
+        <item>37</item>
+        <item>38</item>
+        <item>39</item>
+        <item>40</item>
+        <item>41</item>
+        <item>42</item>
+        <item>43</item>
+        <item>44</item>
+        <item>45</item>
+        <item>46</item>
+        <item>47</item>
+        <item>48</item>
+        <item>49</item>
+        <item>50</item>
+        <item>51</item>
+        <item>52</item>
+        <item>53</item>
+        <item>54</item>
+        <item>55</item>
+        <item>56</item>
+        <item>57</item>
+        <item>58</item>
+        <item>59</item>
+        <item>60</item>
+        <item>61</item>
+        <item>62</item>
+        <item>63</item>
+        <item>64</item>
+        <item>65</item>
+        <item>66</item>
+        <item>67</item>
+        <item>68</item>
+        <item>69</item>
+        <item>70</item>
+        <item>71</item>
+        <item>72</item>
+        <item>73</item>
+        <item>74</item>
+        <item>75</item>
+        <item>76</item>
+        <item>77</item>
+        <item>78</item>
+        <item>79</item>
+        <item>80</item>
+        <item>81</item>
+        <item>82</item>
+        <item>83</item>
+        <item>84</item>
+        <item>85</item>
+        <item>86</item>
+        <item>87</item>
+        <item>88</item>
+        <item>89</item>
+        <item>90</item>
+        <item>91</item>
+        <item>92</item>
+        <item>93</item>
+        <item>95</item>
+        <item>96</item>
+        <item>97</item>
+        <item>98</item>
+        <item>99</item>
+        <item>100</item>
+        <item>101</item>
+        <item>102</item>
+        <item>103</item>
+        <item>104</item>
+        <item>105</item>
+        <item>106</item>
+        <item>107</item>
+        <item>108</item>
+        <item>109</item>
+    </string-array>
+
+
+    <string-array name="es_arr_v_content_license_mask">
+        <item>0</item>
+        <item>1</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="es_arr_v_vulkan_vulkan_debug_utils_messenger_severity">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="es_arr_v_logging_log_level">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="es_arr_v_kernel_kernel_display_gamma_type">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+
+    <!--  -->
+
+    <string-array name="es_arr_apu_apu">
+        <item>nop</item>
+        <item>aaudio</item>
+        <item>opensles</item>
+    </string-array>
+    <string-array name="es_arr_content_license_mask">
+        <item>disable</item>
+        <item>first</item>
+        <item>all</item>
+    </string-array>
+    <string-array name="es_arr_display_postprocess_antialiasing">
+        <item>none</item>
+        <item>fxaa</item>
+        <item>fxaa_extreme</item>
+    </string-array>
+    <string-array name="es_arr_display_postprocess_scaling_and_sharpening">
+        <item>bilinear</item>
+        <item>cas</item>
+        <item>fsr</item>
+    </string-array>
+    <string-array name="es_arr_xconfig_user_country">
+        <item>AE</item>
+        <item>AL</item>
+        <item>AM</item>
+        <item>AR</item>
+        <item>AT</item>
+        <item>AU</item>
+        <item>AZ</item>
+        <item>BE</item>
+        <item>BG</item>
+        <item>BH</item>
+        <item>BN</item>
+        <item>BO</item>
+        <item>BR</item>
+        <item>BY</item>
+        <item>BZ</item>
+        <item>CA</item>
+        <item>CH</item>
+        <item>CL</item>
+        <item>CN</item>
+        <item>CO</item>
+        <item>CR</item>
+        <item>CZ</item>
+        <item>DE</item>
+        <item>DK</item>
+        <item>DO</item>
+        <item>DZ</item>
+        <item>EC</item>
+        <item>EE</item>
+        <item>EG</item>
+        <item>ES</item>
+        <item>FI</item>
+        <item>FO</item>
+        <item>FR</item>
+        <item>GB</item>
+        <item>GE</item>
+        <item>GR</item>
+        <item>GT</item>
+        <item>HK</item>
+        <item>HN</item>
+        <item>HR</item>
+        <item>HU</item>
+        <item>ID</item>
+        <item>IE</item>
+        <item>IL</item>
+        <item>IN</item>
+        <item>IQ</item>
+        <item>IR</item>
+        <item>IS</item>
+        <item>IT</item>
+        <item>JM</item>
+        <item>JO</item>
+        <item>JP</item>
+        <item>KE</item>
+        <item>KG</item>
+        <item>KR</item>
+        <item>KW</item>
+        <item>KZ</item>
+        <item>LB</item>
+        <item>LI</item>
+        <item>LT</item>
+        <item>LU</item>
+        <item>LV</item>
+        <item>LY</item>
+        <item>MA</item>
+        <item>MC</item>
+        <item>MK</item>
+        <item>MN</item>
+        <item>MO</item>
+        <item>MV</item>
+        <item>MX</item>
+        <item>MY</item>
+        <item>NI</item>
+        <item>NL</item>
+        <item>NO</item>
+        <item>NZ</item>
+        <item>OM</item>
+        <item>PA</item>
+        <item>PE</item>
+        <item>PH</item>
+        <item>PK</item>
+        <item>PL</item>
+        <item>PR</item>
+        <item>PT</item>
+        <item>PY</item>
+        <item>QA</item>
+        <item>RO</item>
+        <item>RU</item>
+        <item>SA</item>
+        <item>SE</item>
+        <item>SG</item>
+        <item>SI</item>
+        <item>SK</item>
+        <item>SV</item>
+        <item>SY</item>
+        <item>TH</item>
+        <item>TN</item>
+        <item>TR</item>
+        <item>TT</item>
+        <item>TW</item>
+        <item>UA</item>
+        <item>US</item>
+        <item>UY</item>
+        <item>UZ</item>
+        <item>VE</item>
+        <item>VN</item>
+        <item>YE</item>
+        <item>ZA</item>
+    </string-array>
+
+    <string-array name="es_arr_xconfig_user_language">
+        <item>en</item>
+        <item>ja</item>
+        <item>de</item>
+        <item>fr</item>
+        <item>es</item>
+        <item>it</item>
+        <item>ko</item>
+        <item>zh</item>
+        <item>pt</item>
+        <item>pl</item>
+        <item>ru</item>
+        <item>sv</item>
+        <item>tr</item>
+        <item>nb</item>
+        <item>nl</item>
+        <item>zh</item>
+    </string-array>
+    <string-array name="es_arr_gpu_gpu">
+        <item>vulkan</item>
+        <item>null</item>
+    </string-array>
+    <string-array name="es_arr_cpu_cpu">
+        <item>any</item>
+        <item>a64</item>
+    </string-array>
+    <string-array name="es_arr_gpu_render_target_path_vulkan">
+        <item>any</item>
+        <item>fbo</item>
+        <item>fsi</item>
+    </string-array>
+    <string-array name="es_arr_hid_hid">
+        <item>android</item>
+        <item>nop</item>
+    </string-array>
+
+    <string-array name="es_arr_vulkan_vulkan_debug_utils_messenger_severity">
+        <item>error</item>
+        <item>warning</item>
+        <item>info</item>
+        <item>verbose</item>
+    </string-array>
+    <string-array name="es_arr_logging_log_level">
+        <item>error</item>
+        <item>warning</item>
+        <item>info</item>
+        <item>debug</item>
+    </string-array>
+
+    <string-array name="es_arr_kernel_kernel_display_gamma_type">
+        <item>linear</item>
+        <item>sRGB(CRT)</item>
+        <item>BT.709(HDTV)</item>
+    </string-array>
+    <string-array name="es_arr_apu_xma_decoder">
+        <item>fake</item>
+        <item>master</item>
+        <item>old</item>
+        <item>new</item>
+    </string-array>
+    <string-array name="es_arr_gpu_readback_resolve">
+        <item>fast</item>
+        <item>full</item>
+        <item>none</item>
+    </string-array>
+</resources>

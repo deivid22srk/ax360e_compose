@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="es_apu_xma_decoder">Декодер Xma</string>
+    <string name="es_cpu_disable_context_promotion">Отключить продвижение контекста</string>
+    <string name="es_cpu_disable_instruction_infocache">Отключить инфокэш инструкций</string>
+    <string name="es_cpu_disable_prefetch_and_cachecontrol">Отключить предварительную выборку и управление кэшем</string>
+    <string name="es_cpu_dump_translated_hir_functions">Дамп переведённых функций HIR</string>
+    <string name="es_cpu_emit_inline_mmio_checks">Вывод встроенных проверок MMIO</string>
+    <string name="es_cpu_emit_mmio_aware_stores_for_recorded_exception_addresses">Вывод MMIO-ориентированных записей для зарегистрированных адресов исключений</string>
+    <string name="es_cpu_enable_early_precompilation">Включить раннюю предварительную компиляцию</string>
+    <string name="es_cpu_full_optimization_even_with_debug">Полная оптимизация даже при отладке</string>
+    <string name="es_cpu_ignore_trap_instructions">Игнорировать инструкции-ловушки</string>
+    <string name="es_cpu_no_reserved_ops">Нет зарезервированных операций</string>
+    <string name="es_cpu_permit_float_constant_evaluation">Разрешить вычисление констант с плавающей точкой</string>
+    <string name="es_cpu_record_mmio_access_exceptions">Записывать исключения доступа MMIO</string>
+    <string name="es_cpu_writable_code_segments">Записываемые сегменты кода</string>
+    <string name="es_gpu_gpu_allow_invalid_upload_range">GPU разрешить недопустимый диапазон загрузки</string>
+    <string name="es_gpu_target_trace_file">Файл трассировки цели</string>
+    <string name="es_gpu_trace_dump_path">Путь дампа трассировки</string>
+    <string name="es_general_allow_game_relative_writes">Разрешить относительные записи игры</string>
+    <string name="es_general_controller_hotkeys">Горячие клавиши контроллера</string>
+    <string name="es_general_disable_doubleclick_fullscreen">Отключить полноэкранный режим двойным щелчком</string>
+    <string name="es_hid_guide_button">Кнопка гида</string>
+    <string name="es_kernel_allow_avatar_initialization">Разрешить инициализацию аватара</string>
+    <string name="es_storage_force_mount_devkit">Принудительное монтирование Devkit</string>
+    <string name="es_storage_mount_memory_unit">Смонтировать модуль памяти</string>
+    <string name="es_ui_custom_font_path">Путь пользовательского шрифта</string>
+
+    <string name="_default">По умолчанию</string>
+    <string name="driver_library_path_dialog_add_hint">Добавить пользовательский драйвер (*.zip)</string>
+    <string name="es_vulkan_vulkan_lib_path">Путь к библиотеке пользовательского драйвера</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">Пользовательский драйвер принудительно макс. частоты</string>
+
+    <string name="create_shortcut">Создать ярлык</string>
+    <string name="disable_virtual_keyboard">Отключить виртуальную клавиатуру</string>
+    <string name="joystick">Джойстик</string>
+
+    <string name="dpad">Крестовина</string>
+    <string name="abxy">ABXY</string>
+    <string name="lr">LR</string>
+    <string name="start_back">Start/Back</string>
+
+    <string name="save_and_quit">Сохранить и выйти</string>
+    <string name="scale_rate">Коэффициент масштабирования</string>
+
+    <string name="refresh_list">Обновить список</string>
+    <string name="about">О приложении</string>
+    <string name="gratitude">Благодарности</string>
+    <string name="update_log">Журнал обновлений</string>
+    <string name="device_info">Информация об устройстве</string>
+    <string name="open_source_licenses">Лицензии открытого ПО</string>
+
+    <string name="open_file_manager">Открыть файловый менеджер</string>
+    <string name="game_list_loading">Загрузка списка игр...</string>
+    <string name="quit">Выход</string>
+    <string name="device_unsupport_vulkan_msg">Ваше устройство не поддерживает Vulkan и не соответствует минимальным требованиям для запуска этого приложения, пожалуйста, выйдите.</string>
+
+    <string name="loading">Загрузка...</string>
+    <string name="msg_processing">Обработка...</string>
+    <string name="empty_game_list">Список игр пуст, пожалуйста, установите каталог с играми</string>
+
+    <string name="enable_vibrator">Включить вибрацию</string>
+
+    <string name="set_game_dir">Установить каталог с играми</string>
+
+    <string name="clear">Очистить</string>
+    <string name="press_a_key">Нажмите любую клавишу для продолжения...</string>
+
+    <string name="reset_as_default">Сбросить до значений по умолчанию</string>
+    <string name="key_mappers">Сопоставления клавиш</string>
+
+    <string name="virtual_pad_edit">Редактировать виртуальный контроллер</string>
+
+    <string name="left">влево</string>
+    <string name="up">вверх</string>
+    <string name="right">вправо</string>
+    <string name="down">вниз</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+
+    <string name="lshoulder">LShoulder</string>
+    <string name="lthumbpress">LThumbPress</string>
+    <string name="ltrigger">LTrigger</string>
+
+    <string name="rshoulder">RShoulder</string>
+    <string name="rthumbpress">RThumbPress</string>
+    <string name="rtrigger">RTrigger</string>
+
+    <string name="start">start</string>
+    <string name="back">Назад</string>
+
+    <string name="use_global_config">Использовать глобальную конфигурацию</string>
+
+    <string name="settings">Настройки</string>
+
+
+    <string name="gratitude_content">Спасибо Ruban за все ИКОНКИ\n\n
+		Спасибо SRC267 (Sting) за управление reddit/discord\n\n
+		Спасибо 妖妖 за тестирование\n\n
+		Спасибо 再见某人 \n\n
+        Спасибо 再见某人 \n\n
+        Спасибо 再见某人 \n\n
+        \n\n
+        		Основано на оптимизации трансплантации Xenia, спасибо всем участникам проекта Xenia\n\n
+    </string>
+
+    <string name="es_apu">APU</string>
+<string name="es_apu_apu">Аудиосистема</string>
+<string name="es_apu_apu_max_queued_frames">Максимум кадров в очереди</string>
+<string name="es_apu_enable_xmp">Включить музыкальный проигрыватель</string>
+<string name="es_apu_ffmpeg_verbose">Подробный вывод FFmpeg</string>
+<string name="es_apu_mute">Отключить весь звук</string>
+<string name="es_apu_use_dedicated_xma_thread">Выделенный поток XMA</string>
+<string name="es_apu_use_new_decoder">Использовать новый декодер XMA</string>
+<string name="es_apu_xmp_default_volume">Громкость музыки по умолчанию</string>
+
+<string name="es_cpu">CPU</string>
+<string name="es_cpu_break_condition_gpr">Условие останова GPR</string>
+<string name="es_cpu_break_condition_op">Оператор условия останова</string>
+<string name="es_cpu_break_condition_truncate">Обрезать значение до 32 бит</string>
+<string name="es_cpu_break_condition_value">Значение условия останова</string>
+<string name="es_cpu_break_on_debugbreak">Останов при Debugbreak</string>
+<string name="es_cpu_break_on_instruction">Останов на инструкции</string>
+<string name="es_cpu_break_on_start">Останов при запуске</string>
+<string name="es_cpu_break_on_unimplemented_instructions">Останов на нереализованных инструкциях</string>
+<string name="es_cpu_clock_no_scaling">Отключить масштабирование тактовой частоты</string>
+<string name="es_cpu_clock_source_raw">Использовать исходный источник тактовой частоты</string>
+<string name="es_cpu_cpu">Бэкенд CPU</string>
+<string name="es_cpu_debugprint_trap_log">Журнал ловушек Debugprint</string>
+<string name="es_cpu_disable_global_lock">Отключить глобальную блокировку</string>
+<string name="es_cpu_disassemble_functions">Дизассемблировать функции</string>
+<string name="es_cpu_ignore_undefined_externs">Игнорировать неопределенные внешние ссылки</string>
+<string name="es_cpu_inline_mmio_access">Встроенный доступ MMIO</string>
+<string name="es_cpu_load_module_map">Загрузить карту модуля</string>
+<string name="es_cpu_pvr">Версия/ревизия процессора</string>
+<string name="es_cpu_store_all_context_values">Сохранить все значения контекста</string>
+<string name="es_cpu_trace_function_coverage">Трассировка покрытия функций</string>
+<string name="es_cpu_trace_function_data">Трассировка данных функций</string>
+<string name="es_cpu_trace_function_data_path">Путь трассировки данных функций</string>
+<string name="es_cpu_trace_function_references">Трассировка ссылок функций</string>
+<string name="es_cpu_trace_functions">Трассировка функций</string>
+<string name="es_cpu_validate_hir">Проверить HIR</string>
+
+<string name="es_content">Содержимое</string>
+<string name="es_content_license_mask">Маска лицензии</string>
+
+<string name="es_display">Дисплей</string>
+<string name="es_display_fullscreen">Полноэкранный режим</string>
+<string name="es_display_host_present_from_non_ui_thread">Прямая презентация из потока, не относящегося к UI</string>
+<string name="es_display_postprocess_antialiasing">Постобработка сглаживания</string>
+<string name="es_display_postprocess_dither">Постобработка дизеринга</string>
+<string name="es_display_postprocess_ffx_cas_additional_sharpness">Дополнительная резкость CAS</string>
+<string name="es_display_postprocess_ffx_fsr_max_upsampling_passes">Максимум проходов апскейлинга FSR</string>
+<string name="es_display_postprocess_ffx_fsr_sharpness_reduction">Снижение резкости FSR</string>
+<string name="es_display_postprocess_scaling_and_sharpening">Масштабирование и повышение резкости</string>
+<string name="es_display_present_letterbox">Презентация Letterbox</string>
+<string name="es_display_present_render_pass_clear">Очистить проход рендеринга</string>
+<string name="es_display_present_safe_area_x">Безопасная область X</string>
+<string name="es_display_present_safe_area_y">Безопасная область Y</string>
+
+<string name="es_gpu">GPU</string>
+<string name="es_gpu_clear_memory_page_state">Очистить состояние страницы памяти</string>
+<string name="es_gpu_depth_float24_convert_in_pixel_shader">Преобразовать глубину в пиксельном шейдере</string>
+<string name="es_gpu_depth_float24_round">Округлить преобразование глубины</string>
+<string name="es_gpu_depth_transfer_not_equal_test">Тест неравенства передачи глубины</string>
+<string name="es_gpu_disassemble_pm4">Дизассемблировать пакеты PM4</string>
+<string name="es_gpu_draw_resolution_scale_x">Масштаб разрешения отрисовки X</string>
+<string name="es_gpu_draw_resolution_scale_y">Масштаб разрешения отрисовки Y</string>
+<string name="es_gpu_draw_resolution_scaled_texture_offsets">Смещения масштабированных текстур</string>
+<string name="es_gpu_dump_shaders">Путь дампа шейдеров</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu">Выполнять VS на CPU для необрезанных отрисовок</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Выполнять VS на CPU для бэкенда PSI</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Выполнять VS на CPU с ножницами</string>
+<string name="es_gpu_force_convert_line_loops_to_strips">Принудительно преобразовать циклы линий в полосы</string>
+<string name="es_gpu_force_convert_quad_lists_to_triangle_lists">Принудительно преобразовать списки квадов в списки треугольников</string>
+<string name="es_gpu_force_convert_triangle_fans_to_lists">Принудительно преобразовать веера треугольников в списки</string>
+<string name="es_gpu_framerate_limit">Ограничение частоты кадров</string>
+<string name="es_gpu_gamma_render_target_as_srgb">Гамма RT как sRGB</string>
+<string name="es_gpu_gpu">Графическая система</string>
+<string name="es_gpu_gpu_allow_invalid_fetch_constants">Разрешить недопустимые константы выборки</string>
+<string name="es_gpu_half_pixel_offset">Смещение на полпикселя</string>
+<string name="es_gpu_ignore_32bit_vertex_index_support">Игнорировать поддержку 32-битных индексов вершин</string>
+<string name="es_gpu_log_guest_driven_gpu_register_written_values">Журнал записи регистров GPU</string>
+<string name="es_gpu_log_ringbuffer_kickoff_initiator_bts">Журнал запуска кольцевого буфера</string>
+<string name="es_gpu_mrt_edram_used_range_clamp_to_min">Зажим MRT EDRAM к минимуму</string>
+<string name="es_gpu_native_2x_msaa">Родной 2x MSAA</string>
+<string name="es_gpu_native_stencil_value_output">Родной вывод значений трафарета</string>
+<string name="es_gpu_non_seamless_cube_map">Не бесшовная кубическая карта</string>
+<string name="es_gpu_primitive_processor_cache_min_indices">Минимальные индексы кэша примитивов</string>
+<string name="es_gpu_query_occlusion_sample_lower_threshold">Нижний порог выборки окклюзии</string>
+<string name="es_gpu_query_occlusion_sample_upper_threshold">Верхний порог выборки окклюзии</string>
+<string name="es_gpu_readback_memexport">Обратная передача Memexport</string>
+<string name="es_gpu_readback_resolve">Обратная передача Resolve</string>
+<string name="es_gpu_render_target_path_vulkan">Путь целевого рендеринга (Vulkan)</string>
+<string name="es_gpu_resolve_resolution_scale_fill_half_pixel_offset">Смещение на полпикселя заполнения масштаба Resolve</string>
+<string name="es_gpu_snorm16_render_target_full_range">Полный диапазон SNORM16 RT</string>
+<string name="es_gpu_store_shaders">Хранить шейдеры</string>
+<string name="es_gpu_texture_cache_memory_limit_hard">Жесткий лимит кэша текстур</string>
+<string name="es_gpu_texture_cache_memory_limit_render_to_texture">Лимит RTT кэша текстур</string>
+<string name="es_gpu_texture_cache_memory_limit_soft">Мягкий лимит кэша текстур</string>
+<string name="es_gpu_texture_cache_memory_limit_soft_lifetime">Время жизни мягкого лимита кэша текстур</string>
+<string name="es_gpu_trace_gpu_prefix">Префикс трассировки GPU</string>
+<string name="es_gpu_trace_gpu_stream">Трассировка потока GPU</string>
+<string name="es_gpu_vsync">VSYNC</string>
+
+<string name="es_general">Общие</string>
+<string name="es_general_allow_plugins">Разрешить плагины</string>
+<string name="es_general_apply_patches">Применить патчи</string>
+<string name="es_general_debug">Режим отладки</string>
+<string name="es_general_discord">Discord Rich Presence</string>
+<string name="es_general_launch_module">Модуль запуска</string>
+<string name="es_general_notification_sound_path">Путь звука уведомлений</string>
+<string name="es_general_time_scalar">Скаляр времени</string>
+
+<string name="es_hid">HID</string>
+<string name="es_hid_hid">Система ввода</string>
+<string name="es_hid_left_stick_deadzone_percentage">Мертвая зона левого стика</string>
+<string name="es_hid_right_stick_deadzone_percentage">Мертвая зона правого стика</string>
+<string name="es_hid_vibration">Вибрация контроллера</string>
+
+<string name="es_kernel">Ядро</string>
+<string name="es_kernel_allow_nui_initialization">Разрешить инициализацию NUI</string>
+<string name="es_kernel_allow_incompatible_title_update">Разрешить несовместимое обновление заголовка</string>
+<string name="es_kernel_apply_title_update">Применить обновления заголовков</string>
+<string name="es_kernel_cl">Аргументы командной строки</string>
+<string name="es_kernel_default_achievements_backend">Бэкенд достижений</string>
+<string name="es_kernel_ignore_thread_affinities">Игнорировать привязки потоков</string>
+<string name="es_kernel_ignore_thread_priorities">Игнорировать приоритеты потоков</string>
+<string name="es_kernel_kernel_build_version">Версия сборки ядра</string>
+<string name="es_kernel_kernel_cert_monitor">Монитор сертификатов</string>
+<string name="es_kernel_kernel_debug_monitor">Монитор отладки</string>
+<string name="es_kernel_kernel_display_gamma_power">Степень гаммы дисплея</string>
+<string name="es_kernel_kernel_display_gamma_type">Тип гаммы дисплея</string>
+<string name="es_kernel_kernel_pix">PIX</string>
+<string name="es_kernel_log_high_frequency_kernel_calls">Журнал вызовов высокой частоты</string>
+<string name="es_kernel_staging_mode">Режим подготовки</string>
+
+<string name="es_logging">Журналирование</string>
+<string name="es_logging_flush_log">Сбросить журнал</string>
+<string name="es_logging_log_file">Путь файла журнала</string>
+<string name="es_logging_log_level">Уровень журнала</string>
+<string name="es_logging_log_mask">Маска журнала</string>
+<string name="es_logging_log_string_format_kernel_calls">Журнал вызовов ядра</string>
+<string name="es_logging_log_to_debugprint">Журнал в DebugPrint</string>
+<string name="es_logging_log_to_stdout">Журнал в Stdout</string>
+
+<string name="es_memory">Память</string>
+<string name="es_memory_ignore_offset_for_ranged_allocations">Игнорировать смещение для распределенных аллокаций</string>
+<string name="es_memory_mmap_address_high">Высокий адрес MMAP</string>
+<string name="es_memory_protect_on_release">Защитить освобожденную память</string>
+<string name="es_memory_protect_zero">Защитить нулевую страницу</string>
+<string name="es_memory_scribble_heap">Куча Scribble</string>
+<string name="es_memory_writable_executable_memory">Записываемая исполняемая память</string>
+
+<string name="es_profiles">Профили</string>
+<string name="es_profiles_logged_profile_slot_0_xuid">Слот профиля 0 XUID</string>
+<string name="es_profiles_logged_profile_slot_1_xuid">Слот профиля 1 XUID</string>
+<string name="es_profiles_logged_profile_slot_2_xuid">Слот профиля 2 XUID</string>
+<string name="es_profiles_logged_profile_slot_3_xuid">Слот профиля 3 XUID</string>
+
+<string name="es_storage">Хранилище</string>
+<string name="es_storage_cache_root">Корневой путь кэша</string>
+<string name="es_storage_content_root">Корневой путь содержимого</string>
+<string name="es_storage_mount_cache">Монтировать кэш</string>
+<string name="es_storage_mount_scratch">Монтировать временное хранилище</string>
+<string name="es_storage_storage_root">Корневой путь хранилища</string>
+
+<string name="es_ui">UI</string>
+<string name="es_ui_headless">Безголовый режим</string>
+<string name="es_ui_profiler_dpi_scaling">Масштабирование DPI профайлера</string>
+<string name="es_ui_show_achievement_notification">Показать уведомление о достижении</string>
+<string name="es_ui_show_profiler">Показать профайлер</string>
+<string name="es_ui_storage_selection_dialog">Диалог выбора хранилища</string>
+
+<string name="es_video">Видео</string>
+<string name="es_video_avpack">AV Pack</string>
+<string name="es_video_enable_3d_mode">Включить 3D-режим</string>
+<string name="es_video_interlaced">Чересстрочный режим</string>
+<string name="es_video_internal_display_resolution">Внутреннее разрешение дисплея</string>
+<string name="es_video_internal_display_resolution_x">Пользовательская ширина дисплея</string>
+<string name="es_video_internal_display_resolution_y">Пользовательская высота дисплея</string>
+<string name="es_video_use_50Hz_mode">Использовать режим 50 Гц</string>
+<string name="es_video_video_standard">Видео стандарт</string>
+<string name="es_video_widescreen">Широкоформатный режим</string>
+
+<string name="es_vulkan">Vulkan</string>
+<string name="es_vulkan_vulkan_allow_present_mode_fifo_relaxed">Разрешить режим презентации FIFO Relaxed</string>
+<string name="es_vulkan_vulkan_allow_present_mode_immediate">Разрешить режим презентации Immediate</string>
+<string name="es_vulkan_vulkan_allow_present_mode_mailbox">Разрешить режим презентации Mailbox</string>
+<string name="es_vulkan_vulkan_device">Индекс устройства Vulkan</string>
+<string name="es_vulkan_vulkan_log_debug_messages">Журнал отладочных сообщений Vulkan</string>
+<string name="es_vulkan_vulkan_sparse_shared_memory">Разреженная разделяемая память</string>
+<string name="es_vulkan_vulkan_validation">Слой валидации Vulkan</string>
+
+<string name="es_xconfig">XConfig</string>
+<string name="es_xconfig_audio_flag">Аудио флаг</string>
+<string name="es_xconfig_user_country">Страна пользователя</string>
+<string name="es_xconfig_user_language">Язык пользователя</string>
+
+<string name="es_a64">a64</string>
+<string name="es_a64_a64_extension_mask">Маска расширения A64</string>
+
+    <string name="es_hint_apu_apu">Аудиосистема. Используйте: [any, nop, opensles, aaudio]</string>
+    <string name="es_hint_apu_apu_max_queued_frames">Позволяет изменять максимальное количество буферизированных аудиокадров для уменьшения задержки звука. Уменьшение этого значения может вызвать проблемы с производительностью. Диапазон значений: [4-64]</string>
+    <string name="es_hint_apu_enable_xmp">Включает воспроизведение Music Player.</string>
+    <string name="es_hint_apu_ffmpeg_verbose">Подробный вывод FFmpeg (отладка и выше)</string>
+    <string name="es_hint_apu_mute">Отключает весь аудиовыход.</string>
+    <string name="es_hint_apu_use_dedicated_xma_thread">Включает декодирование XMA в отдельном потоке. Отключение должно дать лучшие результаты, но немного снизить производительность.</string>
+    <string name="es_hint_apu_use_new_decoder">Включает использование нового экспериментального аудиодекодера XMA.</string>
+    <string name="es_hint_apu_xmp_default_volume">Громкость музыки по умолчанию, если игра не устанавливает её [0-100].</string>
+
+    <string name="es_hint_cpu_break_condition_gpr">GPR сравнивается с</string>
+    <string name="es_hint_cpu_break_condition_op">оператор сравнения</string>
+    <string name="es_hint_cpu_break_condition_truncate">усекать значение до 32 бит</string>
+    <string name="es_hint_cpu_break_condition_value">значение, с которым сравнивается</string>
+    <string name="es_hint_cpu_break_on_debugbreak">int3 на JITed запросы __debugbreak.</string>
+    <string name="es_hint_cpu_break_on_instruction">int3 перед выполнением данного адреса гостя.</string>
+    <string name="es_hint_cpu_break_on_start">Прервать отладчик при запуске.</string>
+    <string name="es_hint_cpu_break_on_unimplemented_instructions">Прервать отладчик хоста (или аварийно завершить, если отладчик не подключен), если встречается невыполненная инструкция PowerPC.</string>
+    <string name="es_hint_cpu_clock_no_scaling">Отключить код масштабирования. Управление временем и блокировка обходятся. Время системы гостя напрямую берется из хоста.</string>
+    <string name="es_hint_cpu_clock_source_raw">На x64 использовать инструкцию RDTSC как источник времени. Требуется инвариантный TSC. На a64 использовать регистр CNTVCT_EL0 как источник времени</string>
+    <string name="es_hint_cpu_cpu">Бэкенд CPU [any, x64, a64].</string>
+    <string name="es_hint_cpu_debugprint_trap_log">Журналировать ловушки debugprint в активный отладчик</string>
+    <string name="es_hint_cpu_disable_global_lock">Отключает использование глобальной блокировки в коде гостя. Не влияет на код хоста.</string>
+    <string name="es_hint_cpu_disassemble_functions">Дизассемблировать функции во время генерации.</string>
+    <string name="es_hint_cpu_ignore_undefined_externs">Не выходить при вызове неопределенного extern.</string>
+    <string name="es_hint_cpu_inline_mmio_access">Встроенные константные загрузки и сохранения MMIO.</string>
+    <string name="es_hint_cpu_load_module_map">Загружает .map для имен символов и для сравнения с сгенерированной базой данных символов.</string>
+    <string name="es_hint_cpu_pvr">Номер версии и ревизии процессора.\nБиты 0-15 - номер версии.\nБиты 16-31 - номер ревизии.\nПримечание: Некоторые XEX (например, mfgbootlauncher.xex) могут проверять значение меньше 0x710700.</string>
+    <string name="es_hint_cpu_store_all_context_values">Не удалять мертвые хранения контекста для помощи в отладке.</string>
+    <string name="es_hint_cpu_trace_function_coverage">Генерировать трассировку для статистики покрытия инструкций функций.</string>
+    <string name="es_hint_cpu_trace_function_data">Генерировать трассировку для данных результатов функций.</string>
+    <string name="es_hint_cpu_trace_function_data_path">Файл для записи данных трассировки.</string>
+    <string name="es_hint_cpu_trace_function_references">Генерировать трассировку для ссылок на адреса функций.</string>
+    <string name="es_hint_cpu_trace_functions">Генерировать трассировку для статистики функций.</string>
+    <string name="es_hint_cpu_validate_hir">Выполнять проверки валидации HIR во время компиляции.</string>
+
+    <string name="es_hint_content_license_mask">Установить маску лицензии для активированного контента.\n0 = Лицензии не включены.\n1 = Первая лицензия включена. Обычно полная версия лицензии в Xbox Live Arcade titles.\n-1 или 0xFFFFFFFF = Все возможные лицензии включены. Обычно плохая идея, может привести к неопределенному поведению.</string>
+
+    <string name="es_hint_display_fullscreen">Запускать ли эмулятор в полноэкранном режиме.</string>
+    <string name="es_hint_display_host_present_from_non_ui_thread">Разрешить потоку эмуляции GPU представлять вывод гостя на поверхность хоста напрямую вместо запроса потока UI сделать это через систему окон хоста.</string>
+    <string name="es_hint_display_postprocess_antialiasing">Эффект сглаживания постобработки для применения к выводу изображения игры.
+Использование сглаживания постобработки настоятельно рекомендуется, когда активны AMD FidelityFX Contrast Adaptive Sharpening или Super Resolution 1.0.
+Используйте: [none, fxaa, fxaa_extreme]
+none (или любое другое значение, не указанное здесь): Не изменять исходное изображение.
+fxaa: NVIDIA Fast Approximate Anti-Aliasing 3.11, нормальное качество (12).
+fxaa_extreme: NVIDIA Fast Approximate Anti-Aliasing 3.11, экстремальное качество (39).</string>
+    <string name="es_hint_display_postprocess_dither">Смешивание финального вывода изображения из внутренней точности до 8 бит на канал для более плавных градиентов.\nНа дисплее 10bpc нижние 2 бита будут сохранены, но к ним будет добавлен шум - отключение может быть рекомендовано для 10bpc, но зависит от возможностей отображения 10bpc фактического используемого дисплея.</string>
+    <string name="es_hint_display_postprocess_ffx_cas_additional_sharpness">Дополнительная резкость для AMD FidelityFX Contrast Adaptive Sharpening (CAS), от 0 до 1. Выше = резче.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_max_upsampling_passes">Максимальное количество проходов апсемплинга, выполняемых в AMD FidelityFX Super Resolution 1.0 (FSR) перед возвратом к билинейному растяжению после финального прохода.\nКаждый проход увеличивает только до 2x2 предыдущего размера. Если игра выводит изображение 1280x720, 1 проход увеличит его до 2560x1440 (ниже 4K), после 2 проходов оно будет увеличено до максимума 5120x2880 (включая 3840x2160 для 4K) и так далее.\nЭта переменная не имеет эффекта, если разрешение дисплея не очень высокое, но может быть уменьшена на разрешениях типа 4K или 8K в случае слишком большого влияния на производительность множественных проходов апсемплинга FSR, или если желательны более мягкие края.\nЗначение по умолчанию - максимум, внутренне поддерживаемый Xenia.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_sharpness_reduction">Снижение резкости для AMD FidelityFX Super Resolution 1.0 (FSR), в стопах. Ниже = резче.</string>
+    <string name="es_hint_display_postprocess_scaling_and_sharpening">Эффект постобработки для использования для передискретизации и/или повышения резкости финального вывода дисплея.
+Используйте: [bilinear, cas, fsr]
+bilinear (или любое другое значение, не указанное здесь): Исходное изображение 1:1, простое билинейное растяжение для передискретизации.
+cas: Использовать AMD FidelityFX Contrast Adaptive Sharpening (CAS) для повышения резкости при коэффициентах масштабирования до 2x2, с дополнительным билинейным растяжением для больших коэффициентов.
+fsr: Использовать AMD FidelityFX Super Resolution 1.0 (FSR) для наивысшего качества апскейлинга, или AMD FidelityFX Contrast Adaptive Sharpening для повышения резкости без масштабирования или даунсемплинга.
+Для масштабирования коэффициентами более 2x2 выполняется несколько проходов FSR.</string>
+    <string name="es_hint_display_present_letterbox">Сохранять соотношение сторон при растяжении, отображая полосы вокруг изображения, когда больше нет области overscan для обрезки.</string>
+    <string name="es_hint_display_present_render_pass_clear">На графических бэкендах, где это поддерживается, использовать операцию загрузки clear render pass в презентации вместо команд clear, очищающих только область letterbox.</string>
+    <string name="es_hint_display_present_safe_area_x">Процент ширины изображения, который можно сохранить при представлении для поддержания соотношения сторон без letterboxing или растяжения.</string>
+    <string name="es_hint_display_present_safe_area_y">Процент высоты изображения, который можно сохранить при представлении для поддержания соотношения сторон без letterboxing или растяжения.</string>
+
+    <string name="es_hint_gpu_clear_memory_page_state">Обновить состояние страниц памяти для включения данных, записанных gpu. (Используйте для игр \'Team Ninja\' для исправления отсутствующих моделей персонажей)</string>
+    <string name="es_hint_gpu_depth_float24_convert_in_pixel_shader">Преобразовывать ли значения глубины в 24-битную плавающую точку (20e4) из точности хоста (32-битная плавающая точка) напрямую в pixel shaders рисунков гостя при использовании буфера глубины хоста.\nЭто предотвращает визуальные артефакты, если полные данные глубины точности хоста потеряны. Это затратная опция, потому что она делает GPU неспособным использовать сжатие буфера глубины, а также с MSAA заставляет pixel shader выполняться для каждой субпиксельной выборки, а не для всего пикселя, делая шейдинг пикселей в 2 или 4 раза тяжелее в зависимости от количества выборок MSAA.</string>
+    <string name="es_hint_gpu_depth_float24_round">Округлять ли до ближайшего четного, а не усекать (округление к нулю), глубину при преобразовании её в 24-битную плавающую точку (20e4) из точности хоста (32-битная плавающая точка) при использовании буфера глубины хоста.\nfalse: Рекомендуется. Преобразование может переместить значения глубины дальше от камеры.\ntrue: Только для особых случаев проблем, вызванных незначительными ошибками округления 32-битной плавающей точки.</string>
+    <string name="es_hint_gpu_depth_transfer_not_equal_test">При передаче данных между render targets глубины использовать тест "не равно", чтобы избежать перезаписи глубины через вывод глубины шейдера, если она такая же, как текущая в буфере глубины в случае круговых поездок данных.</string>
+    <string name="es_hint_gpu_disassemble_pm4">Только что-то делает в debug сборках, если установлено, будет дизассемблировать и журналировать все пакеты PM4, отправленные в CP.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_x">Целочисленный масштаб ширины пикселя, используемый для масштабирования разрешения рендеринга непрозрачно для игры. 1, 2 и 3 могут поддерживаться, но поддержка чего-либо выше 1 зависит от свойств устройства.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_y">Целочисленный масштаб ширины пикселя, используемый для масштабирования разрешения рендеринга непрозрачно для игры. См. draw_resolution_scale_x для дополнительной информации.</string>
+    <string name="es_hint_gpu_draw_resolution_scaled_texture_offsets">Применять смещения из инструкций выборки текстуры с учетом масштаба разрешения для render-to-texture, для более корректной фильтрации теней, bloom и т.д., в некоторых случаях.</string>
+    <string name="es_hint_gpu_dump_shaders">Для отладки шейдеров, путь для сброса шейдеров GPU по мере их компиляции.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu">Выполнять vertex shader для рисунков с отключенным клиппингом, в основном рисунков screen-space (таких как clears), на CPU, когда это возможно, для оценки объема EDRAM, задействованного в рисунке.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Если execute_unclipped_draw_vs_on_cpu включен, выполнять vertex shader для неклиппированных рисунков на CPU даже при использовании реализации pixel shader interlock (rasterizer-ordered view) render backend на хосте.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Не ограничивать использование execute_unclipped_draw_vs_on_cpu только не-scissored рисунками (с правой и нижней сторонами прямоугольника scissor на 8192 или дальше), хотя если прямоугольник scissor присутствует, обычно достаточно для оценки высоты render target.</string>
+    <string name="es_hint_gpu_force_convert_line_loops_to_strips">Только для тестирования поддержки downlevel графического API хоста, принудительное преобразование CPU line loops в line strips, даже если хост нативно поддерживает примитивы line loop.</string>
+    <string name="es_hint_gpu_force_convert_quad_lists_to_triangle_lists">Только для тестирования поддержки downlevel графического API хоста, принудительное преобразование CPU quad lists в quad strips, даже если хост нативно поддерживает примитивы quad list или через эмуляцию geometry shader.</string>
+    <string name="es_hint_gpu_force_convert_triangle_fans_to_lists">Только для тестирования поддержки downlevel графического API хоста, принудительное преобразование CPU triangle fans в triangle lists, даже если хост нативно поддерживает примитивы triangle fan.</string>
+    <string name="es_hint_gpu_framerate_limit">Максимум кадров в секунду. 0 = Неограниченные кадры. По умолчанию 60, когда установлено 0, и VSYNC включен.</string>
+    <string name="es_hint_gpu_gamma_render_target_as_srgb">Когда хост не может записать piecewise linear gamma напрямую с правильным blending, использовать sRGB вывод на хосте для концептуально правильного blending в линейном цветовом пространстве, имея слегка иное распределение точности в render target и серьезно некорректные значения, если игра обращается к результирующим цветам напрямую как к сырым данным.</string>
+    <string name="es_hint_gpu_gpu">Графическая система. Используйте: [vulkan, null]</string>
+    <string name="es_hint_gpu_gpu_allow_invalid_fetch_constants">Разрешить константы выборки текстур и вершин с недопустимым типом - вообще небезопасно, потому что константа может содержать полностью недопустимые значения, но может использоваться для обхода ошибок типа констант выборки в некоторых играх, пока не найдена реальная причина, почему они недопустимы.</string>
+    <string name="es_hint_gpu_half_pixel_offset">Включить поддержку vertex half-pixel offset (D3D9 PA_SU_VTX_CNTL PIX_CENTER). Вообще игры осведомлены о half-pixel offset, и включение этого является правильным поведением (отключение этого может значительно сломать постобработку в некоторых играх).</string>
+    <string name="es_hint_gpu_ignore_32bit_vertex_index_support">Только для тестирования поддержки downlevel графического API хоста (полезно только для тестирования GPU хоста уровня Qualcomm Adreno 4xx), принудительная индирекция или предварительное маскирование и предварительная замена 32-битных индексов вершин, как если бы хост поддерживал только 24-битные индексы.</string>
+    <string name="es_hint_gpu_log_guest_driven_gpu_register_written_values">Только что-то делает в debug сборках, если установлено, будет журналировать каждую запись в регистр gpu, сделанную гостем.</string>
+    <string name="es_hint_gpu_log_ringbuffer_kickoff_initiator_bts">Только что-то делает в debug сборках, если установлено, будет журналировать псевдо-стектрейс потока гостя, который записал новую позицию чтения.</string>
+    <string name="es_hint_gpu_mrt_edram_used_range_clamp_to_min">С render targets хоста, если привязано несколько render targets, оценивать диапазон EDRAM, модифицированный в любом из них, чтобы быть не больше расстояния между любыми двумя render targets в EDRAM, а не позволять последнему требовать остальную часть EDRAM.</string>
+    <string name="es_hint_gpu_native_2x_msaa">Использовать 2x MSAA хоста, когда доступно. Может быть отключено для тестирования масштабируемости на GPU API хоста, где 2x не обязательно, в этом случае будут использоваться 2 выборки из 4x MSAA (с аналогичным или худшим качеством и большим использованием памяти).</string>
+    <string name="es_hint_gpu_native_stencil_value_output">Использовать вывод ссылки stencil pixel shader, где доступно, для целей типа копирования между render targets. Может быть отключено для тестирования масштабируемости, в этом случае будет выполняться гораздо более дорогое рисование 8 квадов.</string>
+    <string name="es_hint_gpu_non_seamless_cube_map">Отключить фильтрацию между гранями cube map возле краев, где возможно (Vulkan с VK_EXT_non_seamless_cube_map) для воспроизведения поведения Direct3D 9.</string>
+    <string name="es_hint_gpu_primitive_processor_cache_min_indices">Наименьшее количество индексов гостя для хранения в кэше для попытки повторного использования позже в том же кадре, если выполняется обработка (такая как преобразование типа примитива или замена индекса сброса). Установка этого в очень высокое значение может привести к чрезмерной обработке CPU, в то время как очень низкое значение может привести к чрезмерной блокировке и поискам. Отрицательные значения отключают кэширование.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_lower_threshold">Если установлено в -1, никакие счетчики выборок не записываются, игры могут зависать. В противном случае счетчик выборок каждого тайла будет увеличиваться на каждое EVENT_WRITE_ZPD на это число. Установка этого в 0 означает, что все сообщается как окклюзированное.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_upper_threshold">Установить в большее число, чем query_occlusion_sample_lower_threshold. Это значение игнорируется, если query_occlusion_sample_lower_threshold установлен в -1.</string>
+    <string name="es_hint_gpu_readback_memexport">[Только D3D12] Читать данные, записанные memory export в шейдерах на CPU. Это может потребоваться в некоторых играх (но многие обращаются только к экспортированным данным на GPU, и этот флаг не нужен для обработки такого поведения), но вызывает синхронизацию mid-frame, поэтому имеет огромное влияние на производительность.</string>
+    <string name="es_hint_gpu_readback_resolve">[Только D3D12] Читать результаты render-to-texture на CPU. Это может потребоваться в некоторых играх, например, для скриншотов в сохраненных играх, но вызывает синхронизацию mid-frame, поэтому имеет огромное влияние на производительность.</string>
+    <string name="es_hint_gpu_render_target_path_vulkan">Путь эмуляции render target для использования на Vulkan. Используйте: [any, fbo, fsi]\nfbo: Host framebuffers и fixed-function blending и тестирование глубины/stencil, копирование между render targets при необходимости. Меньшая точность (ограниченная поддержка форматов пикселей).\nfsi: Ручная упаковка пикселей, blending и тестирование глубины/stencil, со свободными изменениями макета render target. Требуется GPU, поддерживающая fragment shader interlock. Высшая точность (все форматы пикселей обрабатываются в программном обеспечении).</string>
+    <string name="es_hint_gpu_resolve_resolution_scale_fill_half_pixel_offset">При использовании масштабирования разрешения применять хак, который растягивает первый наверняка покрытый пиксель хоста в левой и верхней сторонах областей разрешения render target для устранения разрыва, вызванного half-pixel offset (это необходимо для определенных игр для отображения графики сцены).</string>
+    <string name="es_hint_gpu_snorm16_render_target_full_range">Когда хост может поддерживать только render targets 16_16 и 16_16_16_16 как -1...1, переотображать -32...32 в -1...1 для использования полного возможного диапазона значений, ценой корректности мультипликативного blending.</string>
+    <string name="es_hint_gpu_store_shaders">Хранить шейдеры постоянно и загружать их при загрузке игр, чтобы избежать всплесков runtime и зависаний при игре в игру не в первый раз.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_hard">Максимальное использование памяти текстур хоста (в мегабайтах), выше которого текстуры будут уничтожаться как можно скорее.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_render_to_texture">Часть бюджета памяти текстур хоста (в мегабайтах), которая будет масштабироваться текущим масштабом разрешения рисования.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft">Максимальное использование памяти текстур хоста (в мегабайтах), выше которого старые текстуры будут уничтожаться.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft_lifetime">Секунды, в течение которых текстура должна быть неиспользуемой, чтобы считаться достаточно старой для удаления, если использование памяти текстур превышает texture_cache_memory_limit_soft.</string>
+    <string name="es_hint_gpu_trace_gpu_prefix">Путь префикса для файлов трассировки GPU.</string>
+    <string name="es_hint_gpu_trace_gpu_stream">Трассировать все пакеты GPU.</string>
+    <string name="es_hint_gpu_vsync">Включить VSYNC.</string>
+
+    <string name="es_hint_general_allow_plugins">Разрешает загрузку плагинов/тренеров из plugins\title_id\plugin.xex. Плагины - это модули homebrew xex, которые могут использоваться для создания модов. Эта функция экспериментальная.</string>
+    <string name="es_hint_general_apply_patches">Включает функцию пользовательского патчинга</string>
+    <string name="es_hint_general_debug">Разрешить отладку и сохранять отладочную информацию.</string>
+    <string name="es_hint_general_discord">Включить Discord rich presence</string>
+    <string name="es_hint_general_launch_module">Исполняемый файл для запуска с .iso или пакета вместо default.xex или модуля, указанного игрой. Оставьте пустым для запуска модуля по умолчанию.</string>
+    <string name="es_hint_general_notification_sound_path">Путь (включая имя файла) к выбранному звуку уведомления. Звук ДОЛЖЕН быть в формате wav!</string>
+    <string name="es_hint_general_time_scalar">Скаляр, используемый для ускорения или замедления времени (1x, 2x, 1/2x и т.д.).</string>
+
+    <string name="es_hint_hid_hid">Система ввода. Используйте: [android, nop]</string>
+    <string name="es_hint_hid_left_stick_deadzone_percentage">Определяет уровень deadzone для левого стика. Допустимый диапазон [0.0-1.0].</string>
+    <string name="es_hint_hid_right_stick_deadzone_percentage">Определяет уровень deadzone для правого стика. Допустимый диапазон [0.0-1.0].</string>
+    <string name="es_hint_hid_vibration">Переключить вибрацию контроллера.</string>
+
+    <string name="es_hint_kernel_allow_nui_initialization">Включить инициализацию NUI. Устанавливайте true только при тестировании игр kinect. Некоторым играм может потребоваться реализация аватара.</string>
+    <string name="es_hint_kernel_allow_incompatible_title_update">Разрешить применение title updates с несовпадающими подписями.</string>
+    <string name="es_hint_kernel_apply_title_update">Применять title updates.</string>
+    <string name="es_hint_kernel_cl">Указать дополнительную командную строку, предоставленную гостю.</string>
+    <string name="es_hint_kernel_default_achievements_backend">Определяет, какой бэкенд достижений должен использоваться по умолчанию. Возможные опции: GPD.</string>
+    <string name="es_hint_kernel_ignore_thread_affinities">Игнорирует указанные игрой сродства потоков.</string>
+    <string name="es_hint_kernel_ignore_thread_priorities">Игнорирует указанные игрой приоритеты потоков.</string>
+    <string name="es_hint_kernel_kernel_build_version">Определить текущую версию ядра</string>
+    <string name="es_hint_kernel_kernel_cert_monitor">Включить монитор cert.</string>
+    <string name="es_hint_kernel_kernel_debug_monitor">Включить монитор отладки.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_power">Гamma дисплея для использования с kernel_display_gamma_type 3.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_type">Тип гаммы дисплея: 0 - линейная, 1 - sRGB (CRT), 2 - BT.709 (HDTV), 3 - степень, указанная через kernel_display_gamma_power.</string>
+    <string name="es_hint_kernel_kernel_pix">Включить PIX.</string>
+    <string name="es_hint_kernel_log_high_frequency_kernel_calls">Журналировать вызовы ядра с тегом kHighFrequency.</string>
+    <string name="es_hint_kernel_staging_mode">Включает режим предварительного просмотра в панелях приборов для рендеринга отладочной информации.</string>
+
+    <string name="es_hint_logging_flush_log">Сбрасывать файл журнала после каждой партии строк журнала.</string>
+    <string name="es_hint_logging_log_file">Журналы записываются в указанный файл</string>
+    <string name="es_hint_logging_log_level">Максимальный уровень для журналирования. (0=error, 1=warning, 2=info, 3=debug)</string>
+    <string name="es_hint_logging_log_mask">Отключает определенные категории для более детального ведения журнала отладки. Kernel = 1, Apu = 2, Cpu = 4.</string>
+    <string name="es_hint_logging_log_string_format_kernel_calls">Журналировать вызовы ядра с тегом kHighFrequency.</string>
+    <string name="es_hint_logging_log_to_debugprint">Выводить журнал в DebugPrint.</string>
+    <string name="es_hint_logging_log_to_stdout">Записывать вывод журнала в stdout</string>
+
+    <string name="es_hint_memory_ignore_offset_for_ranged_allocations">Позволяет игнорировать смещение 4k для физических выделений с предоставленным диапазоном. Некоторые титулы проверяют, соответствует ли результат предоставленному нижнему диапазону.</string>
+    <string name="es_hint_memory_mmap_address_high">1-124</string>
+    <string name="es_hint_memory_protect_on_release">Защищать освобожденную память для предотвращения доступа.</string>
+    <string name="es_hint_memory_protect_zero">Защищать нулевую страницу от чтения и записи.</string>
+    <string name="es_hint_memory_scribble_heap">Записывать 0xCD во всю выделенную память кучи.</string>
+    <string name="es_hint_memory_writable_executable_memory">Разрешить отображение памяти с доступом на запись и выполнение, для имитации поведения на платформах, где это не поддерживается</string>
+
+    <string name="es_hint_profiles_logged_profile_slot_0_xuid">XUID профиля для загрузки при загрузке в слоте 0</string>
+    <string name="es_hint_profiles_logged_profile_slot_1_xuid">XUID профиля для загрузки при загрузке в слоте 1</string>
+    <string name="es_hint_profiles_logged_profile_slot_2_xuid">XUID профиля для загрузки при загрузке в слоте 2</string>
+    <string name="es_hint_profiles_logged_profile_slot_3_xuid">XUID профиля для загрузки при загрузке в слоте 3</string>
+
+    <string name="es_hint_storage_cache_root">Корневой путь для файлов, используемых для ускорения определенных частей эмулятора или игры. Эти файлы могут быть постоянными, но они могут быть удалены без серьезных побочных эффектов, таких как потеря прогресса. Если пусто, будет использоваться папка cache под storage root, или, если доступно, каталог cache, предпочтительный для ОС.</string>
+    <string name="es_hint_storage_content_root">Корневой путь для хранения контента гостя (сохранения и т.д.), или пусто для использования папки content под storage root.</string>
+    <string name="es_hint_storage_mount_cache">Включить монтирование cache</string>
+    <string name="es_hint_storage_mount_scratch">Включить монтирование scratch</string>
+    <string name="es_hint_storage_storage_root">Корневой путь для постоянного внутреннего хранения данных (конфигурация и т.д.), или пусто для использования пути, предпочтительного для ОС, такого как папка документов, или каталог исполняемого файла эмулятора, если в нем присутствует portable.txt.</string>
+
+    <string name="es_hint_ui_headless">Не отображать никакой UI, используя значения по умолчанию для подсказок по мере необходимости.</string>
+    <string name="es_hint_ui_profiler_dpi_scaling">Применять масштабирование DPI окна к profiler.</string>
+    <string name="es_hint_ui_show_achievement_notification">Показывать уведомление о достижении на экране.</string>
+    <string name="es_hint_ui_show_profiler">Показывать UI профилирования по умолчанию.</string>
+    <string name="es_hint_ui_storage_selection_dialog">Показывать диалог выбора устройства хранения, когда игра запрашивает это.</string>
+
+        <string name="es_hint_video_avpack">Режимы видео
+0 = PAL-60 Component (SD)
+1 = Не используется
+2 = PAL-60 SCART
+3 = 480p Component (HD)
+4 = HDMI+A
+5 = PAL-60 Composite/S-Video
+6 = VGA
+7 = TV PAL-60
+8 = HDMI (по умолчанию)</string>
+    <string name="es_hint_video_enable_3d_mode">Включает использование стереоскопического режима в играх.</string>
+    <string name="es_hint_video_interlaced">Переключает чересстрочный режим.</string>
+    <string name="es_hint_video_internal_display_resolution">Разрешить играм, поддерживающим разные разрешения, рендериться в определенном разрешении. Это не гарантирует работу со всеми играми или улучшение производительности.\n0=640x480, 1=640x576, 2=720x480, 3=720x576, 4=800x600, 5=848x480, 6=1024x768, 7=1152x864, 8=1280x720 (По умолчанию), 9=1280x768, 10=1280x960, 11=1280x1024, 12=1360x768, 13=1440x900, 14=1680x1050, 15=1920x540, 16=1920x1080, 17=internal_display_resolution_x/y</string>
+    <string name="es_hint_video_internal_display_resolution_x">Пользовательская ширина. См. internal_display_resolution. Диапазон 1-1920.</string>
+    <string name="es_hint_video_internal_display_resolution_y">Пользовательская высота. См. internal_display_resolution. Диапазон 1-1080.</string>
+    <string name="es_hint_video_use_50Hz_mode">Включает использование режима PAL-50.</string>
+    <string name="es_hint_video_video_standard">Включает переключение между различными видеосигналами. 1=NTSC, 2=NTSC-J, 3=PAL</string>
+    <string name="es_hint_video_widescreen">Переключает соотношение сторон между 16:9 и 4:3.</string>
+
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_fifo_relaxed">Когда доступно, разрешать расслабленный режим презентации first-in-first-out (3-й приоритет), который вызывает ожидание вертикальной синхронизации дисплея хоста, но может представлять с разрывами, если кадры не соответствуют частоте обновления дисплея хоста.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_immediate">Когда доступно, разрешать немедленный режим презентации (1-й приоритет), предлагающий наименьшую задержку с возможностью разрывов в определенных случаях и, в зависимости от конфигурации, переменную частоту обновления.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_mailbox">Когда доступно, разрешать режим презентации mailbox (2-й приоритет), предлагающий низкую задержку без возможности разрывов.</string>
+    <string name="es_hint_vulkan_vulkan_device">Индекс предпочитаемого физического устройства Vulkan или -1 для использования любого совместимого устройства.</string>
+    <string name="es_hint_vulkan_vulkan_log_debug_messages">Записывать сообщения Vulkan VK_EXT_debug_utils в журнал Xenia, в отличие от вывода отладки ОС.</string>
+    <string name="es_hint_vulkan_vulkan_sparse_shared_memory">Включить разреженное привязывание для эмуляции общей памяти. Отключение увеличивает использование видеопамяти - создается буфер 512 МБ - но позволяет работать графическим отладчикам, которые не поддерживают разреженное привязывание.</string>
+    <string name="es_hint_vulkan_vulkan_validation">Включить уровень проверки Vulkan (VK_LAYER_KHRONOS_validation). Сообщения будут записываться в журнал Xenia, если \'vulkan_log_debug_messages\' включен, или в вывод отладки ОС в противном случае.</string>
+
+    <string name="es_hint_xconfig_audio_flag">Режим аудио аналоговый.
+0x00000001 = Dolby Pro Logic
+0x00000002 = Аналоговое моно
+Режим аудио цифровой.
+0x00000000 = Цифровое стерео (выберите один из вышеперечисленных самостоятельно)
+0x00010000 = Dolby Digital
+0x00030000 = Dolby Digital с WMA PRO
+Специальные флаги.
+0x00000003 = Обход стерео
+0x80000000 = Низкая задержка
+Эта конфигурация требует сопряжения аналогового и цифрового флага вместе, тогда как цифровое стерео требует только аналоговый флаг. Дополнительные флаги необязательны. Пример) 0x00010001</string>
+    <string name="es_hint_xconfig_user_country">ID страны пользователя.
+1=AE 2=AL 3=AM 4=AR 5=AT 6=AU 7=AZ 8=BE 9=BG
+10=BH 11=BN 12=BO 13=BR 14=BY 15=BZ 16=CA 18=CH 19=CL
+20=CN 21=CO 22=CR 23=CZ 24=DE 25=DK 26=DO 27=DZ 28=EC
+29=EE 30=EG 31=ES 32=FI 33=FO 34=FR 35=GB 36=GE 37=GR
+38=GT 39=HK 40=HN 41=HR 42=HU 43=ID 44=IE 45=IL 46=IN
+47=IQ 48=IR 49=IS 50=IT 51=JM 52=JO 53=JP 54=KE 55=KG
+56=KR 57=KW 58=KZ 59=LB 60=LI 61=LT 62=LU 63=LV 64=LY
+65=MA 66=MC 67=MK 68=MN 69=MO 70=MV 71=MX 72=MY 73=NI
+74=NL 75=NO 76=NZ 77=OM 78=PA 79=PE 80=PH 81=PK 82=PL
+83=PR 84=PT 85=PY 86=QA 87=RO 88=RU 89=SA 90=SE 91=SG
+92=SI 93=SK 95=SV 96=SY 97=TH 98=TN 99=TR 100=TT 101=TW
+102=UA 103=US 104=UY 105=UZ 106=VE 107=VN 108=YE 109=ZA</string>
+    <string name="es_hint_xconfig_user_language">ID языка пользователя.\n1=en 2=ja 3=de 4=fr 5=es 6=it 7=ko 8=zh\n9=pt 11=pl 12=ru 13=sv 14=tr 15=nb 16=nl 17=zh</string>
+
+    <string name="es_hint_a64_a64_extension_mask">Разрешить обнаружение и использование конкретных функций набора инструкций.
+0 = armv8.0
+1 = LSE
+2 = F16C
+-1 = Обнаружить и использовать все возможные функции процессора</string>
+
+
+</resources>

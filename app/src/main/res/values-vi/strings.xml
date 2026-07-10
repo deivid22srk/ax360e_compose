@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="es_apu_xma_decoder">Bộ giải mã Xma</string>
+    <string name="es_cpu_disable_context_promotion">Tắt quảng bá ngữ cảnh</string>
+    <string name="es_cpu_disable_instruction_infocache">Tắt bộ nhớ đệm thông tin lệnh</string>
+    <string name="es_cpu_disable_prefetch_and_cachecontrol">Tắt tìm nạp trước và điều khiển bộ đệm</string>
+    <string name="es_cpu_dump_translated_hir_functions">Kết xuất các hàm HIR đã dịch</string>
+    <string name="es_cpu_emit_inline_mmio_checks">Phát kiểm tra MMIO nội tuyến</string>
+    <string name="es_cpu_emit_mmio_aware_stores_for_recorded_exception_addresses">Phát lưu trữ nhận biết MMIO cho các địa chỉ ngoại lệ đã ghi</string>
+    <string name="es_cpu_enable_early_precompilation">Bật biên dịch trước sớm</string>
+    <string name="es_cpu_full_optimization_even_with_debug">Tối ưu hóa đầy đủ ngay cả khi gỡ lỗi</string>
+    <string name="es_cpu_ignore_trap_instructions">Bỏ qua lệnh bẫy</string>
+    <string name="es_cpu_no_reserved_ops">Không có thao tác dành riêng</string>
+    <string name="es_cpu_permit_float_constant_evaluation">Cho phép đánh giá hằng số dấu phẩy động</string>
+    <string name="es_cpu_record_mmio_access_exceptions">Ghi lại ngoại lệ truy cập MMIO</string>
+    <string name="es_cpu_writable_code_segments">Đoạn mã có thể ghi</string>
+    <string name="es_gpu_gpu_allow_invalid_upload_range">Cho phép phạm vi tải lên không hợp lệ GPU</string>
+    <string name="es_gpu_target_trace_file">Tệp theo dõi đích</string>
+    <string name="es_gpu_trace_dump_path">Đường dẫn kết xuất theo dõi</string>
+    <string name="es_general_allow_game_relative_writes">Cho phép ghi tương đối trò chơi</string>
+    <string name="es_general_controller_hotkeys">Phím tắt tay cầm</string>
+    <string name="es_general_disable_doubleclick_fullscreen">Tắt nhấp đúp toàn màn hình</string>
+    <string name="es_hid_guide_button">Nút Guide</string>
+    <string name="es_kernel_allow_avatar_initialization">Cho phép khởi tạo Avatar</string>
+    <string name="es_storage_force_mount_devkit">Bắt buộc gắn Devkit</string>
+    <string name="es_storage_mount_memory_unit">Gắn đơn vị bộ nhớ</string>
+    <string name="es_ui_custom_font_path">Đường dẫn phông chữ tùy chỉnh</string>
+
+    <string name="_default">Mặc định</string>
+    <string name="driver_library_path_dialog_add_hint">Thêm trình điều khiển tùy chỉnh (*.zip)</string>
+    <string name="es_vulkan_vulkan_lib_path">Đường dẫn thư viện trình điều khiển tùy chỉnh</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">Trình điều khiển tùy chỉnh buộc xung nhịp tối đa</string>
+
+    <string name="create_shortcut">Tạo Phím tắt</string>
+    <string name="disable_virtual_keyboard">Tắt bàn phím ảo</string>
+    <string name="joystick">Cần điều khiển</string>
+
+    <string name="dpad">Dpad</string>
+    <string name="abxy">ABXY</string>
+    <string name="lr">LR</string>
+    <string name="start_back">Bắt đầu/Quay lại</string>
+
+    <string name="save_and_quit">Lưu &amp; Thoát</string>
+    <string name="scale_rate">Tỷ lệ thu phóng</string>
+
+    <string name="refresh_list">Làm mới danh sách</string>
+    <string name="about">Giới thiệu</string>
+    <string name="gratitude">Lời cảm ơn</string>
+    <string name="update_log">Nhật ký cập nhật</string>
+    <string name="device_info">Thông tin thiết bị</string>
+    <string name="open_source_licenses">Giấy phép mã nguồn mở</string>
+
+    <string name="open_file_manager">Mở trình quản lý tập tin</string>
+    <string name="game_list_loading">Đang tải danh sách trò chơi...</string>
+    <string name="quit">Thoát</string>
+    <string name="device_unsupport_vulkan_msg">Thiết bị của bạn không hỗ trợ Vulkan và không đáp ứng yêu cầu tối thiểu để chạy ứng dụng này, vui lòng thoát.</string>
+
+    <string name="loading">Đang tải...</string>
+    <string name="msg_processing">Đang xử lý...</string>
+    <string name="empty_game_list">Danh sách trò chơi trống, vui lòng thiết lập thư mục trò chơi</string>
+
+    <string name="enable_vibrator">Bật rung</string>
+
+    <string name="set_game_dir">Thiết lập thư mục trò chơi</string>
+
+    <string name="clear">Xóa</string>
+    <string name="press_a_key">Nhấn phím bất kỳ để tiếp tục...</string>
+
+    <string name="reset_as_default">Đặt lại về mặc định</string>
+    <string name="key_mappers">Bản đồ phím</string>
+
+    <string name="virtual_pad_edit">Chỉnh sửa bàn phím ảo</string>
+
+    <string name="left">trái</string>
+    <string name="up">lên</string>
+    <string name="right">phải</string>
+    <string name="down">xuống</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+
+    <string name="lshoulder">LShoulder</string>
+    <string name="lthumbpress">LThumbPress</string>
+    <string name="ltrigger">LTrigger</string>
+
+    <string name="rshoulder">RShoulder</string>
+    <string name="rthumbpress">RThumbPress</string>
+    <string name="rtrigger">RTrigger</string>
+
+    <string name="start">bắt đầu</string>
+    <string name="back">Quay lại</string>
+
+    <string name="use_global_config">Sử dụng cấu hình toàn cục</string>
+
+    <string name="settings">Cài đặt</string>
+
+
+    <string name="gratitude_content">Cảm ơn Ruban vì tất cả các biểu tượng\n\n
+		Cảm ơn SRC267 (Sting) đã quản lý reddit/discord\n\n
+		Cảm ơn 妖妖 đã kiểm thử\n\n
+		Cảm ơn 再见某人 \n\n
+        Cảm ơn 再见某人 \n\n
+        Cảm ơn 再见某人 \n\n
+        \n\n
+        		Dựa trên tối ưu hóa cấy ghép Xenia, cảm ơn tất cả những người tham gia dự án Xenia\n\n
+    </string>
+
+    <string name="es_apu">APU</string>
+<string name="es_apu_apu">Hệ thống âm thanh</string>
+<string name="es_apu_apu_max_queued_frames">Số khung hình tối đa trong hàng đợi</string>
+<string name="es_apu_enable_xmp">Bật trình phát nhạc</string>
+<string name="es_apu_ffmpeg_verbose">Đầu ra chi tiết FFmpeg</string>
+<string name="es_apu_mute">Tắt tất cả âm thanh</string>
+<string name="es_apu_use_dedicated_xma_thread">Luồng XMA chuyên dụng</string>
+<string name="es_apu_use_new_decoder">Sử dụng bộ giải mã XMA mới</string>
+<string name="es_apu_xmp_default_volume">Âm lượng nhạc mặc định</string>
+
+<string name="es_cpu">CPU</string>
+<string name="es_cpu_break_condition_gpr">Điều kiện ngắt GPR</string>
+<string name="es_cpu_break_condition_op">Toán tử điều kiện ngắt</string>
+<string name="es_cpu_break_condition_truncate">Cắt ngắn giá trị về 32-bit</string>
+<string name="es_cpu_break_condition_value">Giá trị điều kiện ngắt</string>
+<string name="es_cpu_break_on_debugbreak">Ngắt khi Debugbreak</string>
+<string name="es_cpu_break_on_instruction">Ngắt khi thực hiện lệnh</string>
+<string name="es_cpu_break_on_start">Ngắt khi khởi động</string>
+<string name="es_cpu_break_on_unimplemented_instructions">Ngắt khi gặp lệnh chưa thực hiện</string>
+<string name="es_cpu_clock_no_scaling">Vô hiệu hóa chia tỷ lệ xung nhịp</string>
+<string name="es_cpu_clock_source_raw">Sử dụng nguồn xung nhịp thô</string>
+<string name="es_cpu_cpu">Backend CPU</string>
+<string name="es_cpu_debugprint_trap_log">Ghi log các bẫy Debugprint</string>
+<string name="es_cpu_disable_global_lock">Vô hiệu hóa khóa toàn cục</string>
+<string name="es_cpu_disassemble_functions">Phân rã các hàm</string>
+<string name="es_cpu_ignore_undefined_externs">Bỏ qua các extern chưa định nghĩa</string>
+<string name="es_cpu_inline_mmio_access">Truy cập MMIO nội tuyến</string>
+<string name="es_cpu_load_module_map">Tải bản đồ mô-đun</string>
+<string name="es_cpu_pvr">Phiên bản/Hiệu chỉnh Bộ xử lý</string>
+<string name="es_cpu_store_all_context_values">Lưu trữ tất cả giá trị ngữ cảnh</string>
+<string name="es_cpu_trace_function_coverage">Theo dõi phạm vi hàm</string>
+<string name="es_cpu_trace_function_data">Theo dõi dữ liệu hàm</string>
+<string name="es_cpu_trace_function_data_path">Đường dẫn theo dõi dữ liệu hàm</string>
+<string name="es_cpu_trace_function_references">Theo dõi tham chiếu hàm</string>
+<string name="es_cpu_trace_functions">Theo dõi các hàm</string>
+<string name="es_cpu_validate_hir">Xác thực HIR</string>
+
+<string name="es_content">Nội dung</string>
+<string name="es_content_license_mask">Mặt nạ giấy phép</string>
+
+<string name="es_display">Hiển thị</string>
+<string name="es_display_fullscreen">Chế độ toàn màn hình</string>
+<string name="es_display_host_present_from_non_ui_thread">Trình bày trực tiếp từ luồng không phải UI</string>
+<string name="es_display_postprocess_antialiasing">Chống răng cưa hậu xử lý</string>
+<string name="es_display_postprocess_dither">Phối màu hậu xử lý</string>
+<string name="es_display_postprocess_ffx_cas_additional_sharpness">Độ sắc CAS bổ sung</string>
+<string name="es_display_postprocess_ffx_fsr_max_upsampling_passes">Số lần lấy mẫu tối đa FSR</string>
+<string name="es_display_postprocess_ffx_fsr_sharpness_reduction">Giảm độ sắc FSR</string>
+<string name="es_display_postprocess_scaling_and_sharpening">Co giãn và làm sắc nét</string>
+<string name="es_display_present_letterbox">Trình bày Letterbox</string>
+<string name="es_display_present_render_pass_clear">Xóa Pass kết xuất</string>
+<string name="es_display_present_safe_area_x">Khu vực an toàn X</string>
+<string name="es_display_present_safe_area_y">Khu vực an toàn Y</string>
+
+<string name="es_gpu">GPU</string>
+<string name="es_gpu_clear_memory_page_state">Xóa trạng thái trang bộ nhớ</string>
+<string name="es_gpu_depth_float24_convert_in_pixel_shader">Chuyển đổi độ sâu trong Pixel Shader</string>
+<string name="es_gpu_depth_float24_round">Làm tròn chuyển đổi độ sâu</string>
+<string name="es_gpu_depth_transfer_not_equal_test">Kiểm tra chuyển giao độ sâu không bằng</string>
+<string name="es_gpu_disassemble_pm4">Phân rã các gói PM4</string>
+<string name="es_gpu_draw_resolution_scale_x">Tỷ lệ độ phân giải vẽ X</string>
+<string name="es_gpu_draw_resolution_scale_y">Tỷ lệ độ phân giải vẽ Y</string>
+<string name="es_gpu_draw_resolution_scaled_texture_offsets">Độ lệch kết cấu đã co giãn</string>
+<string name="es_gpu_dump_shaders">Đường dẫn đổ bóng</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu">Thực thi VS trên CPU cho các lần vẽ chưa cắt</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Thực thi VS trên CPU cho backend PSI</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Thực thi VS trên CPU với kéo cắt</string>
+<string name="es_gpu_force_convert_line_loops_to_strips">Buộc chuyển đổi vòng lặp đường thành dải</string>
+<string name="es_gpu_force_convert_quad_lists_to_triangle_lists">Buộc chuyển đổi danh sách tứ giác thành tam giác</string>
+<string name="es_gpu_force_convert_triangle_fans_to_lists">Buộc chuyển đổi quạt tam giác thành danh sách</string>
+<string name="es_gpu_framerate_limit">Giới hạn tốc độ khung hình</string>
+<string name="es_gpu_gamma_render_target_as_srgb">Gamma RT dưới dạng sRGB</string>
+<string name="es_gpu_gpu">Hệ thống đồ họa</string>
+<string name="es_gpu_gpu_allow_invalid_fetch_constants">Cho phép hằng số lấy dữ liệu không hợp lệ</string>
+<string name="es_gpu_half_pixel_offset">Độ lệch nửa pixel</string>
+<string name="es_gpu_ignore_32bit_vertex_index_support">Bỏ qua hỗ trợ chỉ mục đỉnh 32-bit</string>
+<string name="es_gpu_log_guest_driven_gpu_register_written_values">Ghi log ghi thanh ghi GPU</string>
+<string name="es_gpu_log_ringbuffer_kickoff_initiator_bts">Ghi log khởi động Ringbuffer</string>
+<string name="es_gpu_mrt_edram_used_range_clamp_to_min">Kẹp MRT EDRAM về tối thiểu</string>
+<string name="es_gpu_native_2x_msaa">MSAA gốc 2x</string>
+<string name="es_gpu_native_stencil_value_output">Đầu ra giá trị stencil gốc</string>
+<string name="es_gpu_non_seamless_cube_map">Bản đồ khối không liền mạch</string>
+<string name="es_gpu_primitive_processor_cache_min_indices">Chỉ mục tối thiểu cache nguyên thủy</string>
+<string name="es_gpu_query_occlusion_sample_lower_threshold">Ngưỡng dưới mẫu che khuất</string>
+<string name="es_gpu_query_occlusion_sample_upper_threshold">Ngưỡng trên mẫu che khuất</string>
+<string name="es_gpu_readback_memexport">Đọc lại Memexport</string>
+<string name="es_gpu_readback_resolve">Đọc lại Resolve</string>
+<string name="es_gpu_render_target_path_vulkan">Đường dẫn mục tiêu kết xuất (Vulkan)</string>
+<string name="es_gpu_resolve_resolution_scale_fill_half_pixel_offset">Độ lệch nửa pixel điền tỷ lệ Resolve</string>
+<string name="es_gpu_snorm16_render_target_full_range">Phạm vi đầy đủ SNORM16 RT</string>
+<string name="es_gpu_store_shaders">Lưu trữ shader</string>
+<string name="es_gpu_texture_cache_memory_limit_hard">Giới hạn cứng cache kết cấu</string>
+<string name="es_gpu_texture_cache_memory_limit_render_to_texture">Giới hạn RTT cache kết cấu</string>
+<string name="es_gpu_texture_cache_memory_limit_soft">Giới hạn mềm cache kết cấu</string>
+<string name="es_gpu_texture_cache_memory_limit_soft_lifetime">Thời gian sống mềm cache kết cấu</string>
+<string name="es_gpu_trace_gpu_prefix">Tiền tố theo dõi GPU</string>
+<string name="es_gpu_trace_gpu_stream">Theo dõi luồng GPU</string>
+<string name="es_gpu_vsync">VSYNC</string>
+
+<string name="es_general">Chung</string>
+<string name="es_general_allow_plugins">Cho phép plugin</string>
+<string name="es_general_apply_patches">Áp dụng bản vá</string>
+<string name="es_general_debug">Chế độ gỡ lỗi</string>
+<string name="es_general_discord">Discord Rich Presence</string>
+<string name="es_general_launch_module">Mô-đun khởi động</string>
+<string name="es_general_notification_sound_path">Đường dẫn âm thanh thông báo</string>
+<string name="es_general_time_scalar">Hệ số thời gian</string>
+
+<string name="es_hid">HID</string>
+<string name="es_hid_hid">Hệ thống nhập liệu</string>
+<string name="es_hid_left_stick_deadzone_percentage">Vùng chết cần điều khiển trái</string>
+<string name="es_hid_right_stick_deadzone_percentage">Vùng chết cần điều khiển phải</string>
+<string name="es_hid_vibration">Rung điều khiển</string>
+
+<string name="es_kernel">Kernel</string>
+<string name="es_kernel_allow_nui_initialization">Cho phép khởi tạo NUI</string>
+<string name="es_kernel_allow_incompatible_title_update">Cho phép cập nhật tiêu đề không tương thích</string>
+<string name="es_kernel_apply_title_update">Áp dụng cập nhật tiêu đề</string>
+<string name="es_kernel_cl">Đối số dòng lệnh</string>
+<string name="es_kernel_default_achievements_backend">Backend thành tựu</string>
+<string name="es_kernel_ignore_thread_affinities">Bỏ qua sự liên kết luồng</string>
+<string name="es_kernel_ignore_thread_priorities">Bỏ qua ưu tiên luồng</string>
+<string name="es_kernel_kernel_build_version">Phiên bản xây dựng Kernel</string>
+<string name="es_kernel_kernel_cert_monitor">Giám sát chứng chỉ</string>
+<string name="es_kernel_kernel_debug_monitor">Giám sát gỡ lỗi</string>
+<string name="es_kernel_kernel_display_gamma_power">Công suất gamma hiển thị</string>
+<string name="es_kernel_kernel_display_gamma_type">Loại gamma hiển thị</string>
+<string name="es_kernel_kernel_pix">PIX</string>
+<string name="es_kernel_log_high_frequency_kernel_calls">Ghi log các cuộc gọi kernel tần suất cao</string>
+<string name="es_kernel_staging_mode">Chế độ dàn dựng</string>
+
+<string name="es_logging">Ghi log</string>
+<string name="es_logging_flush_log">Xóa log</string>
+<string name="es_logging_log_file">Đường dẫn tệp log</string>
+<string name="es_logging_log_level">Mức log</string>
+<string name="es_logging_log_mask">Mặt nạ log</string>
+<string name="es_logging_log_string_format_kernel_calls">Ghi log cuộc gọi kernel</string>
+<string name="es_logging_log_to_debugprint">Ghi log vào DebugPrint</string>
+<string name="es_logging_log_to_stdout">Ghi log vào Stdout</string>
+
+<string name="es_memory">Bộ nhớ</string>
+<string name="es_memory_ignore_offset_for_ranged_allocations">Bỏ qua độ lệch cho phân bổ có phạm vi</string>
+<string name="es_memory_mmap_address_high">Địa chỉ MMAP cao</string>
+<string name="es_memory_protect_on_release">Bảo vệ bộ nhớ đã giải phóng</string>
+<string name="es_memory_protect_zero">Bảo vệ trang không</string>
+<string name="es_memory_scribble_heap">Heap Scribble</string>
+<string name="es_memory_writable_executable_memory">Bộ nhớ thực thi có thể ghi</string>
+
+<string name="es_profiles">Hồ sơ</string>
+<string name="es_profiles_logged_profile_slot_0_xuid">Khe hồ sơ 0 XUID</string>
+<string name="es_profiles_logged_profile_slot_1_xuid">Khe hồ sơ 1 XUID</string>
+<string name="es_profiles_logged_profile_slot_2_xuid">Khe hồ sơ 2 XUID</string>
+<string name="es_profiles_logged_profile_slot_3_xuid">Khe hồ sơ 3 XUID</string>
+
+<string name="es_storage">Lưu trữ</string>
+<string name="es_storage_cache_root">Đường dẫn gốc cache</string>
+<string name="es_storage_content_root">Đường dẫn gốc nội dung</string>
+<string name="es_storage_mount_cache">Gắn cache</string>
+<string name="es_storage_mount_scratch">Gắn scratch</string>
+<string name="es_storage_storage_root">Đường dẫn gốc lưu trữ</string>
+
+<string name="es_ui">Giao diện</string>
+<string name="es_ui_headless">Chế độ không đầu</string>
+<string name="es_ui_profiler_dpi_scaling">Co giãn DPI Profiler</string>
+<string name="es_ui_show_achievement_notification">Hiển thị thông báo thành tựu</string>
+<string name="es_ui_show_profiler">Hiển thị Profiler</string>
+<string name="es_ui_storage_selection_dialog">Hộp thoại chọn lưu trữ</string>
+
+<string name="es_video">Video</string>
+<string name="es_video_avpack">Gói AV</string>
+<string name="es_video_enable_3d_mode">Bật chế độ 3D</string>
+<string name="es_video_interlaced">Chế độ xen kẽ</string>
+<string name="es_video_internal_display_resolution">Độ phân giải hiển thị nội bộ</string>
+<string name="es_video_internal_display_resolution_x">Chiều rộng hiển thị tùy chỉnh</string>
+<string name="es_video_internal_display_resolution_y">Chiều cao hiển thị tùy chỉnh</string>
+<string name="es_video_use_50Hz_mode">Sử dụng chế độ 50Hz</string>
+<string name="es_video_video_standard">Tiêu chuẩn video</string>
+<string name="es_video_widescreen">Chế độ màn hình rộng</string>
+
+<string name="es_vulkan">Vulkan</string>
+<string name="es_vulkan_vulkan_allow_present_mode_fifo_relaxed">Cho phép chế độ trình bày FIFO thư giãn</string>
+<string name="es_vulkan_vulkan_allow_present_mode_immediate">Cho phép chế độ trình bày ngay lập tức</string>
+<string name="es_vulkan_vulkan_allow_present_mode_mailbox">Cho phép chế độ trình bày hộp thư</string>
+<string name="es_vulkan_vulkan_device">Chỉ mục thiết bị Vulkan</string>
+<string name="es_vulkan_vulkan_log_debug_messages">Ghi log tin nhắn gỡ lỗi Vulkan</string>
+<string name="es_vulkan_vulkan_sparse_shared_memory">Bộ nhớ chia sẻ thưa thớt</string>
+<string name="es_vulkan_vulkan_validation">Lớp xác thực Vulkan</string>
+
+<string name="es_xconfig">XConfig</string>
+<string name="es_xconfig_audio_flag">Cờ âm thanh</string>
+<string name="es_xconfig_user_country">Quốc gia người dùng</string>
+<string name="es_xconfig_user_language">Ngôn ngữ người dùng</string>
+
+<string name="es_a64">a64</string>
+<string name="es_a64_a64_extension_mask">Mặt nạ mở rộng A64</string>
+
+    <string name="es_hint_apu_apu">Hệ thống âm thanh. Sử dụng: [any, nop, opensles, aaudio]</string>
+    <string name="es_hint_apu_apu_max_queued_frames">Cho phép thay đổi số khung âm thanh đệm tối đa để giảm độ trễ âm thanh. Giảm giá trị này có thể gây ra vấn đề hiệu suất. Phạm vi giá trị: [4-64]</string>
+    <string name="es_hint_apu_enable_xmp">Bật phát nhạc Music Player.</string>
+    <string name="es_hint_apu_ffmpeg_verbose">Đầu ra FFmpeg chi tiết (gỡ lỗi và cao hơn)</string>
+    <string name="es_hint_apu_mute">Tắt tất cả đầu ra âm thanh.</string>
+    <string name="es_hint_apu_use_dedicated_xma_thread">Bật giải mã XMA trên luồng riêng. Tắt nên tạo kết quả tốt hơn, nhưng giảm hiệu suất một chút.</string>
+    <string name="es_hint_apu_use_new_decoder">Bật sử dụng bộ giải mã âm thanh XMA thử nghiệm mới.</string>
+    <string name="es_hint_apu_xmp_default_volume">Âm lượng nhạc mặc định nếu trò chơi không đặt nó [0-100].</string>
+
+    <string name="es_hint_cpu_break_condition_gpr">GPR so sánh với</string>
+    <string name="es_hint_cpu_break_condition_op">toán tử so sánh</string>
+    <string name="es_hint_cpu_break_condition_truncate">cắt ngắn giá trị thành 32-bit</string>
+    <string name="es_hint_cpu_break_condition_value">giá trị so sánh với</string>
+    <string name="es_hint_cpu_break_on_debugbreak">int3 trên yêu cầu __debugbreak JITed.</string>
+    <string name="es_hint_cpu_break_on_instruction">int3 trước khi địa chỉ guest được thực thi.</string>
+    <string name="es_hint_cpu_break_on_start">Ngắt vào trình gỡ lỗi khi khởi động.</string>
+    <string name="es_hint_cpu_break_on_unimplemented_instructions">Ngắt vào trình gỡ lỗi host (hoặc crash nếu không có trình gỡ lỗi nào được gắn) nếu gặp phải hướng dẫn PowerPC chưa được triển khai.</string>
+    <string name="es_hint_cpu_clock_no_scaling">Vô hiệu hóa mã scaling. Quản lý thời gian và khóa bị bỏ qua. Thời gian hệ thống guest được kéo trực tiếp từ host.</string>
+    <string name="es_hint_cpu_clock_source_raw">Trên x64, sử dụng hướng dẫn RDTSC làm nguồn thời gian. Yêu cầu TSC bất biến. Trên a64, sử dụng thanh ghi CNTVCT_EL0 làm nguồn thời gian</string>
+    <string name="es_hint_cpu_cpu">Backend CPU [any, x64, a64].</string>
+    <string name="es_hint_cpu_debugprint_trap_log">Ghi nhật ký bẫy debugprint vào trình gỡ lỗi hoạt động</string>
+    <string name="es_hint_cpu_disable_global_lock">Vô hiệu hóa việc sử dụng khóa toàn cục trong mã guest. Không ảnh hưởng đến mã host.</string>
+    <string name="es_hint_cpu_disassemble_functions">Tháo lắp các hàm trong quá trình tạo.</string>
+    <string name="es_hint_cpu_ignore_undefined_externs">Không thoát khi một extern không xác định được gọi.</string>
+    <string name="es_hint_cpu_inline_mmio_access">Tải và lưu trữ MMIO hằng số inline.</string>
+    <string name="es_hint_cpu_load_module_map">Tải .map cho tên biểu tượng và để so sánh với cơ sở dữ liệu biểu tượng được tạo.</string>
+    <string name="es_hint_cpu_pvr">Số phiên bản và sửa đổi bộ xử lý.\nBit 0 đến 15 là số phiên bản.\nBit 16 đến 31 là số sửa đổi.\nLưu ý: Một số XEX (như mfgbootlauncher.xex) có thể kiểm tra giá trị nhỏ hơn 0x710700.</string>
+    <string name="es_hint_cpu_store_all_context_values">Không loại bỏ các lưu trữ ngữ cảnh chết để hỗ trợ gỡ lỗi.</string>
+    <string name="es_hint_cpu_trace_function_coverage">Tạo dấu vết cho thống kê phạm vi hướng dẫn hàm.</string>
+    <string name="es_hint_cpu_trace_function_data">Tạo dấu vết cho dữ liệu kết quả hàm.</string>
+    <string name="es_hint_cpu_trace_function_data_path">Tệp để ghi dữ liệu dấu vết vào.</string>
+    <string name="es_hint_cpu_trace_function_references">Tạo dấu vết cho các tham chiếu địa chỉ hàm.</string>
+    <string name="es_hint_cpu_trace_functions">Tạo dấu vết cho thống kê hàm.</string>
+    <string name="es_hint_cpu_validate_hir">Thực hiện kiểm tra xác thực trên HIR trong quá trình biên dịch.</string>
+
+    <string name="es_hint_content_license_mask">Đặt mặt nạ giấy phép cho nội dung đã kích hoạt.\n0 = Không có giấy phép nào được bật.\n1 = Giấy phép đầu tiên được bật. Thông thường là giấy phép phiên bản đầy đủ trong các tựa Xbox Live Arcade.\n-1 hoặc 0xFFFFFFFF = Tất cả giấy phép có thể được bật. Thông thường là ý tưởng tồi, có thể dẫn đến hành vi không xác định.</string>
+
+    <string name="es_hint_display_fullscreen">Cho dù khởi chạy trình giả lập ở chế độ toàn màn hình.</string>
+    <string name="es_hint_display_host_present_from_non_ui_thread">Cho phép luồng mô phỏng GPU trình bày đầu ra guest lên bề mặt host trực tiếp thay vì yêu cầu luồng UI làm điều đó thông qua hệ thống cửa sổ host.</string>
+    <string name="es_hint_display_postprocess_antialiasing">Hiệu ứng chống răng cưa hậu xử lý để áp dụng cho đầu ra hình ảnh của trò chơi.
+Sử dụng chống răng cưa hậu xử lý được khuyến nghị mạnh mẽ khi AMD FidelityFX Contrast Adaptive Sharpening hoặc Super Resolution 1.0 đang hoạt động.
+Sử dụng: [none, fxaa, fxaa_extreme]
+none (hoặc bất kỳ giá trị nào không được liệt kê ở đây): Không thay đổi hình ảnh gốc.
+fxaa: NVIDIA Fast Approximate Anti-Aliasing 3.11, preset chất lượng bình thường (12).
+fxaa_extreme: NVIDIA Fast Approximate Anti-Aliasing 3.11, preset chất lượng cực cao (39).</string>
+    <string name="es_hint_display_postprocess_dither">Dither đầu ra hình ảnh cuối cùng từ độ chính xác nội bộ sang 8 bit mỗi kênh để gradient mượt mà hơn.\nTrên màn hình 10bpc, 2 bit thấp hơn sẽ được giữ lại, nhưng nhiễu sẽ được thêm vào - vô hiệu hóa có thể được khuyến nghị cho 10bpc, nhưng phụ thuộc vào khả năng hiển thị 10bpc của màn hình thực tế được sử dụng.</string>
+    <string name="es_hint_display_postprocess_ffx_cas_additional_sharpness">Độ sắc nét bổ sung cho AMD FidelityFX Contrast Adaptive Sharpening (CAS), từ 0 đến 1. Cao hơn là sắc nét hơn.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_max_upsampling_passes">Số lần vượt qua upsampling tối đa được thực hiện trong AMD FidelityFX Super Resolution 1.0 (FSR) trước khi quay lại kéo dãn bilinear sau lần vượt qua cuối cùng.\nMỗi lần vượt qua chỉ mở rộng tối đa 2x2 kích thước trước đó. Nếu trò chơi xuất ra hình ảnh 1280x720, 1 lần vượt qua sẽ mở rộng nó lên tối đa 2560x1440 (dưới 4K), sau 2 lần vượt qua nó sẽ được mở rộng lên tối đa 5120x2880 (bao gồm 3840x2160 cho 4K), v.v.\nBiến này không có tác dụng nếu độ phân giải màn hình không rất cao, nhưng có thể giảm trên độ phân giải như 4K hoặc 8K trong trường hợp tác động hiệu suất của nhiều lần vượt qua upsampling FSR quá cao, hoặc nếu mong muốn cạnh mềm hơn.\nGiá trị mặc định là tối đa được Xenia hỗ trợ nội bộ.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_sharpness_reduction">Giảm độ sắc nét cho AMD FidelityFX Super Resolution 1.0 (FSR), tính bằng stops. Thấp hơn là sắc nét hơn.</string>
+    <string name="es_hint_display_postprocess_scaling_and_sharpening">Hiệu ứng hậu xử lý để sử dụng để lấy mẫu lại và/hoặc làm sắc nét đầu ra màn hình cuối cùng.
+Sử dụng: [bilinear, cas, fsr]
+bilinear (hoặc bất kỳ giá trị nào không được liệt kê ở đây): Hình ảnh gốc ở 1:1, kéo dãn bilinear đơn giản để lấy mẫu lại.
+cas: Sử dụng AMD FidelityFX Contrast Adaptive Sharpening (CAS) để làm sắc nét ở các hệ số tỷ lệ lên đến 2x2, với kéo dãn bilinear bổ sung cho các hệ số lớn hơn.
+fsr: Sử dụng AMD FidelityFX Super Resolution 1.0 (FSR) để upscaling chất lượng cao nhất, hoặc AMD FidelityFX Contrast Adaptive Sharpening để làm sắc nét trong khi không tỷ lệ hoặc downsampling.
+Đối với tỷ lệ theo hệ số hơn 2x2, nhiều lần vượt qua FSR được thực hiện.</string>
+    <string name="es_hint_display_present_letterbox">Duy trì tỷ lệ khung hình khi kéo dãn bằng cách hiển thị các thanh xung quanh hình ảnh khi không còn diện tích overscan để cắt ra.</string>
+    <string name="es_hint_display_present_render_pass_clear">Trên các backend đồ họa nơi điều này được hỗ trợ, sử dụng thao tác tải render pass clear trong trình bày thay vì các lệnh clear chỉ xóa khu vực letterbox.</string>
+    <string name="es_hint_display_present_safe_area_x">Phần trăm chiều rộng hình ảnh có thể được giữ khi trình bày để duy trì tỷ lệ khung hình mà không cần letterboxing hoặc kéo dãn.</string>
+    <string name="es_hint_display_present_safe_area_y">Phần trăm chiều cao hình ảnh có thể được giữ khi trình bày để duy trì tỷ lệ khung hình mà không cần letterboxing hoặc kéo dãn.</string>
+
+    <string name="es_hint_gpu_clear_memory_page_state">Làm mới trạng thái các trang bộ nhớ để bật dữ liệu được gpu ghi. (Sử dụng cho trò chơi \'Team Ninja\' để sửa mô hình nhân vật bị thiếu)</string>
+    <string name="es_hint_gpu_depth_float24_convert_in_pixel_shader">Cho dù chuyển đổi các giá trị độ sâu sang floating-point 24-bit (20e4) từ độ chính xác host (floating-point 32-bit) trực tiếp trong pixel shaders của các bản vẽ guest khi sử dụng buffer độ sâu host.\nĐiều này ngăn chặn artifacts trực quan nếu dữ liệu độ sâu độ chính xác host đầy đủ bị mất. Đây là một tùy chọn tốn kém vì nó làm cho GPU không thể sử dụng nén buffer độ sâu, và với MSAA, buộc pixel shader chạy cho mọi mẫu subpixel thay vì cho toàn bộ pixel, làm cho shading pixel nặng gấp 2 hoặc 4 lần tùy thuộc vào số lượng mẫu MSAA.</string>
+    <string name="es_hint_gpu_depth_float24_round">Cho dù làm tròn đến số chẵn gần nhất, thay vì cắt ngắn (làm tròn về 0), độ sâu khi chuyển đổi nó sang floating-point 24-bit (20e4) từ độ chính xác host (floating-point 32-bit) khi sử dụng buffer độ sâu host.\nfalse: Được khuyến nghị. Việc chuyển đổi có thể di chuyển các giá trị độ sâu xa hơn khỏi camera.\ntrue: Chỉ cho các trường hợp đặc biệt của vấn đề gây ra bởi lỗi làm tròn floating-point 32-bit nhỏ.</string>
+    <string name="es_hint_gpu_depth_transfer_not_equal_test">Khi truyền dữ liệu giữa các render targets độ sâu, sử dụng kiểm tra "không bằng" để tránh viết lại độ sâu qua đầu ra độ sâu shader nếu nó giống như cái hiện có trong buffer độ sâu trong trường hợp chuyến đi vòng của dữ liệu.</string>
+    <string name="es_hint_gpu_disassemble_pm4">Chỉ làm gì đó trong các bản build debug, nếu được đặt sẽ tháo lắp và ghi nhật ký tất cả các gói PM4 được gửi đến CP.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_x">Thang đo chiều rộng pixel số nguyên được sử dụng để tỷ lệ độ phân giải rendering một cách opaque cho trò chơi. 1, 2 và 3 có thể được hỗ trợ, nhưng hỗ trợ bất cứ thứ gì trên 1 phụ thuộc vào thuộc tính thiết bị.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_y">Thang đo chiều rộng pixel số nguyên được sử dụng để tỷ lệ độ phân giải rendering một cách opaque cho trò chơi. Xem draw_resolution_scale_x để biết thêm thông tin.</string>
+    <string name="es_hint_gpu_draw_resolution_scaled_texture_offsets">Áp dụng các offset từ các hướng dẫn fetch texture có tính đến thang đo độ phân giải cho render-to-texture, để lọc bóng, bloom, v.v. chính xác hơn, trong một số trường hợp.</string>
+    <string name="es_hint_gpu_dump_shaders">Để gỡ lỗi shader, đường dẫn để dump GPU shaders khi chúng được biên dịch.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu">Thực thi vertex shader cho các bản vẽ với clipping bị vô hiệu hóa, chủ yếu là các bản vẽ screen-space (như clears), trên CPU khi có thể để ước tính mức độ EDRAM liên quan trong bản vẽ.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Nếu execute_unclipped_draw_vs_on_cpu được bật, thực thi vertex shader cho các bản vẽ không clipped trên CPU ngay cả khi sử dụng triển khai pixel shader interlock (chế độ xem rasterizer-ordered) của render backend trên host.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Không hạn chế việc sử dụng execute_unclipped_draw_vs_on_cpu chỉ cho các bản vẽ không scissored (với các bên phải và dưới của hình chữ nhật scissor ở 8192 hoặc xa hơn) mặc dù nếu hình chữ nhật scissor hiện diện, nó thường đủ để ước tính chiều cao của render target.</string>
+    <string name="es_hint_gpu_force_convert_line_loops_to_strips">Chỉ để kiểm tra hỗ trợ downlevel API đồ họa host, buộc chuyển đổi CPU của line loops sang line strips ngay cả khi host hỗ trợ các primitive line loop native.</string>
+    <string name="es_hint_gpu_force_convert_quad_lists_to_triangle_lists">Chỉ để kiểm tra hỗ trợ downlevel API đồ họa host, buộc chuyển đổi CPU của quad lists sang quad strips ngay cả khi host hỗ trợ các primitive quad list native hoặc qua mô phỏng geometry shader.</string>
+    <string name="es_hint_gpu_force_convert_triangle_fans_to_lists">Chỉ để kiểm tra hỗ trợ downlevel API đồ họa host, buộc chuyển đổi CPU của triangle fans sang triangle lists ngay cả khi host hỗ trợ các primitive triangle fan native.</string>
+    <string name="es_hint_gpu_framerate_limit">Khung hình mỗi giây tối đa. 0 = Khung hình không giới hạn. Mặc định là 60, khi được đặt thành 0, và VSYNC được bật.</string>
+    <string name="es_hint_gpu_gamma_render_target_as_srgb">Khi host không thể ghi piecewise linear gamma trực tiếp với blending chính xác, sử dụng đầu ra sRGB trên host để blending đúng khái niệm trong không gian màu tuyến tính trong khi có phân phối độ chính xác hơi khác trong render target và các giá trị sai lệch nghiêm trọng nếu trò chơi truy cập các màu kết quả trực tiếp dưới dạng dữ liệu thô.</string>
+    <string name="es_hint_gpu_gpu">Hệ thống đồ họa. Sử dụng: [vulkan, null]</string>
+    <string name="es_hint_gpu_gpu_allow_invalid_fetch_constants">Cho phép các hằng số fetch texture và vertex có loại không hợp lệ - nói chung không an toàn vì hằng số có thể chứa các giá trị hoàn toàn không hợp lệ, nhưng có thể được sử dụng để bỏ qua lỗi loại hằng số fetch trong một số trò chơi cho đến khi tìm thấy lý do thực sự tại sao chúng không hợp lệ.</string>
+    <string name="es_hint_gpu_half_pixel_offset">Bật hỗ trợ vertex half-pixel offset (D3D9 PA_SU_VTX_CNTL PIX_CENTER). Nói chung các trò chơi nhận thức được half-pixel offset, và bật điều này là hành vi đúng (tắt điều này có thể phá vỡ đáng kể post-processing trong một số trò chơi).</string>
+    <string name="es_hint_gpu_ignore_32bit_vertex_index_support">Chỉ để kiểm tra hỗ trợ downlevel API đồ họa host (chỉ hữu ích cho kiểm tra GPU host cấp Qualcomm Adreno 4xx), buộc indirection hoặc pre-masking và pre-swapping các chỉ mục vertex 32-bit như thể host chỉ hỗ trợ chỉ mục 24-bit.</string>
+    <string name="es_hint_gpu_log_guest_driven_gpu_register_written_values">Chỉ làm gì đó trong các bản build debug, nếu được đặt sẽ ghi nhật ký mọi ghi vào thanh ghi gpu do guest thực hiện.</string>
+    <string name="es_hint_gpu_log_ringbuffer_kickoff_initiator_bts">Chỉ làm gì đó trong các bản build debug, nếu được đặt sẽ ghi nhật ký pseudo-stacktrace của luồng guest đã ghi vị trí đọc mới.</string>
+    <string name="es_hint_gpu_mrt_edram_used_range_clamp_to_min">Với các render targets host, nếu nhiều render targets được ràng buộc, ước tính phạm vi EDRAM được sửa đổi trong bất kỳ cái nào trong số chúng không lớn hơn khoảng cách giữa bất kỳ hai render targets nào trong EDRAM, thay vì cho phép cái cuối cùng tuyên bố phần còn lại của EDRAM.</string>
+    <string name="es_hint_gpu_native_2x_msaa">Sử dụng 2x MSAA của host khi có sẵn. Có thể bị vô hiệu hóa để kiểm tra khả năng mở rộng trên các API GPU host nơi 2x không bắt buộc, trong trường hợp này, 2 mẫu của 4x MSAA sẽ được sử dụng thay thế (với chất lượng tương tự hoặc tệ hơn và sử dụng bộ nhớ cao hơn).</string>
+    <string name="es_hint_gpu_native_stencil_value_output">Sử dụng đầu ra tham chiếu stencil của pixel shader khi có sẵn cho các mục đích như sao chép giữa các render targets. Có thể bị vô hiệu hóa để kiểm tra khả năng mở rộng, trong trường hợp này, việc vẽ 8 quads đắt tiền hơn nhiều sẽ được thực hiện.</string>
+    <string name="es_hint_gpu_non_seamless_cube_map">Vô hiệu hóa lọc giữa các mặt của cube map gần các cạnh khi có thể (Vulkan với VK_EXT_non_seamless_cube_map) để tái tạo hành vi Direct3D 9.</string>
+    <string name="es_hint_gpu_primitive_processor_cache_min_indices">Số lượng chỉ mục guest nhỏ nhất để lưu trữ trong cache để cố gắng sử dụng lại sau đó trong cùng một khung hình nếu xử lý (như chuyển đổi loại primitive hoặc thay thế chỉ mục reset) được thực hiện. Đặt giá trị này rất cao có thể dẫn đến xử lý CPU quá mức, trong khi giá trị rất thấp có thể dẫn đến khóa và tra cứu quá mức. Giá trị âm vô hiệu hóa caching.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_lower_threshold">Nếu được đặt thành -1 không có số lượng mẫu nào được ghi, trò chơi có thể bị treo. Nếu không, số lượng mẫu của mọi tile sẽ được tăng lên trên mọi EVENT_WRITE_ZPD theo số này. Đặt giá trị này thành 0 có nghĩa là mọi thứ được báo cáo là bị che khuất.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_upper_threshold">Đặt thành số cao hơn query_occlusion_sample_lower_threshold. Giá trị này bị bỏ qua nếu query_occlusion_sample_lower_threshold được đặt thành -1.</string>
+    <string name="es_hint_gpu_readback_memexport">[Chỉ D3D12] Đọc dữ liệu được ghi bởi memory export trong shaders trên CPU. Điều này có thể cần thiết trong một số trò chơi (nhưng nhiều trò chỉ truy cập dữ liệu xuất trên GPU, và cờ này không cần thiết để xử lý hành vi như vậy), nhưng gây đồng bộ hóa mid-frame, vì vậy nó có tác động hiệu suất lớn.</string>
+    <string name="es_hint_gpu_readback_resolve">[Chỉ D3D12] Đọc kết quả render-to-texture trên CPU. Điều này có thể cần thiết trong một số trò chơi, ví dụ, cho ảnh chụp màn hình trong các trò chơi đã lưu, nhưng gây đồng bộ hóa mid-frame, vì vậy nó có tác động hiệu suất lớn.</string>
+    <string name="es_hint_gpu_render_target_path_vulkan">Đường dẫn mô phỏng render target để sử dụng trên Vulkan. Sử dụng: [any, fbo, fsi]\nfbo: Host framebuffers và blending chức năng cố định và kiểm tra độ sâu/stencil, sao chép giữa các render targets khi cần. Độ chính xác thấp hơn (hỗ trợ định dạng pixel hạn chế).\nfsi: Đóng gói pixel thủ công, blending và kiểm tra độ sâu/stencil, với các thay đổi bố cục render target tự do. Yêu cầu GPU hỗ trợ fragment shader interlock. Độ chính xác cao nhất (tất cả các định dạng pixel được xử lý trong phần mềm).</string>
+    <string name="es_hint_gpu_resolve_resolution_scale_fill_half_pixel_offset">Khi sử dụng tỷ lệ độ phân giải, áp dụng hack kéo dãn pixel host chắc chắn được bao phủ đầu tiên ở các bên trái và trên của các khu vực resolve render target để loại bỏ khoảng trống gây ra bởi half-pixel offset (điều này cần thiết cho một số trò chơi để hiển thị đồ họa cảnh).</string>
+    <string name="es_hint_gpu_snorm16_render_target_full_range">Khi host chỉ có thể hỗ trợ các render targets 16_16 và 16_16_16_16 là -1...1, ánh xạ lại -32...32 thành -1...1 để sử dụng toàn bộ phạm vi giá trị có thể, với chi phí là tính chính xác của blending nhân.</string>
+    <string name="es_hint_gpu_store_shaders">Lưu trữ shaders liên tục và tải chúng khi tải trò chơi để tránh spikes runtime và đóng băng khi chơi trò chơi không phải lần đầu tiên.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_hard">Sử dụng bộ nhớ texture host tối đa (tính bằng megabyte) trên đó các textures sẽ bị hủy càng sớm càng tốt.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_render_to_texture">Một phần ngân sách bộ nhớ texture host (tính bằng megabyte) sẽ được tỷ lệ theo thang đo độ phân giải vẽ hiện tại.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft">Sử dụng bộ nhớ texture host tối đa (tính bằng megabyte) trên đó các textures cũ sẽ bị hủy.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft_lifetime">Giây mà một texture không được sử dụng để được coi là đủ cũ để bị xóa nếu sử dụng bộ nhớ texture vượt quá texture_cache_memory_limit_soft.</string>
+    <string name="es_hint_gpu_trace_gpu_prefix">Đường dẫn tiền tố cho các tệp trace GPU.</string>
+    <string name="es_hint_gpu_trace_gpu_stream">Trace tất cả các gói GPU.</string>
+    <string name="es_hint_gpu_vsync">Bật VSYNC.</string>
+
+    <string name="es_hint_general_allow_plugins">Cho phép tải các plugin/trainers từ plugins\title_id\plugin.xex. Plugin là các module homebrew xex có thể được sử dụng để tạo mods. Tính năng này là thử nghiệm.</string>
+    <string name="es_hint_general_apply_patches">Bật chức năng patch tùy chỉnh</string>
+    <string name="es_hint_general_debug">Cho phép gỡ lỗi và giữ lại thông tin gỡ lỗi.</string>
+    <string name="es_hint_general_discord">Bật Discord rich presence</string>
+    <string name="es_hint_general_launch_module">Executable để khởi chạy từ .iso hoặc gói thay vì default.xex hoặc module được trò chơi chỉ định. Để trống để khởi chạy module mặc định.</string>
+    <string name="es_hint_general_notification_sound_path">Đường dẫn (bao gồm tên tệp) đến âm thanh thông báo đã chọn. Âm thanh PHẢI ở định dạng wav!</string>
+    <string name="es_hint_general_time_scalar">Scalar được sử dụng để tăng tốc hoặc làm chậm thời gian (1x, 2x, 1/2x, v.v.).</string>
+
+    <string name="es_hint_hid_hid">Hệ thống đầu vào. Sử dụng: [android, nop]</string>
+    <string name="es_hint_hid_left_stick_deadzone_percentage">Xác định mức deadzone cho stick trái. Phạm vi cho phép [0.0-1.0].</string>
+    <string name="es_hint_hid_right_stick_deadzone_percentage">Xác định mức deadzone cho stick phải. Phạm vi cho phép [0.0-1.0].</string>
+    <string name="es_hint_hid_vibration">Chuyển đổi rung của bộ điều khiển.</string>
+
+    <string name="es_hint_kernel_allow_nui_initialization">Bật khởi tạo NUI. Chỉ đặt true khi kiểm tra trò chơi kinect. Một số trò chơi có thể yêu cầu triển khai avatar.</string>
+    <string name="es_hint_kernel_allow_incompatible_title_update">Cho phép áp dụng title updates với chữ ký không khớp.</string>
+    <string name="es_hint_kernel_apply_title_update">Áp dụng title updates.</string>
+    <string name="es_hint_kernel_cl">Chỉ định dòng lệnh bổ sung được cung cấp cho guest.</string>
+    <string name="es_hint_kernel_default_achievements_backend">Xác định backend achievements nào nên được sử dụng làm mặc định. Các tùy chọn có thể: GPD.</string>
+    <string name="es_hint_kernel_ignore_thread_affinities">Bỏ qua các affinities luồng được trò chơi chỉ định.</string>
+    <string name="es_hint_kernel_ignore_thread_priorities">Bỏ qua các ưu tiên luồng được trò chơi chỉ định.</string>
+    <string name="es_hint_kernel_kernel_build_version">Xác định phiên bản kernel hiện tại</string>
+    <string name="es_hint_kernel_kernel_cert_monitor">Bật monitor cert.</string>
+    <string name="es_hint_kernel_kernel_debug_monitor">Bật monitor debug.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_power">Display gamma để sử dụng với kernel_display_gamma_type 3.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_type">Loại display gamma: 0 - tuyến tính, 1 - sRGB (CRT), 2 - BT.709 (HDTV), 3 - power được chỉ định qua kernel_display_gamma_power.</string>
+    <string name="es_hint_kernel_kernel_pix">Bật PIX.</string>
+    <string name="es_hint_kernel_log_high_frequency_kernel_calls">Ghi nhật ký các cuộc gọi kernel với thẻ kHighFrequency.</string>
+    <string name="es_hint_kernel_staging_mode">Bật chế độ xem trước trong dashboards để hiển thị thông tin gỡ lỗi.</string>
+
+    <string name="es_hint_logging_flush_log">Flush tệp nhật ký sau mỗi mẻ dòng nhật ký.</string>
+    <string name="es_hint_logging_log_file">Nhật ký được ghi vào tệp được chỉ định</string>
+    <string name="es_hint_logging_log_level">Mức tối đa được ghi nhật ký. (0=error, 1=warning, 2=info, 3=debug)</string>
+    <string name="es_hint_logging_log_mask">Vô hiệu hóa các danh mục cụ thể để ghi nhật ký gỡ lỗi chi tiết hơn. Kernel = 1, Apu = 2, Cpu = 4.</string>
+    <string name="es_hint_logging_log_string_format_kernel_calls">Ghi nhật ký các cuộc gọi kernel với thẻ kHighFrequency.</string>
+    <string name="es_hint_logging_log_to_debugprint">Dump nhật ký vào DebugPrint.</string>
+    <string name="es_hint_logging_log_to_stdout">Ghi đầu ra nhật ký vào stdout</string>
+
+    <string name="es_hint_memory_ignore_offset_for_ranged_allocations">Cho phép bỏ qua offset 4k cho các phân bổ vật lý với phạm vi được cung cấp. Một số tựa game kiểm tra xem kết quả có khớp với phạm vi dưới được cung cấp không.</string>
+    <string name="es_hint_memory_mmap_address_high">1-124</string>
+    <string name="es_hint_memory_protect_on_release">Bảo vệ bộ nhớ được giải phóng để ngăn truy cập.</string>
+    <string name="es_hint_memory_protect_zero">Bảo vệ trang zero khỏi đọc và ghi.</string>
+    <string name="es_hint_memory_scribble_heap">Scribble 0xCD vào tất cả bộ nhớ heap được phân bổ.</string>
+    <string name="es_hint_memory_writable_executable_memory">Cho phép ánh xạ bộ nhớ với cả quyền ghi và thực thi, để mô phỏng hành vi trên các nền tảng không hỗ trợ điều đó</string>
+
+    <string name="es_hint_profiles_logged_profile_slot_0_xuid">XUID của profile để tải khi khởi động trong slot 0</string>
+    <string name="es_hint_profiles_logged_profile_slot_1_xuid">XUID của profile để tải khi khởi động trong slot 1</string>
+    <string name="es_hint_profiles_logged_profile_slot_2_xuid">XUID của profile để tải khi khởi động trong slot 2</string>
+    <string name="es_hint_profiles_logged_profile_slot_3_xuid">XUID của profile để tải khi khởi động trong slot 3</string>
+
+    <string name="es_hint_storage_cache_root">Đường dẫn root cho các tệp được sử dụng để tăng tốc một số phần của trình giả lập hoặc trò chơi. Các tệp này có thể tồn tại, nhưng chúng có thể bị xóa mà không có tác dụng phụ lớn như mất tiến trình. Nếu trống, thư mục cache dưới storage root, hoặc, nếu có sẵn, thư mục cache được OS ưa thích, sẽ được sử dụng.</string>
+    <string name="es_hint_storage_content_root">Đường dẫn root cho lưu trữ nội dung guest (lưu, v.v.), hoặc trống để sử dụng thư mục content dưới storage root.</string>
+    <string name="es_hint_storage_mount_cache">Bật mount cache</string>
+    <string name="es_hint_storage_mount_scratch">Bật mount scratch</string>
+    <string name="es_hint_storage_storage_root">Đường dẫn root cho lưu trữ dữ liệu nội bộ liên tục (config, v.v.), hoặc trống để sử dụng đường dẫn được OS ưa thích, chẳng hạn như thư mục documents, hoặc thư mục executable của trình giả lập nếu portable.txt hiện diện trong đó.</string>
+
+    <string name="es_hint_ui_headless">Không hiển thị bất kỳ UI nào, sử dụng mặc định cho lời nhắc khi cần.</string>
+    <string name="es_hint_ui_profiler_dpi_scaling">Áp dụng thang đo DPI cửa sổ cho profiler.</string>
+    <string name="es_hint_ui_show_achievement_notification">Hiển thị thông báo achievement trên màn hình.</string>
+    <string name="es_hint_ui_show_profiler">Hiển thị UI profiling theo mặc định.</string>
+    <string name="es_hint_ui_storage_selection_dialog">Hiển thị hộp thoại lựa chọn thiết bị lưu trữ khi trò chơi yêu cầu.</string>
+
+        <string name="es_hint_video_avpack">Chế độ video
+0 = PAL-60 Component (SD)
+1 = Không sử dụng
+2 = PAL-60 SCART
+3 = 480p Component (HD)
+4 = HDMI+A
+5 = PAL-60 Composite/S-Video
+6 = VGA
+7 = TV PAL-60
+8 = HDMI (mặc định)</string>
+    <string name="es_hint_video_enable_3d_mode">Cho phép sử dụng chế độ lập thể trong các trò chơi.</string>
+    <string name="es_hint_video_interlaced">Chuyển đổi chế độ xen kẽ.</string>
+    <string name="es_hint_video_internal_display_resolution">Cho phép các trò chơi hỗ trợ độ phân giải khác nhau hiển thị ở độ phân giải cụ thể. Điều này không đảm bảo hoạt động với tất cả các trò chơi hoặc cải thiện hiệu suất.\n0=640x480, 1=640x576, 2=720x480, 3=720x576, 4=800x600, 5=848x480, 6=1024x768, 7=1152x864, 8=1280x720 (Mặc định), 9=1280x768, 10=1280x960, 11=1280x1024, 12=1360x768, 13=1440x900, 14=1680x1050, 15=1920x540, 16=1920x1080, 17=internal_display_resolution_x/y</string>
+    <string name="es_hint_video_internal_display_resolution_x">Chiều rộng tùy chỉnh. Xem internal_display_resolution. Phạm vi 1-1920.</string>
+    <string name="es_hint_video_internal_display_resolution_y">Chiều cao tùy chỉnh. Xem internal_display_resolution. Phạm vi 1-1080.</string>
+    <string name="es_hint_video_use_50Hz_mode">Cho phép sử dụng chế độ PAL-50.</string>
+    <string name="es_hint_video_video_standard">Cho phép chuyển đổi giữa các tín hiệu video khác nhau. 1=NTSC, 2=NTSC-J, 3=PAL</string>
+    <string name="es_hint_video_widescreen">Chuyển đổi giữa tỷ lệ khung hình 16:9 và 4:3.</string>
+
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_fifo_relaxed">Khi khả dụng, cho phép chế độ trình bày relaxed first-in-first-out (ưu tiên thứ 3), gây ra việc chờ đồng bộ dọc của màn hình máy chủ, nhưng có thể xuất hiện với xé rách nếu khung hình không đáp ứng tốc độ làm mới của màn hình máy chủ.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_immediate">Khi khả dụng, cho phép chế độ trình bày immediate (ưu tiên thứ 1), cung cấp độ trễ thấp nhất với khả năng xé rách trong một số trường hợp và, tùy thuộc vào cấu hình, tốc độ làm mới biến đổi.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_mailbox">Khi khả dụng, cho phép chế độ trình bày mailbox (ưu tiên thứ 2), cung cấp độ trễ thấp mà không có khả năng xé rách.</string>
+    <string name="es_hint_vulkan_vulkan_device">Chỉ mục của thiết bị vật lý Vulkan ưa thích hoặc -1 để sử dụng bất kỳ thiết bị tương thích nào.</string>
+    <string name="es_hint_vulkan_vulkan_log_debug_messages">Ghi thông báo VK_EXT_debug_utils của Vulkan vào nhật ký Xenia, thay vì đầu ra gỡ lỗi của hệ điều hành.</string>
+    <string name="es_hint_vulkan_vulkan_sparse_shared_memory">Bật binding sparse cho mô phỏng bộ nhớ chia sẻ. Việc tắt nó làm tăng sử dụng bộ nhớ video - một bộ đệm 512 MB được tạo - nhưng cho phép các trình gỡ lỗi đồ họa không hỗ trợ binding sparse hoạt động.</string>
+    <string name="es_hint_vulkan_vulkan_validation">Bật lớp xác thực Vulkan (VK_LAYER_KHRONOS_validation). Thông báo sẽ được ghi vào nhật ký Xenia nếu \'vulkan_log_debug_messages\' được bật, hoặc vào đầu ra gỡ lỗi của hệ điều hành nếu không.</string>
+
+    <string name="es_hint_xconfig_audio_flag">Chế độ Âm thanh Analog.
+0x00000001 = Dolby Pro Logic
+0x00000002 = Đơn âm Analog
+Chế độ Âm thanh Kỹ thuật số.
+0x00000000 = Stereo Kỹ thuật số (chọn một trong các mục trên một mình)
+0x00010000 = Dolby Digital
+0x00030000 = Dolby Digital với WMA PRO
+Cờ Đặc biệt.
+0x00000003 = Bỏ qua Stereo
+0x80000000 = Độ trễ Thấp
+Cấu hình này yêu cầu bạn ghép một cờ analog và kỹ thuật số với nhau trong khi stereo kỹ thuật số chỉ yêu cầu một cờ analog. Cờ bonus là tùy chọn. Vd) 0x00010001</string>
+    <string name="es_hint_xconfig_user_country">ID quốc gia của người dùng.
+1=AE 2=AL 3=AM 4=AR 5=AT 6=AU 7=AZ 8=BE 9=BG
+10=BH 11=BN 12=BO 13=BR 14=BY 15=BZ 16=CA 18=CH 19=CL
+20=CN 21=CO 22=CR 23=CZ 24=DE 25=DK 26=DO 27=DZ 28=EC
+29=EE 30=EG 31=ES 32=FI 33=FO 34=FR 35=GB 36=GE 37=GR
+38=GT 39=HK 40=HN 41=HR 42=HU 43=ID 44=IE 45=IL 46=IN
+47=IQ 48=IR 49=IS 50=IT 51=JM 52=JO 53=JP 54=KE 55=KG
+56=KR 57=KW 58=KZ 59=LB 60=LI 61=LT 62=LU 63=LV 64=LY
+65=MA 66=MC 67=MK 68=MN 69=MO 70=MV 71=MX 72=MY 73=NI
+74=NL 75=NO 76=NZ 77=OM 78=PA 79=PE 80=PH 81=PK 82=PL
+83=PR 84=PT 85=PY 86=QA 87=RO 88=RU 89=SA 90=SE 91=SG
+92=SI 93=SK 95=SV 96=SY 97=TH 98=TN 99=TR 100=TT 101=TW
+102=UA 103=US 104=UY 105=UZ 106=VE 107=VN 108=YE 109=ZA</string>
+    <string name="es_hint_xconfig_user_language">ID ngôn ngữ của người dùng.\n1=en 2=ja 3=de 4=fr 5=es 6=it 7=ko 8=zh\n9=pt 11=pl 12=ru 13=sv 14=tr 15=nb 16=nl 17=zh</string>
+
+    <string name="es_hint_a64_a64_extension_mask">Cho phép phát hiện và sử dụng các tính năng tập lệnh cụ thể.
+0 = armv8.0
+1 = LSE
+2 = F16C
+-1 = Phát hiện và sử dụng tất cả các tính năng bộ xử lý có thể</string>
+
+
+</resources>

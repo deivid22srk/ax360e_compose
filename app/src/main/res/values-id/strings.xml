@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="es_apu_xma_decoder">Dekoder Xma</string>
+    <string name="es_cpu_disable_context_promotion">Nonaktifkan Promosi Konteks</string>
+    <string name="es_cpu_disable_instruction_infocache">Nonaktifkan Infocache Instruksi</string>
+    <string name="es_cpu_disable_prefetch_and_cachecontrol">Nonaktifkan Prefetch dan Cachecontrol</string>
+    <string name="es_cpu_dump_translated_hir_functions">Dump Fungsi HIR yang Diterjemahkan</string>
+    <string name="es_cpu_emit_inline_mmio_checks">Keluarkan Pemeriksaan MMIO Inline</string>
+    <string name="es_cpu_emit_mmio_aware_stores_for_recorded_exception_addresses">Keluarkan Penyimpanan Sadar MMIO untuk Alamat Pengecualian Tercatat</string>
+    <string name="es_cpu_enable_early_precompilation">Aktifkan Pra-kompilasi Awal</string>
+    <string name="es_cpu_full_optimization_even_with_debug">Optimasi Penuh Bahkan dengan Debug</string>
+    <string name="es_cpu_ignore_trap_instructions">Abaikan Instruksi Trap</string>
+    <string name="es_cpu_no_reserved_ops">Tidak Ada Operasi Tertahan</string>
+    <string name="es_cpu_permit_float_constant_evaluation">Izinkan Evaluasi Konstanta Float</string>
+    <string name="es_cpu_record_mmio_access_exceptions">Catat Pengecualian Akses MMIO</string>
+    <string name="es_cpu_writable_code_segments">Segmen Kode yang Dapat Ditulis</string>
+    <string name="es_gpu_gpu_allow_invalid_upload_range">GPU Izinkan Rentang Upload Tidak Valid</string>
+    <string name="es_gpu_target_trace_file">File Jejak Target</string>
+    <string name="es_gpu_trace_dump_path">Jalur Dump Jejak</string>
+    <string name="es_general_allow_game_relative_writes">Izinkan Penulisan Relatif Game</string>
+    <string name="es_general_controller_hotkeys">Tombol Pintas Kontroler</string>
+    <string name="es_general_disable_doubleclick_fullscreen">Nonaktifkan Layar Penuh Klik Ganda</string>
+    <string name="es_hid_guide_button">Tombol Panduan</string>
+    <string name="es_kernel_allow_avatar_initialization">Izinkan Inisialisasi Avatar</string>
+    <string name="es_storage_force_mount_devkit">Paksa Pasang Devkit</string>
+    <string name="es_storage_mount_memory_unit">Pasang Unit Memori</string>
+    <string name="es_ui_custom_font_path">Jalur Font Kustom</string>
+
+    <string name="_default">Default</string>
+    <string name="driver_library_path_dialog_add_hint">Tambahkan Driver Kustom (*.zip)</string>
+    <string name="es_vulkan_vulkan_lib_path">Jalur Pustaka Driver Kustom</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">Driver Kustom Paksa Clock Maksimal</string>
+
+    <string name="create_shortcut">Buat Pintasan</string>
+    <string name="disable_virtual_keyboard">Nonaktifkan keyboard virtual</string>
+    <string name="joystick">Joystick</string>
+
+    <string name="dpad">Dpad</string>
+    <string name="abxy">ABXY</string>
+    <string name="lr">LR</string>
+    <string name="start_back">Mulai/Kembali</string>
+
+    <string name="save_and_quit">Simpan &amp; Keluar</string>
+    <string name="scale_rate">Tingkat Skala</string>
+
+    <string name="refresh_list">Segarkan Daftar</string>
+    <string name="about">Tentang</string>
+    <string name="gratitude">Ucapan Terima Kasih</string>
+    <string name="update_log">Log Pembaruan</string>
+    <string name="device_info">Info Perangkat</string>
+    <string name="open_source_licenses">Lisensi Sumber Terbuka</string>
+
+    <string name="open_file_manager">Buka Manajer File</string>
+    <string name="game_list_loading">Daftar game sedang dimuat...</string>
+    <string name="quit">Keluar</string>
+    <string name="device_unsupport_vulkan_msg">Perangkat Anda tidak mendukung Vulkan dan tidak dapat memenuhi persyaratan minimum untuk menjalankan aplikasi ini, silakan keluar.</string>
+
+    <string name="loading">Memuat...</string>
+    <string name="msg_processing">Memproses...</string>
+    <string name="empty_game_list">Daftar game kosong, silakan atur direktori game</string>
+
+    <string name="enable_vibrator">Aktifkan Vibrator</string>
+
+    <string name="set_game_dir">Atur Direktori Game</string>
+
+    <string name="clear">Bersihkan</string>
+    <string name="press_a_key">Tekan tombol apa saja untuk melanjutkan...</string>
+
+    <string name="reset_as_default">Reset sebagai Default</string>
+    <string name="key_mappers">Pemeta Kunci</string>
+
+    <string name="virtual_pad_edit">Edit Pad Virtual</string>
+
+    <string name="left">kiri</string>
+    <string name="up">atas</string>
+    <string name="right">kanan</string>
+    <string name="down">bawah</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+
+    <string name="lshoulder">LShoulder</string>
+    <string name="lthumbpress">LThumbPress</string>
+    <string name="ltrigger">LTrigger</string>
+
+    <string name="rshoulder">RShoulder</string>
+    <string name="rthumbpress">RThumbPress</string>
+    <string name="rtrigger">RTrigger</string>
+
+    <string name="start">mulai</string>
+    <string name="back">Kembali</string>
+
+    <string name="use_global_config">Gunakan Konfigurasi Global</string>
+
+    <string name="settings">Pengaturan</string>
+
+
+    <string name="gratitude_content">Terima kasih Ruban untuk semua ICONS\n\n
+		Terima kasih kepada SRC267 (Sting) untuk mengelola reddit/discord\n\n
+		Terima kasih kepada 妖妖 untuk pengujian\n\n
+		Terima kasih kepada 再见某人 \n\n
+        Terima kasih kepada 再见某人 \n\n
+        Terima kasih kepada 再见某人 \n\n
+        \n\n
+        		Berdasarkan optimasi transplantasi Xenia, terima kasih kepada semua peserta proyek Xenia\n\n
+    </string>
+
+    <string name="es_apu">APU</string>
+<string name="es_apu_apu">Sistem Audio</string>
+<string name="es_apu_apu_max_queued_frames">Frame Antrian Maksimal</string>
+<string name="es_apu_enable_xmp">Aktifkan Pemutar Musik</string>
+<string name="es_apu_ffmpeg_verbose">Output Verbose FFmpeg</string>
+<string name="es_apu_mute">Bisukan Semua Audio</string>
+<string name="es_apu_use_dedicated_xma_thread">Thread XMA Khusus</string>
+<string name="es_apu_use_new_decoder">Gunakan Decoder XMA Baru</string>
+<string name="es_apu_xmp_default_volume">Volume Musik Default</string>
+
+<string name="es_cpu">CPU</string>
+<string name="es_cpu_break_condition_gpr">Kondisi Break GPR</string>
+<string name="es_cpu_break_condition_op">Operator Kondisi Break</string>
+<string name="es_cpu_break_condition_truncate">Potong Nilai ke 32-bit</string>
+<string name="es_cpu_break_condition_value">Nilai Kondisi Break</string>
+<string name="es_cpu_break_on_debugbreak">Break saat Debugbreak</string>
+<string name="es_cpu_break_on_instruction">Break saat Instruksi</string>
+<string name="es_cpu_break_on_start">Break saat Mulai</string>
+<string name="es_cpu_break_on_unimplemented_instructions">Break saat Instruksi Tidak Terimplementasi</string>
+<string name="es_cpu_clock_no_scaling">Nonaktifkan Skala Jam</string>
+<string name="es_cpu_clock_source_raw">Gunakan Sumber Jam Mentah</string>
+<string name="es_cpu_cpu">Backend CPU</string>
+<string name="es_cpu_debugprint_trap_log">Log Trap Debugprint</string>
+<string name="es_cpu_disable_global_lock">Nonaktifkan Kunci Global</string>
+<string name="es_cpu_disassemble_functions">Disassemble Fungsi</string>
+<string name="es_cpu_ignore_undefined_externs">Abaikan Eksternal Tidak Terdefinisi</string>
+<string name="es_cpu_inline_mmio_access">Akses MMIO Inline</string>
+<string name="es_cpu_load_module_map">Muat Peta Modul</string>
+<string name="es_cpu_pvr">Versi/Revisi Prosesor</string>
+<string name="es_cpu_store_all_context_values">Simpan Semua Nilai Konteks</string>
+<string name="es_cpu_trace_function_coverage">Lacak Cakupan Fungsi</string>
+<string name="es_cpu_trace_function_data">Lacak Data Fungsi</string>
+<string name="es_cpu_trace_function_data_path">Jalur Lacak Data Fungsi</string>
+<string name="es_cpu_trace_function_references">Lacak Referensi Fungsi</string>
+<string name="es_cpu_trace_functions">Lacak Fungsi</string>
+<string name="es_cpu_validate_hir">Validasi HIR</string>
+
+<string name="es_content">Konten</string>
+<string name="es_content_license_mask">Mask Lisensi</string>
+
+<string name="es_display">Tampilan</string>
+<string name="es_display_fullscreen">Mode Layar Penuh</string>
+<string name="es_display_host_present_from_non_ui_thread">Presentasi Langsung dari Thread Non-UI</string>
+<string name="es_display_postprocess_antialiasing">Anti-aliasing Pasca-proses</string>
+<string name="es_display_postprocess_dither">Dithering Pasca-proses</string>
+<string name="es_display_postprocess_ffx_cas_additional_sharpness">Ketajaman Tambahan CAS</string>
+<string name="es_display_postprocess_ffx_fsr_max_upsampling_passes">Pass Upsampling Maks FSR</string>
+<string name="es_display_postprocess_ffx_fsr_sharpness_reduction">Pengurangan Ketajaman FSR</string>
+<string name="es_display_postprocess_scaling_and_sharpening">Skala dan Ketajaman</string>
+<string name="es_display_present_letterbox">Presentasi Letterbox</string>
+<string name="es_display_present_render_pass_clear">Bersihkan Render Pass</string>
+<string name="es_display_present_safe_area_x">Area Aman X</string>
+<string name="es_display_present_safe_area_y">Area Aman Y</string>
+
+<string name="es_gpu">GPU</string>
+<string name="es_gpu_clear_memory_page_state">Bersihkan Status Halaman Memori</string>
+<string name="es_gpu_depth_float24_convert_in_pixel_shader">Konversi Kedalaman di Pixel Shader</string>
+<string name="es_gpu_depth_float24_round">Bulatkan Konversi Kedalaman</string>
+<string name="es_gpu_depth_transfer_not_equal_test">Tes Transfer Kedalaman Tidak Sama</string>
+<string name="es_gpu_disassemble_pm4">Disassemble Paket PM4</string>
+<string name="es_gpu_draw_resolution_scale_x">Skala Resolusi Gambar X</string>
+<string name="es_gpu_draw_resolution_scale_y">Skala Resolusi Gambar Y</string>
+<string name="es_gpu_draw_resolution_scaled_texture_offsets">Offset Tekstur Berskala</string>
+<string name="es_gpu_dump_shaders">Jalur Dump Shader</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu">Eksekusi VS di CPU untuk Gambar Tidak Terpotong</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Eksekusi VS di CPU untuk Backend PSI</string>
+<string name="es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Eksekusi VS di CPU dengan Scissor</string>
+<string name="es_gpu_force_convert_line_loops_to_strips">Paksa Konversi Loop Garis</string>
+<string name="es_gpu_force_convert_quad_lists_to_triangle_lists">Paksa Konversi Daftar Quad</string>
+<string name="es_gpu_force_convert_triangle_fans_to_lists">Paksa Konversi Fan Segitiga</string>
+<string name="es_gpu_framerate_limit">Batas Framerate</string>
+<string name="es_gpu_gamma_render_target_as_srgb">Target Render Gamma sebagai sRGB</string>
+<string name="es_gpu_gpu">Sistem Grafis</string>
+<string name="es_gpu_gpu_allow_invalid_fetch_constants">Izinkan Konstanta Fetch Tidak Valid</string>
+<string name="es_gpu_half_pixel_offset">Offset Setengah Piksel</string>
+<string name="es_gpu_ignore_32bit_vertex_index_support">Abaikan Dukungan Indeks Vertex 32-bit</string>
+<string name="es_gpu_log_guest_driven_gpu_register_written_values">Log Tulisan Register GPU</string>
+<string name="es_gpu_log_ringbuffer_kickoff_initiator_bts">Log Kickoff Ringbuffer</string>
+<string name="es_gpu_mrt_edram_used_range_clamp_to_min">Klem MRT EDRAM ke Min</string>
+<string name="es_gpu_native_2x_msaa">MSAA Asli 2x</string>
+<string name="es_gpu_native_stencil_value_output">Output Nilai Stensil Asli</string>
+<string name="es_gpu_non_seamless_cube_map">Peta Kubus Tidak Mulus</string>
+<string name="es_gpu_primitive_processor_cache_min_indices">Indeks Min Cache Primitif</string>
+<string name="es_gpu_query_occlusion_sample_lower_threshold">Ambang Bawah Sampel Oklusi</string>
+<string name="es_gpu_query_occlusion_sample_upper_threshold">Ambang Atas Sampel Oklusi</string>
+<string name="es_gpu_readback_memexport">Readback Memexport</string>
+<string name="es_gpu_readback_resolve">Readback Resolve</string>
+<string name="es_gpu_render_target_path_vulkan">Jalur Target Render (Vulkan)</string>
+<string name="es_gpu_resolve_resolution_scale_fill_half_pixel_offset">Offset Setengah Piksel Isi Skala Resolve</string>
+<string name="es_gpu_snorm16_render_target_full_range">Rentang Penuh RT SNORM16</string>
+<string name="es_gpu_store_shaders">Simpan Shader</string>
+<string name="es_gpu_texture_cache_memory_limit_hard">Batas Keras Cache Tekstur</string>
+<string name="es_gpu_texture_cache_memory_limit_render_to_texture">Batas RTT Cache Tekstur</string>
+<string name="es_gpu_texture_cache_memory_limit_soft">Batas Lunak Cache Tekstur</string>
+<string name="es_gpu_texture_cache_memory_limit_soft_lifetime">Umur Cache Tekstur Lunak</string>
+<string name="es_gpu_trace_gpu_prefix">Awalan Lacak GPU</string>
+<string name="es_gpu_trace_gpu_stream">Lacak Aliran GPU</string>
+<string name="es_gpu_vsync">VSYNC</string>
+
+<string name="es_general">Umum</string>
+<string name="es_general_allow_plugins">Izinkan Plugin</string>
+<string name="es_general_apply_patches">Terapkan Patch</string>
+<string name="es_general_debug">Mode Debug</string>
+<string name="es_general_discord">Discord Rich Presence</string>
+<string name="es_general_launch_module">Modul Peluncuran</string>
+<string name="es_general_notification_sound_path">Jalur Suara Notifikasi</string>
+<string name="es_general_time_scalar">Skalar Waktu</string>
+
+<string name="es_hid">HID</string>
+<string name="es_hid_hid">Sistem Input</string>
+<string name="es_hid_left_stick_deadzone_percentage">Deadzone Stick Kiri</string>
+<string name="es_hid_right_stick_deadzone_percentage">Deadzone Stick Kanan</string>
+<string name="es_hid_vibration">Getaran Kontroler</string>
+
+<string name="es_kernel">Kernel</string>
+<string name="es_kernel_allow_nui_initialization">Izinkan Inisialisasi NUI</string>
+<string name="es_kernel_allow_incompatible_title_update">Izinkan Pembaruan Judul Tidak Kompatibel</string>
+<string name="es_kernel_apply_title_update">Terapkan Pembaruan Judul</string>
+<string name="es_kernel_cl">Argumen Baris Perintah</string>
+<string name="es_kernel_default_achievements_backend">Backend Prestasi</string>
+<string name="es_kernel_ignore_thread_affinities">Abaikan Afinitas Thread</string>
+<string name="es_kernel_ignore_thread_priorities">Abaikan Prioritas Thread</string>
+<string name="es_kernel_kernel_build_version">Versi Build Kernel</string>
+<string name="es_kernel_kernel_cert_monitor">Monitor Sertifikat</string>
+<string name="es_kernel_kernel_debug_monitor">Monitor Debug</string>
+<string name="es_kernel_kernel_display_gamma_power">Daya Gamma Tampilan</string>
+<string name="es_kernel_kernel_display_gamma_type">Tipe Gamma Tampilan</string>
+<string name="es_kernel_kernel_pix">PIX</string>
+<string name="es_kernel_log_high_frequency_kernel_calls">Log Panggilan Frekuensi Tinggi</string>
+<string name="es_kernel_staging_mode">Mode Staging</string>
+
+<string name="es_logging">Logging</string>
+<string name="es_logging_flush_log">Bersihkan Log</string>
+<string name="es_logging_log_file">Jalur File Log</string>
+<string name="es_logging_log_level">Level Log</string>
+<string name="es_logging_log_mask">Mask Log</string>
+<string name="es_logging_log_string_format_kernel_calls">Log Panggilan Kernel</string>
+<string name="es_logging_log_to_debugprint">Log ke DebugPrint</string>
+<string name="es_logging_log_to_stdout">Log ke Stdout</string>
+
+<string name="es_memory">Memori</string>
+<string name="es_memory_ignore_offset_for_ranged_allocations">Abaikan Offset untuk Alokasi Berjangkauan</string>
+<string name="es_memory_mmap_address_high">Alamat MMAP Tinggi</string>
+<string name="es_memory_protect_on_release">Lindungi Memori yang Dilepas</string>
+<string name="es_memory_protect_zero">Lindungi Halaman Nol</string>
+<string name="es_memory_scribble_heap">Heap Scribble</string>
+<string name="es_memory_writable_executable_memory">Memori Eksekusi yang Dapat Ditulis</string>
+
+<string name="es_profiles">Profil</string>
+<string name="es_profiles_logged_profile_slot_0_xuid">Slot Profil 0 XUID</string>
+<string name="es_profiles_logged_profile_slot_1_xuid">Slot Profil 1 XUID</string>
+<string name="es_profiles_logged_profile_slot_2_xuid">Slot Profil 2 XUID</string>
+<string name="es_profiles_logged_profile_slot_3_xuid">Slot Profil 3 XUID</string>
+
+<string name="es_storage">Penyimpanan</string>
+<string name="es_storage_cache_root">Jalur Root Cache</string>
+<string name="es_storage_content_root">Jalur Root Konten</string>
+<string name="es_storage_mount_cache">Mount Cache</string>
+<string name="es_storage_mount_scratch">Mount Scratch</string>
+<string name="es_storage_storage_root">Jalur Root Penyimpanan</string>
+
+<string name="es_ui">UI</string>
+<string name="es_ui_headless">Mode Headless</string>
+<string name="es_ui_profiler_dpi_scaling">Skala DPI Profiler</string>
+<string name="es_ui_show_achievement_notification">Tampilkan Notifikasi Prestasi</string>
+<string name="es_ui_show_profiler">Tampilkan Profiler</string>
+<string name="es_ui_storage_selection_dialog">Dialog Pemilihan Penyimpanan</string>
+
+<string name="es_video">Video</string>
+<string name="es_video_avpack">Paket AV</string>
+<string name="es_video_enable_3d_mode">Aktifkan Mode 3D</string>
+<string name="es_video_interlaced">Mode Interlaced</string>
+<string name="es_video_internal_display_resolution">Resolusi Tampilan Internal</string>
+<string name="es_video_internal_display_resolution_x">Lebar Tampilan Kustom</string>
+<string name="es_video_internal_display_resolution_y">Tinggi Tampilan Kustom</string>
+<string name="es_video_use_50Hz_mode">Gunakan Mode 50Hz</string>
+<string name="es_video_video_standard">Standar Video</string>
+<string name="es_video_widescreen">Mode Layar Lebar</string>
+
+<string name="es_vulkan">Vulkan</string>
+<string name="es_vulkan_vulkan_allow_present_mode_fifo_relaxed">Izinkan Mode Present FIFO Santai</string>
+<string name="es_vulkan_vulkan_allow_present_mode_immediate">Izinkan Mode Present Langsung</string>
+<string name="es_vulkan_vulkan_allow_present_mode_mailbox">Izinkan Mode Present Mailbox</string>
+<string name="es_vulkan_vulkan_device">Indeks Perangkat Vulkan</string>
+<string name="es_vulkan_vulkan_log_debug_messages">Log Pesan Debug Vulkan</string>
+<string name="es_vulkan_vulkan_sparse_shared_memory">Memori Bersama Sparse</string>
+<string name="es_vulkan_vulkan_validation">Lapisan Validasi Vulkan</string>
+
+<string name="es_xconfig">XConfig</string>
+<string name="es_xconfig_audio_flag">Flag Audio</string>
+<string name="es_xconfig_user_country">Negara Pengguna</string>
+<string name="es_xconfig_user_language">Bahasa Pengguna</string>
+
+<string name="es_a64">a64</string>
+<string name="es_a64_a64_extension_mask">Mask Ekstensi A64</string>
+
+    <string name="es_hint_apu_apu">Sistem audio. Gunakan: [any, nop, opensles, aaudio]</string>
+    <string name="es_hint_apu_apu_max_queued_frames">Memungkinkan perubahan frame audio buffer maksimal untuk mengurangi delay audio. Menurunkan nilai ini dapat menyebabkan masalah performa. Rentang nilai: [4-64]</string>
+    <string name="es_hint_apu_enable_xmp">Mengaktifkan pemutaran Music Player.</string>
+    <string name="es_hint_apu_ffmpeg_verbose">Output FFmpeg verbose (debug dan di atasnya)</string>
+    <string name="es_hint_apu_mute">Membisukan semua output audio.</string>
+    <string name="es_hint_apu_use_dedicated_xma_thread">Mengaktifkan decoding XMA pada thread terpisah. Non-aktif seharusnya menghasilkan hasil lebih baik, tapi mengurangi performa sedikit.</string>
+    <string name="es_hint_apu_use_new_decoder">Mengaktifkan penggunaan decoder audio XMA eksperimental baru.</string>
+    <string name="es_hint_apu_xmp_default_volume">Volume musik default jika game tidak mengaturnya [0-100].</string>
+
+    <string name="es_hint_cpu_break_condition_gpr">GPR dibandingkan dengan</string>
+    <string name="es_hint_cpu_break_condition_op">operator perbandingan</string>
+    <string name="es_hint_cpu_break_condition_truncate">potong nilai ke 32-bit</string>
+    <string name="es_hint_cpu_break_condition_value">nilai yang dibandingkan</string>
+    <string name="es_hint_cpu_break_on_debugbreak">int3 pada permintaan __debugbreak JITed.</string>
+    <string name="es_hint_cpu_break_on_instruction">int3 sebelum alamat guest yang diberikan dieksekusi.</string>
+    <string name="es_hint_cpu_break_on_start">Masuk ke debugger saat startup.</string>
+    <string name="es_hint_cpu_break_on_unimplemented_instructions">Break ke debugger host (atau crash jika tidak ada debugger terpasang) jika instruksi PowerPC yang tidak terimplementasi ditemukan.</string>
+    <string name="es_hint_cpu_clock_no_scaling">Nonaktifkan kode scaling. Manajemen waktu dan locking dilewati. Waktu sistem guest langsung diambil dari host.</string>
+    <string name="es_hint_cpu_clock_source_raw">Pada x64, gunakan instruksi RDTSC sebagai sumber waktu. Memerlukan TSC invariant. Pada a64, gunakan register CNTVCT_EL0 sebagai sumber waktu</string>
+    <string name="es_hint_cpu_cpu">Backend CPU [any, x64, a64].</string>
+    <string name="es_hint_cpu_debugprint_trap_log">Log trap debugprint ke debugger aktif</string>
+    <string name="es_hint_cpu_disable_global_lock">Menonaktifkan penggunaan lock global dalam kode guest. Tidak mempengaruhi kode host.</string>
+    <string name="es_hint_cpu_disassemble_functions">Disassemble fungsi selama generasi.</string>
+    <string name="es_hint_cpu_ignore_undefined_externs">Jangan keluar ketika extern undefined dipanggil.</string>
+    <string name="es_hint_cpu_inline_mmio_access">Inline load dan store MMIO konstan.</string>
+    <string name="es_hint_cpu_load_module_map">Memuat .map untuk nama simbol dan untuk diff dengan database simbol yang dihasilkan.</string>
+    <string name="es_hint_cpu_pvr">Nomor versi dan revisi prosesor.\nBit 0 sampai 15 adalah nomor versi.\nBit 16 sampai 31 adalah nomor revisi.\nCatatan: Beberapa XEX (seperti mfgbootlauncher.xex) mungkin memeriksa nilai kurang dari 0x710700.</string>
+    <string name="es_hint_cpu_store_all_context_values">Jangan hapus store context mati untuk membantu debugging.</string>
+    <string name="es_hint_cpu_trace_function_coverage">Hasilkan tracing untuk statistik cakupan instruksi fungsi.</string>
+    <string name="es_hint_cpu_trace_function_data">Hasilkan tracing untuk data hasil fungsi.</string>
+    <string name="es_hint_cpu_trace_function_data_path">File untuk menulis data trace.</string>
+    <string name="es_hint_cpu_trace_function_references">Hasilkan tracing untuk referensi alamat fungsi.</string>
+    <string name="es_hint_cpu_trace_functions">Hasilkan tracing untuk statistik fungsi.</string>
+    <string name="es_hint_cpu_validate_hir">Lakukan pemeriksaan validasi pada HIR selama kompilasi.</string>
+
+    <string name="es_hint_content_license_mask">Atur mask lisensi untuk konten yang diaktifkan.\n0 = Tidak ada lisensi diaktifkan.\n1 = Lisensi pertama diaktifkan. Umumnya lisensi versi lengkap di judul Xbox Live Arcade.\n-1 atau 0xFFFFFFFF = Semua lisensi yang mungkin diaktifkan. Umumnya ide buruk, bisa menyebabkan perilaku undefined.</string>
+
+    <string name="es_hint_display_fullscreen">Apakah akan meluncurkan emulator dalam fullscreen.</string>
+    <string name="es_hint_display_host_present_from_non_ui_thread">Izinkan thread emulasi GPU menampilkan output guest ke surface host secara langsung daripada meminta thread UI melakukannya melalui sistem window host.</string>
+    <string name="es_hint_display_postprocess_antialiasing">Efek anti-aliasing post-processing untuk diterapkan pada output gambar game.
+Menggunakan anti-aliasing post-process sangat direkomendasikan ketika AMD FidelityFX Contrast Adaptive Sharpening atau Super Resolution 1.0 aktif.
+Gunakan: [none, fxaa, fxaa_extreme]
+none (atau nilai lain yang tidak terdaftar di sini): Jangan ubah gambar asli.
+fxaa: NVIDIA Fast Approximate Anti-Aliasing 3.11, preset kualitas normal (12).
+fxaa_extreme: NVIDIA Fast Approximate Anti-Aliasing 3.11, preset kualitas ekstrem (39).</string>
+    <string name="es_hint_display_postprocess_dither">Dither output gambar final dari presisi internal ke 8 bit per channel sehingga gradien lebih halus.\nPada display 10bpc, 2 bit bawah akan tetap disimpan, tapi noise akan ditambahkan - menonaktifkan mungkin direkomendasikan untuk 10bpc, tapi tergantung kemampuan display 10bpc dari display aktual yang digunakan.</string>
+    <string name="es_hint_display_postprocess_ffx_cas_additional_sharpness">Ketajaman tambahan untuk AMD FidelityFX Contrast Adaptive Sharpening (CAS), dari 0 sampai 1. Lebih tinggi lebih tajam.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_max_upsampling_passes">Jumlah maksimum pass upsampling yang dilakukan dalam AMD FidelityFX Super Resolution 1.0 (FSR) sebelum kembali ke stretching bilinear setelah pass final.\nSetiap pass upscale hanya sampai 2x2 ukuran sebelumnya. Jika game mengeluarkan gambar 1280x720, 1 pass akan upscale sampai 2560x1440 (di bawah 4K), setelah 2 pass akan diupscale maksimum 5120x2880 (termasuk 3840x2160 untuk 4K), dan seterusnya.\nVariabel ini tidak berpengaruh jika resolusi display tidak terlalu tinggi, tapi bisa dikurangi pada resolusi seperti 4K atau 8K jika dampak performa dari beberapa pass upsampling FSR terlalu tinggi, atau jika tepi lebih lembut diinginkan.\nNilai default adalah maksimum yang didukung secara internal oleh Xenia.</string>
+    <string name="es_hint_display_postprocess_ffx_fsr_sharpness_reduction">Pengurangan ketajaman untuk AMD FidelityFX Super Resolution 1.0 (FSR), dalam stops. Lebih rendah lebih tajam.</string>
+    <string name="es_hint_display_postprocess_scaling_and_sharpening">Efek post-processing untuk resampling dan/atau sharpening output display final.
+Gunakan: [bilinear, cas, fsr]
+bilinear (atau nilai lain yang tidak terdaftar di sini): Gambar asli pada 1:1, stretching bilinear sederhana untuk resampling.
+cas: Gunakan AMD FidelityFX Contrast Adaptive Sharpening (CAS) untuk sharpening pada faktor scaling sampai 2x2, dengan stretching bilinear tambahan untuk faktor lebih besar.
+fsr: Gunakan AMD FidelityFX Super Resolution 1.0 (FSR) untuk upscaling kualitas tertinggi, atau AMD FidelityFX Contrast Adaptive Sharpening untuk sharpening tanpa scaling atau downsampling.
+Untuk scaling dengan faktor lebih dari 2x2, beberapa pass FSR dilakukan.</string>
+    <string name="es_hint_display_present_letterbox">Pertahankan rasio aspek saat stretching dengan menampilkan bar di sekitar gambar ketika tidak ada area overscan lagi untuk dipotong.</string>
+    <string name="es_hint_display_present_render_pass_clear">Pada backend grafis yang mendukung ini, gunakan operasi load render pass clear dalam presentasi daripada perintah clear yang hanya membersihkan area letterbox.</string>
+    <string name="es_hint_display_present_safe_area_x">Persentase lebar gambar yang bisa dipertahankan saat presentasi untuk mempertahankan rasio aspek tanpa letterboxing atau stretching.</string>
+    <string name="es_hint_display_present_safe_area_y">Persentase tinggi gambar yang bisa dipertahankan saat presentasi untuk mempertahankan rasio aspek tanpa letterboxing atau stretching.</string>
+
+    <string name="es_hint_gpu_clear_memory_page_state">Refresh state halaman memori untuk mengaktifkan data yang ditulis gpu. (Gunakan untuk Game \'Team Ninja\' untuk memperbaiki model karakter yang hilang)</string>
+    <string name="es_hint_gpu_depth_float24_convert_in_pixel_shader">Apakah akan mengkonversi nilai depth ke floating-point 24-bit (20e4) dari presisi host (floating-point 32-bit) langsung di pixel shader guest draws saat menggunakan depth buffer host.\nIni mencegah artefak visual jika data depth presisi host penuh hilang. Ini opsi mahal karena membuat GPU tidak bisa menggunakan kompresi depth buffer, dan juga dengan MSAA, memaksa pixel shader berjalan untuk setiap sample subpixel daripada seluruh pixel, membuat pixel shading 2 atau 4 kali lebih berat tergantung jumlah sample MSAA.</string>
+    <string name="es_hint_gpu_depth_float24_round">Apakah akan membulatkan ke genap terdekat, daripada memotong (membulat ke nol), depth saat mengkonversi ke floating-point 24-bit (20e4) dari presisi host (floating-point 32-bit) saat menggunakan depth buffer host.\nfalse: Direkomendasikan. Konversi mungkin memindahkan nilai depth lebih jauh dari kamera.\ntrue: Hanya untuk kasus khusus masalah yang disebabkan error pembulatan floating-point 32-bit minor.</string>
+    <string name="es_hint_gpu_depth_transfer_not_equal_test">Saat mentransfer data antar render target depth, gunakan tes "not equal" untuk menghindari penulisan ulang depth via output depth shader jika sama dengan yang saat ini di depth buffer dalam kasus round trip data.</string>
+    <string name="es_hint_gpu_disassemble_pm4">Hanya melakukan sesuatu di build debug, jika disetel akan disassemble dan log semua paket PM4 yang dikirim ke CP.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_x">Skala lebar pixel integer untuk scaling resolusi rendering secara opaque ke game. 1, 2 dan 3 mungkin didukung, tapi dukungan di atas 1 tergantung properti device.</string>
+    <string name="es_hint_gpu_draw_resolution_scale_y">Skala lebar pixel integer untuk scaling resolusi rendering secara opaque ke game. Lihat draw_resolution_scale_x untuk informasi lebih lanjut.</string>
+    <string name="es_hint_gpu_draw_resolution_scaled_texture_offsets">Terapkan offset dari instruksi fetch texture dengan mempertimbangkan skala resolusi untuk render-to-texture, untuk filtering shadow, bloom, dll yang lebih benar, dalam beberapa kasus.</string>
+    <string name="es_hint_gpu_dump_shaders">Untuk debugging shader, path untuk dump shader GPU saat dikompilasi.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu">Eksekusi vertex shader untuk draws dengan clipping dinonaktifkan, terutama screen-space draws (seperti clears), pada CPU saat memungkinkan untuk memperkirakan luas EDRAM yang terlibat dalam draw.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend">Jika execute_unclipped_draw_vs_on_cpu diaktifkan, eksekusi vertex shader untuk unclipped draws pada CPU bahkan saat menggunakan implementasi pixel shader interlock (rasterizer-ordered view) dari render backend pada host.</string>
+    <string name="es_hint_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor">Jangan batasi penggunaan execute_unclipped_draw_vs_on_cpu hanya untuk non-scissored draws (dengan sisi kanan dan bawah rectangle scissor pada 8192 atau lebih) meskipun jika rectangle scissor ada, biasanya cukup untuk memperkirakan tinggi render target.</string>
+    <string name="es_hint_gpu_force_convert_line_loops_to_strips">Hanya untuk testing dukungan downlevel API grafis host, paksa konversi CPU line loops ke line strips meskipun host mendukung primitif line loop secara native.</string>
+    <string name="es_hint_gpu_force_convert_quad_lists_to_triangle_lists">Hanya untuk testing dukungan downlevel API grafis host, paksa konversi CPU quad lists ke quad strips meskipun host mendukung primitif quad list secara native atau via emulasi geometry shader.</string>
+    <string name="es_hint_gpu_force_convert_triangle_fans_to_lists">Hanya untuk testing dukungan downlevel API grafis host, paksa konversi CPU triangle fans ke triangle lists meskipun host mendukung primitif triangle fan secara native.</string>
+    <string name="es_hint_gpu_framerate_limit">Maksimum frame per detik. 0 = Frame tanpa batas. Default 60, saat disetel 0, dan VSYNC diaktifkan.</string>
+    <string name="es_hint_gpu_gamma_render_target_as_srgb">Saat host tidak bisa menulis gamma linear piecewise langsung dengan blending benar, gunakan output sRGB pada host untuk blending konseptual benar dalam ruang warna linear sambil memiliki distribusi presisi sedikit berbeda di render target dan nilai sangat tidak benar jika game mengakses warna hasil langsung sebagai data raw.</string>
+    <string name="es_hint_gpu_gpu">Sistem grafis. Gunakan: [vulkan, null]</string>
+    <string name="es_hint_gpu_gpu_allow_invalid_fetch_constants">Izinkan konstanta fetch texture dan vertex dengan tipe invalid - umumnya tidak aman karena konstanta mungkin berisi nilai sangat invalid, tapi bisa digunakan untuk bypass error tipe konstanta fetch di game tertentu sampai alasan sebenarnya kenapa invalid ditemukan.</string>
+    <string name="es_hint_gpu_half_pixel_offset">Aktifkan dukungan vertex half-pixel offset (D3D9 PA_SU_VTX_CNTL PIX_CENTER). Umumnya game aware dengan half-pixel offset, dan mengaktifkan ini adalah perilaku benar (menonaktifkan ini bisa merusak post-processing signifikan di beberapa game).</string>
+    <string name="es_hint_gpu_ignore_32bit_vertex_index_support">Hanya untuk testing downlevel API grafis host (hanya berguna untuk testing GPU host level Qualcomm Adreno 4xx), paksa indirection atau pre-masking dan pre-swapping index vertex 32-bit seolah host hanya mendukung index 24-bit.</string>
+    <string name="es_hint_gpu_log_guest_driven_gpu_register_written_values">Hanya melakukan sesuatu di build debug, jika disetel akan log setiap penulisan ke register gpu yang dilakukan guest.</string>
+    <string name="es_hint_gpu_log_ringbuffer_kickoff_initiator_bts">Hanya melakukan sesuatu di build debug, jika disetel akan log pseudo-stacktrace thread guest yang menulis posisi baca baru.</string>
+    <string name="es_hint_gpu_mrt_edram_used_range_clamp_to_min">Dengan render target host, jika multiple render target terikat, perkirakan rentang EDRAM yang dimodifikasi di salah satunya tidak lebih besar dari jarak antara dua render target di EDRAM, daripada mengizinkan yang terakhir mengklaim sisa EDRAM.</string>
+    <string name="es_hint_gpu_native_2x_msaa">Gunakan 2x MSAA host saat tersedia. Bisa dinonaktifkan untuk testing skalabilitas pada API GPU host dimana 2x tidak wajib, dalam kasus ini, 2 sample dari 4x MSAA akan digunakan (dengan kualitas serupa atau lebih buruk dan penggunaan memori lebih tinggi).</string>
+    <string name="es_hint_gpu_native_stencil_value_output">Gunakan output referensi stencil pixel shader saat tersedia untuk tujuan seperti copying antar render target. Bisa dinonaktifkan untuk testing skalabilitas, dalam kasus ini, drawing 8 quads yang jauh lebih mahal akan dilakukan.</string>
+    <string name="es_hint_gpu_non_seamless_cube_map">Nonaktifkan filtering antar muka cube map dekat tepi saat memungkinkan (Vulkan dengan VK_EXT_non_seamless_cube_map) untuk mereproduksi perilaku Direct3D 9.</string>
+    <string name="es_hint_gpu_primitive_processor_cache_min_indices">Jumlah terkecil index guest untuk disimpan di cache untuk mencoba reuse nanti di frame sama jika processing (seperti konversi tipe primitif atau penggantian reset index) dilakukan. Menyetel ini ke nilai sangat tinggi bisa result excessive CPU processing, sementara nilai sangat rendah bisa result excessive locking dan lookups. Nilai negatif menonaktifkan caching.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_lower_threshold">Jika disetel -1 tidak ada sample count ditulis, game bisa hang. Jika tidak, sample count setiap tile akan diincrement pada setiap EVENT_WRITE_ZPD dengan angka ini. Menyetel ini ke 0 berarti semuanya dilaporkan sebagai occluded.</string>
+    <string name="es_hint_gpu_query_occlusion_sample_upper_threshold">Setel ke angka lebih tinggi dari query_occlusion_sample_lower_threshold. Nilai ini diabaikan jika query_occlusion_sample_lower_threshold disetel -1.</string>
+    <string name="es_hint_gpu_readback_memexport">[Khusus D3D12] Baca data yang ditulis memory export di shader pada CPU. Ini mungkin diperlukan di beberapa game (tapi banyak hanya akses data export di GPU, dan flag ini tidak diperlukan untuk menangani perilaku seperti itu), tapi menyebabkan sinkronisasi mid-frame, jadi punya dampak performa besar.</string>
+    <string name="es_hint_gpu_readback_resolve">[Khusus D3D12] Baca hasil render-to-texture pada CPU. Ini mungkin diperlukan di beberapa game, misalnya, untuk screenshot di game tersimpan, tapi menyebabkan sinkronisasi mid-frame, jadi punya dampak performa besar.</string>
+    <string name="es_hint_gpu_render_target_path_vulkan">Path emulasi render target untuk digunakan di Vulkan. Gunakan: [any, fbo, fsi]\nfbo: Framebuffer host dan blending fixed-function serta testing depth/stencil, copying antar render target saat diperlukan. Akurasi lebih rendah (dukungan format pixel terbatas).\nfsi: Packing pixel manual, blending dan testing depth/stencil, dengan perubahan layout render target bebas. Memerlukan GPU yang mendukung fragment shader interlock. Akurasi tertinggi (semua format pixel ditangani software).</string>
+    <string name="es_hint_gpu_resolve_resolution_scale_fill_half_pixel_offset">Saat menggunakan scaling resolusi, terapkan hack yang stretch host pixel pasti covered pertama di sisi kiri dan atas area resolve render target untuk menghilangkan gap disebabkan half-pixel offset (ini diperlukan untuk game tertentu menampilkan grafis scene).</string>
+    <string name="es_hint_gpu_snorm16_render_target_full_range">Saat host hanya bisa mendukung render target 16_16 dan 16_16_16_16 sebagai -1...1, remap -32...32 ke -1...1 untuk menggunakan rentang nilai penuh, dengan mengorbankan kebenaran blending multiplikatif.</string>
+    <string name="es_hint_gpu_store_shaders">Simpan shader secara persisten dan load saat loading game untuk menghindari spike runtime dan freeze saat bermain game bukan untuk pertama kali.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_hard">Penggunaan memori texture host maksimum (dalam megabyte) di atas mana texture akan dihancurkan secepat mungkin.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_render_to_texture">Bagian dari budget memori texture host (dalam megabyte) yang akan di-scale dengan skala resolusi drawing saat ini.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft">Penggunaan memori texture host maksimum (dalam megabyte) di atas mana texture lama akan dihancurkan.</string>
+    <string name="es_hint_gpu_texture_cache_memory_limit_soft_lifetime">Detik texture harus tidak digunakan untuk dianggap cukup lama untuk dihapus jika penggunaan memori texture melebihi texture_cache_memory_limit_soft.</string>
+    <string name="es_hint_gpu_trace_gpu_prefix">Path prefix untuk file trace GPU.</string>
+    <string name="es_hint_gpu_trace_gpu_stream">Trace semua paket GPU.</string>
+    <string name="es_hint_gpu_vsync">Aktifkan VSYNC.</string>
+
+    <string name="es_hint_general_allow_plugins">Mengizinkan loading plugin/trainer dari plugins\title_id\plugin.xex. Plugin adalah modul homebrew xex yang bisa digunakan untuk membuat mod. Fitur ini eksperimental.</string>
+    <string name="es_hint_general_apply_patches">Mengaktifkan fungsionalitas patching kustom</string>
+    <string name="es_hint_general_debug">Izinkan debugging dan pertahankan informasi debug.</string>
+    <string name="es_hint_general_discord">Aktifkan Discord rich presence</string>
+    <string name="es_hint_general_launch_module">Executable untuk launch dari .iso atau package daripada default.xex atau modul yang ditentukan game. Kosongkan untuk launch modul default.</string>
+    <string name="es_hint_general_notification_sound_path">Path (termasuk filename) ke suara notifikasi terpilih. Suara HARUS dalam format wav!</string>
+    <string name="es_hint_general_time_scalar">Scalar digunakan untuk mempercepat atau memperlambat waktu (1x, 2x, 1/2x, dll).</string>
+
+    <string name="es_hint_hid_hid">Sistem input. Gunakan: [android, nop]</string>
+    <string name="es_hint_hid_left_stick_deadzone_percentage">Tentukan level deadzone untuk stick kiri. Rentang yang diizinkan [0.0-1.0].</string>
+    <string name="es_hint_hid_right_stick_deadzone_percentage">Tentukan level deadzone untuk stick kanan. Rentang yang diizinkan [0.0-1.0].</string>
+    <string name="es_hint_hid_vibration">Toggle vibrasi controller.</string>
+
+    <string name="es_hint_kernel_allow_nui_initialization">Aktifkan inisialisasi NUI. Hanya setel true saat testing game kinect. Game tertentu mungkin memerlukan implementasi avatar.</string>
+    <string name="es_hint_kernel_allow_incompatible_title_update">Izinkan title update dengan signature mismatch untuk diterapkan.</string>
+    <string name="es_hint_kernel_apply_title_update">Terapkan title updates.</string>
+    <string name="es_hint_kernel_cl">Tentukan command-line tambahan yang disediakan ke guest.</string>
+    <string name="es_hint_kernel_default_achievements_backend">Tentukan backend achievements mana yang harus digunakan sebagai default. Opsi yang mungkin: GPD.</string>
+    <string name="es_hint_kernel_ignore_thread_affinities">Abaikan affinities thread yang ditentukan game.</string>
+    <string name="es_hint_kernel_ignore_thread_priorities">Abaikan prioritas thread yang ditentukan game.</string>
+    <string name="es_hint_kernel_kernel_build_version">Tentukan versi kernel saat ini</string>
+    <string name="es_hint_kernel_kernel_cert_monitor">Aktifkan cert monitor.</string>
+    <string name="es_hint_kernel_kernel_debug_monitor">Aktifkan debug monitor.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_power">Display gamma untuk digunakan dengan kernel_display_gamma_type 3.</string>
+    <string name="es_hint_kernel_kernel_display_gamma_type">Tipe display gamma: 0 - linear, 1 - sRGB (CRT), 2 - BT.709 (HDTV), 3 - power ditentukan via kernel_display_gamma_power.</string>
+    <string name="es_hint_kernel_kernel_pix">Aktifkan PIX.</string>
+    <string name="es_hint_kernel_log_high_frequency_kernel_calls">Log panggilan kernel dengan tag kHighFrequency.</string>
+    <string name="es_hint_kernel_staging_mode">Mengaktifkan mode preview di dashboard untuk render informasi debug.</string>
+
+    <string name="es_hint_logging_flush_log">Flush file log setelah setiap batch baris log.</string>
+    <string name="es_hint_logging_log_file">Log ditulis ke file yang diberikan</string>
+    <string name="es_hint_logging_log_level">Level maksimum untuk dicatat. (0=error, 1=warning, 2=info, 3=debug)</string>
+    <string name="es_hint_logging_log_mask">Menonaktifkan kategori spesifik untuk logging debug lebih granular. Kernel = 1, Apu = 2, Cpu = 4.</string>
+    <string name="es_hint_logging_log_string_format_kernel_calls">Log panggilan kernel dengan tag kHighFrequency.</string>
+    <string name="es_hint_logging_log_to_debugprint">Dump log ke DebugPrint.</string>
+    <string name="es_hint_logging_log_to_stdout">Tulis output log ke stdout</string>
+
+    <string name="es_hint_memory_ignore_offset_for_ranged_allocations">Memungkinkan untuk mengabaikan offset 4k untuk alokasi fisik dengan rentang yang disediakan. Judul tertentu memeriksa apakah hasil cocok dengan rentang bawah yang disediakan.</string>
+    <string name="es_hint_memory_mmap_address_high">1-124</string>
+    <string name="es_hint_memory_protect_on_release">Lindungi memori yang dirilis untuk mencegah akses.</string>
+    <string name="es_hint_memory_protect_zero">Lindungi zero page dari reads dan writes.</string>
+    <string name="es_hint_memory_scribble_heap">Scribble 0xCD ke semua memori heap yang dialokasikan.</string>
+    <string name="es_hint_memory_writable_executable_memory">Izinkan mapping memori dengan akses write dan execute, untuk simulasi perilaku di platform yang tidak mendukung itu</string>
+
+    <string name="es_hint_profiles_logged_profile_slot_0_xuid">XUID profile untuk load saat boot di slot 0</string>
+    <string name="es_hint_profiles_logged_profile_slot_1_xuid">XUID profile untuk load saat boot di slot 1</string>
+    <string name="es_hint_profiles_logged_profile_slot_2_xuid">XUID profile untuk load saat boot di slot 2</string>
+    <string name="es_hint_profiles_logged_profile_slot_3_xuid">XUID profile untuk load saat boot di slot 3</string>
+
+    <string name="es_hint_storage_cache_root">Path root untuk file yang digunakan untuk mempercepat bagian tertentu emulator atau game. File ini mungkin persisten, tapi bisa dihapus tanpa efek samping besar seperti kehilangan progres. Jika kosong, folder cache di bawah storage root, atau, jika tersedia, direktori cache yang disukai OS, akan digunakan.</string>
+    <string name="es_hint_storage_content_root">Path root untuk penyimpanan konten guest (save, dll), atau kosong untuk menggunakan folder content di bawah storage root.</string>
+    <string name="es_hint_storage_mount_cache">Aktifkan cache mount</string>
+    <string name="es_hint_storage_mount_scratch">Aktifkan scratch mount</string>
+    <string name="es_hint_storage_storage_root">Path root untuk penyimpanan data internal persisten (config, dll), atau kosong untuk menggunakan path yang disukai OS, seperti folder documents, atau direktori executable emulator jika portable.txt ada di dalamnya.</string>
+
+    <string name="es_hint_ui_headless">Jangan tampilkan UI apapun, menggunakan default untuk prompt sesuai kebutuhan.</string>
+    <string name="es_hint_ui_profiler_dpi_scaling">Terapkan scaling DPI window ke profiler.</string>
+    <string name="es_hint_ui_show_achievement_notification">Tampilkan notifikasi achievement di layar.</string>
+    <string name="es_hint_ui_show_profiler">Tampilkan UI profiling secara default.</string>
+    <string name="es_hint_ui_storage_selection_dialog">Tampilkan dialog pemilihan device storage saat game memintanya.</string>
+
+        <string name="es_hint_video_avpack">Mode video
+0 = PAL-60 Component (SD)
+1 = Tidak digunakan
+2 = PAL-60 SCART
+3 = 480p Component (HD)
+4 = HDMI+A
+5 = PAL-60 Composite/S-Video
+6 = VGA
+7 = TV PAL-60
+8 = HDMI (default)</string>
+    <string name="es_hint_video_enable_3d_mode">Mengaktifkan penggunaan mode stereoskopik dalam judul.</string>
+    <string name="es_hint_video_interlaced">Mengaktifkan mode interlaced.</string>
+    <string name="es_hint_video_internal_display_resolution">Izinkan game yang mendukung resolusi berbeda untuk dirender dalam resolusi tertentu. Ini tidak dijamin berfungsi dengan semua game atau meningkatkan kinerja.\n0=640x480, 1=640x576, 2=720x480, 3=720x576, 4=800x600, 5=848x480, 6=1024x768, 7=1152x864, 8=1280x720 (Default), 9=1280x768, 10=1280x960, 11=1280x1024, 12=1360x768, 13=1440x900, 14=1680x1050, 15=1920x540, 16=1920x1080, 17=internal_display_resolution_x/y</string>
+    <string name="es_hint_video_internal_display_resolution_x">Lebar kustom. Lihat internal_display_resolution. Rentang 1-1920.</string>
+    <string name="es_hint_video_internal_display_resolution_y">Tinggi kustom. Lihat internal_display_resolution. Rentang 1-1080.</string>
+    <string name="es_hint_video_use_50Hz_mode">Mengaktifkan penggunaan mode PAL-50.</string>
+    <string name="es_hint_video_video_standard">Mengaktifkan beralih di antara sinyal video yang berbeda. 1=NTSC, 2=NTSC-J, 3=PAL</string>
+    <string name="es_hint_video_widescreen">Beralih di antara rasio aspek 16:9 dan 4:3.</string>
+
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_fifo_relaxed">Saat tersedia, izinkan mode presentasi relaxed first-in-first-out (prioritas ke-3), yang menyebabkan menunggu sinkronisasi vertikal tampilan host, tetapi dapat menampilkan dengan tearing jika frame tidak memenuhi kecepatan refresh tampilan host.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_immediate">Saat tersedia, izinkan mode presentasi immediate (prioritas ke-1), menawarkan latensi terendah dengan kemungkinan tearing dalam kasus tertentu, dan, tergantung pada konfigurasi, kecepatan refresh variabel.</string>
+    <string name="es_hint_vulkan_vulkan_allow_present_mode_mailbox">Saat tersedia, izinkan mode presentasi mailbox (prioritas ke-2), menawarkan latensi rendah tanpa kemungkinan tearing.</string>
+    <string name="es_hint_vulkan_vulkan_device">Indeks perangkat fisik Vulkan yang disukai, atau -1 untuk menggunakan perangkat kompatibel apa pun.</string>
+    <string name="es_hint_vulkan_vulkan_log_debug_messages">Tulis pesan VK_EXT_debug_utils Vulkan ke log Xenia, bukan ke output debug OS.</string>
+    <string name="es_hint_vulkan_vulkan_sparse_shared_memory">Aktifkan sparse binding untuk emulasi memori bersama. Menonaktifkannya meningkatkan penggunaan memori video - buffer 512 MB dibuat - tetapi memungkinkan debugger grafis yang tidak mendukung sparse binding untuk bekerja.</string>
+    <string name="es_hint_vulkan_vulkan_validation">Aktifkan layer validasi Vulkan (VK_LAYER_KHRONOS_validation). Pesan akan ditulis ke log Xenia jika \'vulkan_log_debug_messages\' diaktifkan, atau ke output debug OS jika tidak.</string>
+
+    <string name="es_hint_xconfig_audio_flag">Mode Audio Analog.
+0x00000001 = Dolby Pro Logic
+0x00000002 = Analog Mono
+Mode Audio Digital.
+0x00000000 = Digital Stereo (pilih salah satu di atas sendiri)
+0x00010000 = Dolby Digital
+0x00030000 = Dolby Digital dengan WMA PRO
+Flag Khusus.
+0x00000003 = Stereo Bypass
+0x80000000 = Latensi Rendah
+Konfigurasi ini mengharuskan Anda memasangkan flag analog dan digital bersama-sama sementara stereo digital hanya memerlukan flag analog. Flag bonus bersifat opsional. Cth) 0x00010001</string>
+    <string name="es_hint_xconfig_user_country">ID negara pengguna.
+1=AE 2=AL 3=AM 4=AR 5=AT 6=AU 7=AZ 8=BE 9=BG
+10=BH 11=BN 12=BO 13=BR 14=BY 15=BZ 16=CA 18=CH 19=CL
+20=CN 21=CO 22=CR 23=CZ 24=DE 25=DK 26=DO 27=DZ 28=EC
+29=EE 30=EG 31=ES 32=FI 33=FO 34=FR 35=GB 36=GE 37=GR
+38=GT 39=HK 40=HN 41=HR 42=HU 43=ID 44=IE 45=IL 46=IN
+47=IQ 48=IR 49=IS 50=IT 51=JM 52=JO 53=JP 54=KE 55=KG
+56=KR 57=KW 58=KZ 59=LB 60=LI 61=LT 62=LU 63=LV 64=LY
+65=MA 66=MC 67=MK 68=MN 69=MO 70=MV 71=MX 72=MY 73=NI
+74=NL 75=NO 76=NZ 77=OM 78=PA 79=PE 80=PH 81=PK 82=PL
+83=PR 84=PT 85=PY 86=QA 87=RO 88=RU 89=SA 90=SE 91=SG
+92=SI 93=SK 95=SV 96=SY 97=TH 98=TN 99=TR 100=TT 101=TW
+102=UA 103=US 104=UY 105=UZ 106=VE 107=VN 108=YE 109=ZA</string>
+    <string name="es_hint_xconfig_user_language">ID bahasa pengguna.\n1=en 2=ja 3=de 4=fr 5=es 6=it 7=ko 8=zh\n9=pt 11=pl 12=ru 13=sv 14=tr 15=nb 16=nl 17=zh</string>
+
+    <string name="es_hint_a64_a64_extension_mask">Izinkan deteksi dan pemanfaatan fitur set instruksi tertentu.
+0 = armv8.0
+1 = LSE
+2 = F16C
+-1 = Deteksi dan manfaatkan semua fitur prosesor yang memungkinkan</string>
+
+
+</resources>
