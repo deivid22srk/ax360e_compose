@@ -73,6 +73,10 @@
             android:exported="false"
             android:label="@string/about" />
 
+        <activity android:name="aenu.ax360e.LogViewerActivity"
+            android:exported="false"
+            android:label="Emulator Logs" />
+
         <provider
             android:name="aenu.ax360e.DocumentsProvider"
             android:authorities="${applicationId}.DocumentsProvider"

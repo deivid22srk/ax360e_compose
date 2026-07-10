@@ -47,6 +47,7 @@ import aenu.ax360e.EmulatorSettings
 import aenu.ax360e.KeyMapActivity
 import aenu.ax360e.AboutActivity
 import aenu.ax360e.VirtualControlEdit
+import aenu.ax360e.LogViewerActivity
 import aenu.ax360e.R
 import aenu.ax360e.ui.model.GameListLoader
 import aenu.ax360e.ui.components.GameCard
@@ -145,6 +146,20 @@ fun MainScreen() {
                                     openFileManager()
                                 },
                                 leadingIcon = { Icon(Icons.Default.FolderOpen, contentDescription = null) }
+                            )
+                            // Emulator Logs - shows per-game log files captured
+                            // when the user exits a game. Each log contains the
+                            // xenia-canary XELOG* output (errors, warnings,
+                            // unimplemented instructions, kernel traces, etc.)
+                            // for that session. Users can view, copy, share,
+                            // and delete logs.
+                            DropdownMenuItem(
+                                text = { Text("Emulator Logs") },
+                                onClick = {
+                                    menuExpanded = false
+                                    context.startActivity(Intent(context, LogViewerActivity::class.java))
+                                },
+                                leadingIcon = { Icon(Icons.Default.Create, contentDescription = null) }
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.about)) },

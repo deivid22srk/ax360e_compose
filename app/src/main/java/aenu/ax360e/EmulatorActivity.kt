@@ -146,6 +146,24 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
     }
 
     override fun onDestroy() {
+        // [LOG CAPTURE] Before the process exits, save the current xe.log
+        // as a per-game log file so the user can review it later in the
+        // LogViewerActivity. The game name is extracted from the intent URI
+        // (the file name without extension) — the actual title name from
+        // the STFS header is only known after the emulator boots, but the
+        // URI is available immediately.
+        try {
+            val gameUri = intent.getStringExtra(EXTRA_GAME_URI) ?: ""
+            val gameName = if (gameUri.isNotEmpty()) {
+                // Extract a human-readable name from the URI
+                val decoded = android.net.Uri.decode(gameUri)
+                val lastSegment = decoded.substringAfterLast('/').substringBeforeLast('.')
+                lastSegment.ifEmpty { "unknown" }
+            } else "unknown"
+            aenu.ax360e.ui.model.EmulatorLogRepository.captureGameLog(this, gameName)
+        } catch (_: Exception) {
+            // Don't let log capture crash the exit path
+        }
         super.onDestroy()
         System.exit(0)
     }
