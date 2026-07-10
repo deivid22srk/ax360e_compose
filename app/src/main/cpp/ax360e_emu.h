@@ -27,6 +27,32 @@ public:
 
     std::atomic<bool> paint_pending_{false};
 
+    // [ANDROID SURFACE RECOVERY] When the guest output thread (GPU Commands
+    // thread) detects that the Vulkan surface is outdated (vkAcquireNextImageKHR
+    // returns VK_ERROR_OUT_OF_DATE_KHR), it calls window->RequestPaint() to
+    // ask the UI thread to recover. The UI thread then tries to recreate the
+    // swapchain, but if the VkSurface itself is invalid (e.g., the ANativeWindow
+    // was recycled by Android's SurfaceFlinger), the swapchain recreation fails
+    // and the presenter enters kUnconnectedRetryAtStateChange — a stuck state
+    // that only a surface change event can recover from.
+    //
+    // On Android, surface change events only come from the Java side
+    // (SurfaceHolder.Callback.surfaceChanged), which is NOT called when the
+    // surface becomes outdated organically (e.g., due to power management,
+    // driver issues, or SurfaceFlinger recycling the surface buffer queue).
+    //
+    // To recover, we detect paint requests from the guest output thread
+    // (by checking the caller's thread ID against the UI thread ID) and
+    // force a full surface recreation via UpdateSurface() before painting.
+    // This destroys the old VkSurface and creates a new one from the current
+    // ANativeWindow, breaking the stuck state.
+    //
+    // A cooldown of 500ms prevents excessive surface recreation if the
+    // recovery itself fails (e.g., if the ANativeWindow is truly gone).
+    std::atomic<bool> paint_from_guest_thread_{false};
+    std::atomic<int64_t> last_surface_recovery_ns_{0};
+    static constexpr int64_t SURFACE_RECOVERY_COOLDOWN_NS = 500'000'000LL; // 500ms
+
     void NotifyUILoopOfPendingFunctions() override;
 
     void PlatformQuitFromUIThread() override;
