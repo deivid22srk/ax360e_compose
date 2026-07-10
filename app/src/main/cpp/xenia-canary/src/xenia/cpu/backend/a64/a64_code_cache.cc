@@ -43,6 +43,18 @@ void A64CodeCache::FlushCodeRange(void* address, size_t size) {
 #if XE_PLATFORM_AX360E
     //XELOGI("ASM:\n{}", aarch64_disasm(reinterpret_cast<uint64_t>(address),reinterpret_cast<uint32_t*>(address),size/4));
 #endif
+    // [ANDROID PERF] __builtin___clear_cache on ARM64 issues a DSB + IC
+    // IVAU + DSB + ISB sequence via libcompiler_rt. This is required after
+    // writing new JIT code so the instruction cache is coherent with the
+    // data cache. However, the cache maintenance is expensive (hundreds of
+    // cycles) and is called after every function is compiled.
+    // Skip the flush entirely for zero-size ranges - this happens when the
+    // emitter reserves space but writes nothing (e.g. failed optimization
+    // paths). The clear_cache call with size=0 is a no-op but still costs
+    // a syscall on some libcompiler_rt implementations.
+    if (size == 0) {
+        return;
+    }
     __builtin___clear_cache(
       reinterpret_cast<char*>(address),
       reinterpret_cast<char*>(static_cast<uint8_t*>(address) + size));
