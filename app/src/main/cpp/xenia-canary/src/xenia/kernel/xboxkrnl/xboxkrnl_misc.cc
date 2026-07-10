@@ -60,7 +60,9 @@ dword_result_t KeSaveFloatingPointState_entry(pointer_t<uint8_t> save_state) {
   // inspects it for "did we save?" validity checks.
   if (save_state) {
     // First DWORD is the "valid" flag in X_FPU_SAVE_STATE on Xbox 360.
-    xe::store_and_swap<uint32_t>(save_state.as<void*>(), 1u);
+    // pointer_t<uint8_t> has operator uint8_t*() which converts to void*
+    // implicitly — no .as<>() needed (TypedPointerParam doesn't have one).
+    xe::store_and_swap<uint32_t>(static_cast<void*>(save_state), 1u);
   }
   return X_STATUS_SUCCESS;
 }
