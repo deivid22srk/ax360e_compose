@@ -1,6 +1,5 @@
 package aenu.ax360e
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
@@ -18,6 +17,7 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,11 +36,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.documentfile.provider.DocumentFile
 import aenu.ax360e.ui.theme.Ax360eTheme
 
-class EmulatorActivity : Activity(), SurfaceHolder.Callback, View.OnGenericMotionListener {
+class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGenericMotionListener {
 
     companion object {
         const val EXTRA_GAME_URI = "game_uri"
-        private const val DELAY_ON_CREATE = 0xaeae0001
+        private const val DELAY_ON_CREATE: Int = 0xaeae0001.toInt()
     }
 
     private var surfaceView: SurfaceView? = null
@@ -155,7 +155,7 @@ class EmulatorActivity : Activity(), SurfaceHolder.Callback, View.OnGenericMotio
         if (gameKey == -1) return super.onKeyDown(keyCode, event)
         if (event.repeatCount == 0) {
             vibrate()
-            Emulator.get.key_event(gameKey, true, VirtualControl.KEY_VALUE_UNUSED)
+            Emulator.get.key_event(gameKey, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
             return true
         }
         return super.onKeyDown(keyCode, event)
@@ -164,7 +164,7 @@ class EmulatorActivity : Activity(), SurfaceHolder.Callback, View.OnGenericMotio
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
         val gameKey = keysMap.get(keyCode, -1)
         if (gameKey != -1) {
-            Emulator.get.key_event(gameKey, false, VirtualControl.KEY_VALUE_UNUSED)
+            Emulator.get.key_event(gameKey, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
             return true
         }
         return super.onKeyUp(keyCode, event)
@@ -203,52 +203,52 @@ class EmulatorActivity : Activity(), SurfaceHolder.Callback, View.OnGenericMotio
             val xaxis = event.getAxisValue(MotionEvent.AXIS_HAT_X)
             val yaxis = event.getAxisValue(MotionEvent.AXIS_HAT_Y)
             if (xaxis == -1.0f) {
-                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, true, VirtualControl.KEY_VALUE_UNUSED)
-                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, false, VirtualControl.KEY_VALUE_UNUSED)
+                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
+                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
                 vibrate(); pressed = true
             } else if (xaxis == 1.0f) {
-                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, true, VirtualControl.KEY_VALUE_UNUSED)
-                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, false, VirtualControl.KEY_VALUE_UNUSED)
+                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
+                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
                 vibrate(); pressed = true
             }
             if (yaxis == -1.0f) {
-                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, true, VirtualControl.KEY_VALUE_UNUSED)
-                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, false, VirtualControl.KEY_VALUE_UNUSED)
+                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
+                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
                 vibrate(); pressed = true
             } else if (yaxis == 1.0f) {
-                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, true, VirtualControl.KEY_VALUE_UNUSED)
-                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, false, VirtualControl.KEY_VALUE_UNUSED)
+                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
+                Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
                 vibrate(); pressed = true
             }
         } else if (event is KeyEvent) {
             when (event.keyCode) {
                 KeyEvent.KEYCODE_DPAD_LEFT -> {
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, true, VirtualControl.KEY_VALUE_UNUSED)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, false, VirtualControl.KEY_VALUE_UNUSED)
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
                     vibrate(); pressed = true
                 }
                 KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, true, VirtualControl.KEY_VALUE_UNUSED)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, false, VirtualControl.KEY_VALUE_UNUSED)
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
                     vibrate(); pressed = true
                 }
                 KeyEvent.KEYCODE_DPAD_UP -> {
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, true, VirtualControl.KEY_VALUE_UNUSED)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, false, VirtualControl.KEY_VALUE_UNUSED)
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
                     vibrate(); pressed = true
                 }
                 KeyEvent.KEYCODE_DPAD_DOWN -> {
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, true, VirtualControl.KEY_VALUE_UNUSED)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, false, VirtualControl.KEY_VALUE_UNUSED)
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, true, VirtualControl.KEY_VALUE_UNUSED.toInt())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
                     vibrate(); pressed = true
                 }
             }
         }
         if (pressed) return true
-        Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, false, VirtualControl.KEY_VALUE_UNUSED)
-        Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, false, VirtualControl.KEY_VALUE_UNUSED)
-        Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, false, VirtualControl.KEY_VALUE_UNUSED)
-        Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, false, VirtualControl.KEY_VALUE_UNUSED)
+        Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_LEFT, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
+        Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_UP, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
+        Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_RIGHT, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
+        Emulator.get.key_event(VirtualControl.KEY_CODE_DPAD_DOWN, false, VirtualControl.KEY_VALUE_UNUSED.toInt())
         return false
     }
 
@@ -269,10 +269,10 @@ class EmulatorActivity : Activity(), SurfaceHolder.Callback, View.OnGenericMotio
             if (laxisX != 0f) {
                 if (laxisX < 0) {
                     Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_RIGHT, false, _0)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_LEFT, true, (laxisX * 32768.0f).toInt().toShort())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_LEFT, true, (laxisX * 32768.0f).toInt())
                 } else {
                     Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_LEFT, false, _0)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_RIGHT, true, (Math.abs(laxisX) * 32767.0f).toInt().toShort())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_RIGHT, true, (Math.abs(laxisX) * 32767.0f).toInt())
                 }
             } else {
                 Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_RIGHT, false, _0)
@@ -281,10 +281,10 @@ class EmulatorActivity : Activity(), SurfaceHolder.Callback, View.OnGenericMotio
             if (laxisY != 0f) {
                 if (laxisY < 0) {
                     Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_DOWN, false, _0)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_UP, true, ((-laxisY) * 32767.0f).toInt().toShort())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_UP, true, ((-laxisY) * 32767.0f).toInt())
                 } else {
                     Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_UP, false, _0)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_DOWN, true, ((-laxisY) * 32768.0f).toInt().toShort())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_DOWN, true, ((-laxisY) * 32768.0f).toInt())
                 }
             } else {
                 Emulator.get.key_event(VirtualControl.KEY_CODE_LTHUMB_DOWN, false, _0)
@@ -295,10 +295,10 @@ class EmulatorActivity : Activity(), SurfaceHolder.Callback, View.OnGenericMotio
             if (raxisX != 0f) {
                 if (raxisX < 0) {
                     Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_RIGHT, false, _0)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_LEFT, true, (raxisX * 32768.0f).toInt().toShort())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_LEFT, true, (raxisX * 32768.0f).toInt())
                 } else {
                     Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_LEFT, false, _0)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_RIGHT, true, (raxisX * 32767.0f).toInt().toShort())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_RIGHT, true, (raxisX * 32767.0f).toInt())
                 }
             } else {
                 Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_RIGHT, false, _0)
@@ -307,10 +307,10 @@ class EmulatorActivity : Activity(), SurfaceHolder.Callback, View.OnGenericMotio
             if (raxisY != 0f) {
                 if (raxisY < 0) {
                     Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_DOWN, false, _0)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_UP, true, ((-raxisY) * 32767.0f).toInt().toShort())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_UP, true, ((-raxisY) * 32767.0f).toInt())
                 } else {
                     Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_UP, false, _0)
-                    Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_DOWN, true, ((-raxisY) * 32768.0f).toInt().toShort())
+                    Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_DOWN, true, ((-raxisY) * 32768.0f).toInt())
                 }
             } else {
                 Emulator.get.key_event(VirtualControl.KEY_CODE_RTHUMB_DOWN, false, _0)
@@ -351,12 +351,12 @@ private fun EmulatorScreen(
  * Bridge to GameListLoader (Kotlin side) for backward compatibility with old Java calls.
  */
 private object GameListLoaderHolder {
-    fun loadGameDir(activity: Activity): android.net.Uri? {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
+    fun loadGameDir(context: android.content.Context): android.net.Uri? {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         val uriStr = prefs.getString("game_dir", null) ?: return null
         val uri = android.net.Uri.parse(uriStr)
         runCatching {
-            activity.contentResolver.takePersistableUriPermission(
+            context.contentResolver.takePersistableUriPermission(
                 uri,
                 android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
