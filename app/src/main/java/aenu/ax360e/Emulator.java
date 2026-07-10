@@ -49,6 +49,27 @@ public class Emulator extends aenu.emulator.Emulator{
 
     public native GameInfo meta_info_from_god_game(Context ctx,String uri) throws RuntimeException;
 
+    /**
+     * Generic metadata extraction for any XContent container (GOD/LIVE/PIRS/CON).
+     * Mirrors the xenia-canary Emulator::ProcessContentPackageHeader logic.
+     *
+     * <p>Reads the XContentContainerHeader from the file at {@code uri} and
+     * extracts:
+     * <ul>
+     *   <li>{@code name} - the title_name field (UTF-16BE -> UTF-8)
+     *   <li>{@code icon} - the title_thumbnail PNG banner (176x64) when present,
+     *       falling back to the smaller 64x64 thumbnail for older packages
+     * </ul>
+     *
+     * <p>Returns {@code null} if the file is not a valid XContent container
+     * (e.g. plain ISO or raw XEX files have no STFS header).
+     *
+     * @param ctx  Android context used to open the file via SAF
+     * @param uri  content:// URI of the game file
+     * @return a {@link GameInfo} with name + icon populated, or {@code null}
+     */
+    public native GameInfo meta_info_from_uri(Context ctx, String uri) throws RuntimeException;
+
 
     public static class GameInfo{
 

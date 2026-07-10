@@ -177,6 +177,88 @@ static jobject j_meta_info_from_god_game(JNIEnv* env,jobject self,jobject contex
     env->SetObjectField(game_info, fid_icon, icon);
     return game_info;
 }
+
+// Generic metadata extraction for any XContent container (GOD/LIVE/PIRS/CON).
+// Mirrors the xenia-canary Emulator::ProcessContentPackageHeader logic:
+//   1. Read the XContentContainerHeader (0x971A bytes) from the file
+//   2. Validate magic (CON/LIVE/PIRS)
+//   3. Extract title_name (UTF-16BE -> UTF-8)
+//   4. Prefer title_thumbnail (176x64 PNG banner) over thumbnail (64x64 icon)
+//      to match the upstream emulator_window.cc game list rendering.
+//
+// Returns a GameInfo with name + icon populated, or NULL if the file is not
+// a valid XContent container (e.g. plain ISO or XEX files).
+static jobject j_meta_info_from_uri(JNIEnv* env, jobject self, jobject context, jstring uri_str) {
+    jclass cls_GameInfo = env->FindClass("aenu/ax360e/Emulator$GameInfo");
+    jmethodID mid_GameInfo_ctor = env->GetMethodID(cls_GameInfo, "<init>", "()V");
+    jfieldID fid_name = env->GetFieldID(cls_GameInfo, "name", "Ljava/lang/String;");
+    jfieldID fid_uri = env->GetFieldID(cls_GameInfo, "uri", "Ljava/lang/String;");
+    jfieldID fid_icon = env->GetFieldID(cls_GameInfo, "icon", "[B");
+
+    jclass uri_class = env->FindClass("android/net/Uri");
+    jmethodID parse_method = env->GetStaticMethodID(uri_class, "parse", "(Ljava/lang/String;)Landroid/net/Uri;");
+
+    jobject game_info = env->NewObject(cls_GameInfo, mid_GameInfo_ctor);
+    env->SetObjectField(game_info, fid_uri, uri_str);
+
+    jobject uri = env->CallStaticObjectMethod(uri_class, parse_method, uri_str);
+
+    // Open the file via SAF and mmap enough bytes for the full container header.
+    int fd = env->CallStaticIntMethod(g_class_Emulator, mid_open_uri_fd, context, uri);
+    if (fd == -1) {
+        return NULL;
+    }
+    std::unique_ptr<xe::MappedMemory> mmap = xe::MappedMemory::OpenForUnixFd(fd);
+    if (!mmap) {
+        return NULL;
+    }
+    if (mmap->size() < sizeof(xe::vfs::XContentContainerHeader)) {
+        // Not an XContent container (e.g. plain ISO or raw XEX).
+        return NULL;
+    }
+
+    const xe::vfs::XContentContainerHeader* header =
+        reinterpret_cast<const xe::vfs::XContentContainerHeader*>(mmap->data());
+
+    // Validate magic - same check as XContentHeader::is_magic_valid()
+    if (!header->content_header.is_magic_valid()) {
+        return NULL;
+    }
+
+    // Title name (UTF-16BE, 64 chars max) -> UTF-8
+    std::string name = xe::to_utf8(header->content_metadata.title_name());
+    if (!name.empty()) {
+        env->SetObjectField(game_info, fid_name, env->NewStringUTF(name.c_str()));
+    }
+
+    // Prefer title_thumbnail (banner 176x64) - matches xenia-canary
+    // emulator_window.cc game list rendering. Falls back to thumbnail (64x64)
+    // for backward compatibility with older packages that only ship the small
+    // icon.
+    const uint8_t* icon_data = nullptr;
+    uint32_t icon_size = 0;
+    if (header->content_metadata.title_thumbnail_size > 0 &&
+        header->content_metadata.title_thumbnail_size <=
+            xe::vfs::XContentMetadata::kThumbLengthV2) {
+        icon_data = header->content_metadata.title_thumbnail;
+        icon_size = header->content_metadata.title_thumbnail_size;
+    } else if (header->content_metadata.thumbnail_size > 0 &&
+               header->content_metadata.thumbnail_size <=
+                   xe::vfs::XContentMetadata::kThumbLengthV2) {
+        icon_data = header->content_metadata.thumbnail;
+        icon_size = header->content_metadata.thumbnail_size;
+    }
+
+    if (icon_data != nullptr && icon_size > 0) {
+        jbyteArray icon = env->NewByteArray(icon_size);
+        env->SetByteArrayRegion(icon, 0, icon_size,
+                                reinterpret_cast<const jbyte*>(icon_data));
+        env->SetObjectField(game_info, fid_icon, icon);
+    }
+
+    return game_info;
+}
+
 #if 0
 static std::unique_ptr<xe::apu::AudioSystem> create_nop_audio_system(
         xe::cpu::Processor* processor) {
@@ -373,37 +455,37 @@ static const std::pair<std::string,entries> gen_list[]={
         {"Kernel|kernel_display_gamma_type",{"linear@0","sRGB(CRT)@1","BT.709(HDTV)@2",/*kernel_display_gamma_power@3*/}},
         {"Logging|log_level",{"error@0","warning@1","info@2","debug@3",}},
         /*
-                                                  	#  0 = PAL-60 Component (SD)
-                                                  	#  1 = Unused
-                                                  	#  2 = PAL-60 SCART
-                                                  	#  3 = 480p Component (HD)
-                                                  	#  4 = HDMI+A
-                                                  	#  5 = PAL-60 Composite/S-Video
-                                                  	#  6 = VGA
-                                                  	#  7 = TV PAL-60
-                                                  	#  8 = HDMI (default)*/
+                                                        #  0 = PAL-60 Component (SD)
+                                                        #  1 = Unused
+                                                        #  2 = PAL-60 SCART
+                                                        #  3 = 480p Component (HD)
+                                                        #  4 = HDMI+A
+                                                        #  5 = PAL-60 Composite/S-Video
+                                                        #  6 = VGA
+                                                        #  7 = TV PAL-60
+                                                        #  8 = HDMI (default)*/
         {"Video|avpack",{"PAL-60 Component (SD)@0", "Unused@1","PAL-60 SCART@2","480p Component (HD)@3","HDMI+A@4","PAL-60 Composite/S-Video@5","VGA@6","TV PAL-60@7","HDMI@8"}},
         /*#    1=NTSC
-                                                  	#    2=NTSC-J
-                                                  	#    3=PAL*/
+                                                        #    2=NTSC-J
+                                                        #    3=PAL*/
         {"Video|video_standard",{ "NTSC@1","NTSC-J@2","PAL-60@3"}},
 /*#    0=640x480
-                                                  	#    1=640x576
-                                                  	#    2=720x480
-                                                  	#    3=720x576
-                                                  	#    4=800x600
-                                                  	#    5=848x480
-                                                  	#    6=1024x768
-                                                  	#    7=1152x864
-                                                  	#    8=1280x720 (Default)
-                                                  	#    9=1280x768
-                                                  	#    10=1280x960
-                                                  	#    11=1280x1024
-                                                  	#    12=1360x768
-                                                  	#    13=1440x900
-                                                  	#    14=1680x1050
-                                                  	#    15=1920x540
-                                                  	#    16=1920x1080*/
+                                                        #    1=640x576
+                                                        #    2=720x480
+                                                        #    3=720x576
+                                                        #    4=800x600
+                                                        #    5=848x480
+                                                        #    6=1024x768
+                                                        #    7=1152x864
+                                                        #    8=1280x720 (Default)
+                                                        #    9=1280x768
+                                                        #    10=1280x960
+                                                        #    11=1280x1024
+                                                        #    12=1360x768
+                                                        #    13=1440x900
+                                                        #    14=1680x1050
+                                                        #    15=1920x540
+                                                        #    16=1920x1080*/
         {"Video|internal_display_resolution",{ "640x480@0","640x576@1","720x480@2","720x576@3","800x600@4","848x480@5","1024x768@6","1152x864@7","1280x720@8"
                                                ,"1280x768@9","1280x960@10","1280x1024@11","1360x768@12","1440x900@13", "1680x1050@14","1920x540@15","1920x1080@16"}},
                                                /*Kernel = 1, Apu = 2, Cpu = 4.*/
@@ -707,6 +789,7 @@ int register_ax360e_Emulator(JNIEnv* env){
             { "setup_document_file_tree", "(Landroidx/documentfile/provider/DocumentFile;)V", (void *) j_setup_document_file_tree },
             { "setup_launch_args", "([Ljava/lang/String;)V", (void *) j_setup_launch_args },
             { "meta_info_from_god_game", "(Landroid/content/Context;Ljava/lang/String;)Laenu/ax360e/Emulator$GameInfo;", (void *) j_meta_info_from_god_game },
+            { "meta_info_from_uri", "(Landroid/content/Context;Ljava/lang/String;)Laenu/ax360e/Emulator$GameInfo;", (void *) j_meta_info_from_uri },
             { "setup_uri_info_list_file", "(Ljava/lang/String;)V", (void *) j_setup_uri_info_list_file },
             {"simple_device_info", "()Ljava/lang/String;", (void *) j_simple_device_info}
             ,{"generate_config_xml", "(Ljava/lang/String;)Ljava/lang/String;", (void *) generate_config_xml}
