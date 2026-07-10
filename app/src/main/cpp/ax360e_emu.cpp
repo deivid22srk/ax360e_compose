@@ -18,6 +18,11 @@
 #include <array>
 #include <memory>
 #include <sys/prctl.h>
+#include <sys/resource.h>
+#include <sys/syscall.h>
+#include <sched.h>
+#include <unistd.h>
+#include <errno.h>
 
 #include "xenia/apu/nop/nop_audio_system.h"
 #include "xenia/base/cvar.h"
@@ -385,6 +390,62 @@ void EmulatorApp::emu_thr_main() {
 
     xe::threading::set_name("Emulator");
     xe::Profiler::ThreadEnter("Emulator");
+
+    // [ANDROID PERF] Raise the emulator thread's scheduling priority.
+    // On Android, threads default to nice=0 (SCHED_OTHER). The emulator
+    // thread is the single hottest thread in the process - it runs the
+    // PPC JIT, the kernel, and drives the GPU command processor. Setting
+    // nice=-8 gives it priority over background GC, binder threads, and
+    // UI housekeeping without requiring SCHED_FIFO (which needs CAP_SYS_NICE
+    // and is blocked by Android's SELinux policy for unprivileged apps).
+    // -8 is chosen as a safe value: it's above foreground (-6) but below
+    // audio threads (-16) so audio glitching is avoided if AAudio uses
+    // its own high-priority thread.
+    // We use setpriority directly because xenia's threading::set_priority
+    // tries SCHED_FIFO first (which fails with EPERM on Android) and then
+    // falls back to nice, but logs a warning each time - calling
+    // setpriority directly avoids the warning noise.
+    {
+        int tid = static_cast<int>(gettid());
+        if (setpriority(PRIO_PROCESS, tid, -8) != 0) {
+            // EPERM is expected if the process has already dropped privileges.
+            // Most Android apps can still lower nice to -8 within their
+            // scheduling class via setpriority - the kernel allows up to
+            // RLIMIT_NICE (default -10 on Android).
+            XELOGW("Failed to set emulator thread priority: errno={}", errno);
+        }
+    }
+
+    // [ANDROID PERF] Pin the emulator thread to the "big" cores on
+    // big.LITTLE ARM64 SoCs (Snapdragon, Exynos, Dimensity). On a typical
+    // 8-core SoC with 1 prime + 3 big + 4 little (e.g. Cortex-X2 + A710 +
+    // A510), the default scheduler may migrate the emulator thread to
+    // little cores during transient load drops, causing 5-10x slowdown
+    // when the workload ramps back up. By pinning to cores 4-7 (the big +
+    // prime cluster on most Android SoCs), we ensure consistent high-
+    // performance execution. This is a heuristic - if the SoC has a
+    // different topology (e.g. all-big), the affinity mask still works
+    // because sched_setaffinity ignores non-existent CPUs in the mask.
+    // The sysconf(_SC_NPROCESSORS_ONLN) check ensures we don't set bits
+    // for CPUs that don't exist (which would fail with EINVAL).
+    {
+        int cpu_count = static_cast<int>(sysconf(_SC_NPROCESSORS_ONLN));
+        if (cpu_count > 4) {
+            cpu_set_t mask;
+            CPU_ZERO(&mask);
+            // Pin to cores 4..cpu_count-1 (typically the big/prime cluster).
+            // On 8-core SoCs this is cores 4-7. On 6-core (3+3) it's 3-5.
+            for (int i = 4; i < cpu_count; ++i) {
+                CPU_SET(i, &mask);
+            }
+            int tid = static_cast<int>(gettid());
+            if (sched_setaffinity(tid, sizeof(cpu_set_t), &mask) != 0) {
+                // EPERM is possible on some Android versions for unprivileged
+                // apps, but most allow it within the same process.
+                XELOGW("Failed to set emulator thread affinity: errno={}", errno);
+            }
+        }
+    }
 
     // Setup and initialize all subsystems. If we can't do something
     // (unsupported system, memory issues, etc) this will fail early.

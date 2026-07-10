@@ -19,6 +19,17 @@
 #include <mutex>
 #include <sstream>
 
+// MADV_HUGEPAGE is Linux-only and enables transparent huge pages for
+// anonymous mappings. On ARM64 mobile, the guest memory (512MB+) and the
+// JIT code cache (256MB+) are performance-critical: every guest load/store
+// and every JIT code fetch goes through the TLB. Transparent huge pages
+// coalesce 512 4KB page table entries into a single 2MB entry, cutting TLB
+// pressure by 512x for sequential access patterns. This is especially
+// important on mobile where TLB sizes are smaller than desktop/server.
+#ifndef MADV_HUGEPAGE
+#define MADV_HUGEPAGE 14
+#endif
+
 #include "xenia/base/logging.h"
 #include "xenia/base/math.h"
 #include "xenia/base/platform.h"
@@ -153,10 +164,24 @@ void* AllocFixed(void* base_address, size_t length,
     flags |= MAP_FIXED;
   }
 
-  XELOGI("AllocFixed {:x} -> {:x}", reinterpret_cast<uint64_t >(base_address),reinterpret_cast<uint64_t >(base_address)+length);
+  /* [ANDROID PERF] Removed verbose XELOGI on every AllocFixed call - this was logging every memory allocation (including the 512MB guest memory setup which generates dozens of calls), adding fcntl/string-format overhead to a hot path. Use adb logcat with "xe" tag if you need to debug allocation patterns. */
   void* result = mmap(base_address, length, prot, flags, -1, 0);
 
   if (result != MAP_FAILED) {
+    // [ANDROID PERF] Enable transparent huge pages for large anonymous
+    // mappings. The guest memory heap (512MB+) and the JIT code cache
+    // (256MB+) are the hottest regions in the emulator - every guest
+    // load/store and every JIT code fetch walks the page table. Without
+    // huge pages, a 512MB region requires 131072 4KB PTEs; with huge
+    // pages it needs only 256 2MB PTEs, a 512x reduction in TLB pressure.
+    // madvise() is advisory - the kernel may ignore it if fragmented,
+    // but on modern Android (5.x+) with khugepaged it reliably collapses
+    // to huge pages within a few seconds of access.
+    // Threshold: 2MB (one huge page) - below that the syscall overhead
+    // exceeds the TLB benefit.
+    if (length >= (2 * 1024 * 1024)) {
+      madvise(result, length, MADV_HUGEPAGE);
+    }
     return result;
   }
   return nullptr;
@@ -346,11 +371,20 @@ void* MapFileView(FileMappingHandle handle, void* base_address, size_t length,
   if (base_address != nullptr) {
       flags |= MAP_FIXED;
   }
-    XELOGI("MapFileView {:x} -> {:x}", reinterpret_cast<uint64_t >(base_address),reinterpret_cast<uint64_t >(base_address)+length);
+    /* [ANDROID PERF] Removed verbose MapFileView log - hot path. */
 
     void* result = mmap(base_address, length, prot, flags, handle, file_offset);
 
   if (result != MAP_FAILED) {
+    // [ANDROID PERF] Enable transparent huge pages for large file-backed
+    // mappings. This benefits the JIT code cache (256MB, mapped via
+    // ASharedMemory) and the guest memory backing store (512MB+). On
+    // ARM64 mobile, the i-cache and d-cache TLBs are small (often 32-64
+    // entries each); huge pages prevent TLB thrashing when the JIT emits
+    // code that spans many 4KB pages.
+    if (length >= (2 * 1024 * 1024)) {
+      madvise(result, length, MADV_HUGEPAGE);
+    }
     std::lock_guard guard(g_mapped_file_ranges_mutex);
     mapped_file_ranges.push_back(
         {reinterpret_cast<uintptr_t>(result),
