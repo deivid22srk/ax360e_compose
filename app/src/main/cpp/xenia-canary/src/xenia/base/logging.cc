@@ -10,6 +10,7 @@
 #include "xenia/base/logging.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
@@ -432,10 +433,46 @@ void InitializeLogging(const std::string_view app_name) {
   logger_ = new (mem) Logger(app_name);
 
 #if XE_PLATFORM_ANDROID
-  // TODO(Triang3l): Enable file logging, but not by default as logs may be
-  // huge.
+  // [ANDROID LOG FILE] The upstream xenia-canary only enables AndroidLogSink
+  // (logcat) on Android and skips file logging entirely, with a TODO comment
+  // "Enable file logging, but not by default as logs may be huge."
+  //
+  // ax360e_compose needs file logging for the per-game EmulatorLogScreen
+  // feature: EmulatorActivity passes --log_file={app_data_dir}/xe.log and
+  // EmulatorLogRepository.captureGameLog() copies it to a per-game log file
+  // on exit. Without FileLogSink, xe.log is never created and no logs are
+  // ever saved.
+  //
+  // Fix: if cvars::log_file is non-empty (i.e., --log_file was passed),
+  // create a FileLogSink in addition to AndroidLogSink. This mirrors the
+  // non-Android branch below. The log file is opened in "wt" (text write)
+  // mode and the FileLogSink takes ownership (owns_file_=true), so it will
+  // be closed by ShutdownLogging() → ~Logger() → ~FileLogSink().
   if (cvars::log_to_logcat) {
     logger_->AddLogSink(std::make_unique<AndroidLogSink>(app_name));
+  }
+  if (!cvars::log_file.empty()) {
+    xe::filesystem::CreateParentFolder(cvars::log_file);
+    FILE* log_file = xe::filesystem::OpenFile(cvars::log_file, "wt");
+    if (log_file) {
+      // [ANDROID LOG DURABILITY] Use line buffering (_IOLBF) instead of the
+      // default full buffering (_IOFBF). This causes stdio to flush the FILE*
+      // buffer to the kernel after every newline, so each log line is
+      // immediately visible in the file.
+      //
+      // This protects against data loss when the process is killed without
+      // running C++ destructors — e.g., low-memory kill, OOM kill, or the user
+      // force-stopping the app from Android Settings. With full buffering, up
+      // to 4KB of log data could be lost in the FILE* buffer. With line
+      // buffering, at most the current incomplete line is lost.
+      //
+      // The performance cost is negligible: xenia-canary's log volume is
+      // ~100-500 lines/sec during gameplay, so we're doing ~100-500 extra
+      // fflush syscalls per second — well within the noise floor compared to
+      // the JIT and GPU work.
+      setvbuf(log_file, nullptr, _IOLBF, 0);
+      logger_->AddLogSink(std::make_unique<FileLogSink>(log_file, true));
+    }
   }
 #else
   FILE* log_file = nullptr;

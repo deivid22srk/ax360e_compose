@@ -873,4 +873,28 @@ namespace ae{
     void init(){
     }
 
+    // [ANDROID LOG FLUSH] Flushes the xenia-canary log file to disk.
+    //
+    // The FileLogSink (created in InitializeLogging when --log_file is set)
+    // uses stdio FILE* buffering. On normal exit, ~Logger() calls
+    // ~FileLogSink() which calls fflush+fclose. But if the process is killed
+    // by System.exit(0) (as EmulatorActivity.onDestroy does), the C++ static
+    // destructors may not run, and the last few KB of log data stays in the
+    // FILE* buffer and is lost.
+    //
+    // This function is called from EmulatorActivity.onDestroy BEFORE
+    // captureGameLog() and BEFORE System.exit(0), ensuring the log file has
+    // all flushed data on disk when captureGameLog copies it.
+    //
+    // We use ShutdownLogging() rather than a partial flush because:
+    //   1. It calls ~Logger() which calls ~FileLogSink() on all sinks,
+    //      guaranteeing both fflush AND fclose
+    //   2. After ShutdownLogging, logger_ is null, so any late XELOG* calls
+    //      from other threads are safely dropped (ShouldLog returns false)
+    //   3. The process is about to exit anyway, so we don't need the logger
+    //      anymore
+    void flush_log() {
+        xe::ShutdownLogging();
+    }
+
 }

@@ -152,6 +152,18 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
         // (the file name without extension) — the actual title name from
         // the STFS header is only known after the emulator boots, but the
         // URI is available immediately.
+        //
+        // STEP 1: Flush the xenia-canary log file to disk. The FileLogSink
+        // uses stdio FILE* buffering, and System.exit(0) below may not run
+        // C++ static destructors. Without this flush, the last few KB of
+        // log data is lost and captureGameLog would copy an incomplete file.
+        try {
+            Emulator.get.flush_log()
+        } catch (_: Exception) {
+            // Don't let flush crash the exit path
+        }
+
+        // STEP 2: Copy the flushed xe.log to a per-game log file.
         try {
             val gameUri = intent.getStringExtra(EXTRA_GAME_URI) ?: ""
             val gameName = if (gameUri.isNotEmpty()) {

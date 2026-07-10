@@ -121,4 +121,12 @@ public class Emulator {
 
     public native void surface_changed();
 
+    /**
+     * [ANDROID LOG FLUSH] Flushes the xenia-canary log file to disk.
+     * Must be called from EmulatorActivity.onDestroy() BEFORE
+     * captureGameLog() and BEFORE System.exit(0) to ensure the FileLogSink's
+     * FILE* buffer is fully flushed so the per-game log copy is complete.
+     */
+    public native void flush_log();
+
 }

@@ -15,7 +15,7 @@ namespace ae{
 #define LOG_TAG "Emulator_Config"
 #define LOGE(...) {      \
     __android_log_print(ANDROID_LOG_ERROR, LOG_TAG,"%s : %d",__FILE__,__LINE__);\
-	__android_log_print(ANDROID_LOG_ERROR, LOG_TAG,__VA_ARGS__);\
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG,__VA_ARGS__);\
 }
 
 #define CFG_TYPE_TOML 1
@@ -506,6 +506,15 @@ static void j_quit(JNIEnv* env,jobject self){
     ae::quit();
 }
 
+// [ANDROID LOG FLUSH] JNI bridge for ae::flush_log().
+// Called from EmulatorActivity.onDestroy BEFORE captureGameLog() and
+// BEFORE System.exit(0) to ensure the xenia-canary log file is fully
+// flushed to disk. Without this, the FileLogSink's FILE* buffer may
+// not be flushed and the last few KB of log data is lost.
+static void j_flush_log(JNIEnv* env,jobject self){
+    ae::flush_log();
+}
+
 int register_Emulator(JNIEnv* env){
     static const JNINativeMethod methods[] = {
             { "setup_game_path", "(Ljava/lang/String;)V", (void *) j_setup_game_path },
@@ -520,6 +529,7 @@ int register_Emulator(JNIEnv* env){
             { "resume", "()V", (void *) j_resume },
             { "change_surface", "(II)V", (void *) j_change_surface },
             { "surface_changed", "()V", (void *) j_surface_changed },
+            { "flush_log", "()V", (void *) j_flush_log },
     };
     return env->RegisterNatives(env->FindClass("aenu/emulator/Emulator"),methods, sizeof(methods)/sizeof(methods[0]));
 }

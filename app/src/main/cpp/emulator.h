@@ -28,5 +28,6 @@ namespace ae{
     extern void pause();
     extern void resume();
     extern void quit();
+    extern void flush_log();  // [ANDROID LOG FLUSH] — see ax360e_emu.cpp
 }
 #endif //APS3E_EMULATOR_H
