@@ -38,7 +38,7 @@ namespace xam {
 // Sets the LIVE port used by LRC. In the emulator we have no LIVE
 // transport, so just accept the value and continue.
 dword_result_t XamLrcSetTitlePort_entry(dword_t port) {
-  XELOGI("XamLrcSetTitlePort({:08X}) stubbed - no LIVE transport", port.value);
+  XELOGI("XamLrcSetTitlePort({:08X}) stubbed - no LIVE transport", port.value());
   return 0;
 }
 DECLARE_XAM_EXPORT1(XamLrcSetTitlePort, kNone, kStub);
@@ -52,7 +52,7 @@ dword_result_t XamLrcVerifyClientId_entry(dword_t user_index,
                                           pointer_t<uint8_t> client_id,
                                           dword_t client_id_size) {
   XELOGI("XamLrcVerifyClientId(user={}, size={}) stubbed - returning success",
-         user_index.value, client_id_size.value);
+         user_index.value(), client_id_size.value());
   return 0;
 }
 DECLARE_XAM_EXPORT1(XamLrcVerifyClientId, kNone, kStub);
@@ -67,7 +67,7 @@ dword_result_t XamLrcEncryptDecryptTitleMessage_entry(
     dword_t encrypt) {
   XELOGI("XamLrcEncryptDecryptTitleMessage(user={}, size={}, encrypt={}) "
          "stubbed - identity (no LIVE keys)",
-         user_index.value, buffer_size.value, encrypt.value);
+         user_index.value(), buffer_size.value(), encrypt.value());
   return 0;
 }
 DECLARE_XAM_EXPORT1(XamLrcEncryptDecryptTitleMessage, kNone, kStub);
@@ -91,7 +91,7 @@ dword_result_t XamLrcLogError_entry(dword_t error_code,
                                     pointer_t<uint8_t> context,
                                     dword_t context_size) {
   XELOGW("XamLrcLogError(error=0x{:08X}) stubbed - suppressed LRC error report",
-         error_code.value);
+         error_code.value());
   return 0;
 }
 DECLARE_XAM_EXPORT1(XamLrcLogError, kNone, kStub);

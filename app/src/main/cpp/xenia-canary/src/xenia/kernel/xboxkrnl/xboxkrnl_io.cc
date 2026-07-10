@@ -786,10 +786,10 @@ dword_result_t IoDismountVolumeByFileHandle_entry(dword_t file_handle) {
     // The XFile itself is left open - the guest may continue to use the
     // handle for reads after the "dismount".
     XELOGI("IoDismountVolumeByFileHandle(handle={:08X}, path={}) - stubbed",
-           file_handle.value, file->path());
+           file_handle.value(), file->path());
   } else {
     XELOGW("IoDismountVolumeByFileHandle(handle={:08X}) - bad handle",
-           file_handle.value);
+           file_handle.value());
   }
   return X_STATUS_SUCCESS;
 }
