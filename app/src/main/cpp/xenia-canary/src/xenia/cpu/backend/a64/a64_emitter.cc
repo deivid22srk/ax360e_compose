@@ -54,7 +54,35 @@ static uint64_t UndefinedCallExtern(void* raw_context, uint64_t function_ptr) {
   return 0;
 }
 
-static constexpr size_t kMaxCodeSize = 1_MiB;
+// [ANDROID CRASH FIX] Maximum code size per JIT-compiled function.
+//
+// The upstream xenia-canary uses 1 MiB, which is sufficient for most PPC
+// functions. However, some games (notably Forza Horizon 2 and Forza
+// Motorsport 4) have very large functions — especially after HIR
+// optimization passes inline many blocks — that generate >1 MiB of A64
+// code. When this happens, Xbyak throws Error(ERR_CODE_IS_TOO_BIG) which
+// is uncaught, causing std::terminate → SIGABRT → process crash.
+//
+// The crash happens mid-game after ~111s of uptime (see log captured on
+// moto g34 5G, Forza Horizon 2):
+//   "terminating due to uncaught exception of type Xbyak_aarch64::Error:
+//    code is too big"
+//   tid 27609 (XThread539C46F0), pid 27513 (ax360e.free:emu)
+//
+// Fix part 1: increase kMaxCodeSize to 8 MiB. This is the maximum size
+// of a single JIT function's emitted code. The actual allocation is
+// virtual (mmap'd via the allocator) and only the touched pages consume
+// physical memory, so increasing the cap doesn't waste RAM for normal
+// functions. 8 MiB is generous — the largest known PPC functions in
+// commercial Xbox 360 titles generate ~2-3 MiB of A64 code after HIR
+// inlining.
+//
+// Fix part 2: wrap Emit() in try/catch (see A64Assembler::Assemble) so
+// if a function STILL exceeds 8 MiB (or any other Xbyak error occurs),
+// we log the error and return false instead of crashing the process.
+// The caller (Processor) will then fall back to interpreting the
+// function, which is slow but doesn't crash.
+static constexpr size_t kMaxCodeSize = 8_MiB;
 
 // Register maps:
 // GPR allocatable registers: x22, x23, x24, x25, x26, x27, x28

@@ -13,6 +13,7 @@
 
 #include "third_party/capstone/include/capstone/aarch64.h"
 #include "third_party/capstone/include/capstone/capstone.h"
+#include "xenia/base/logging.h"
 #include "xenia/base/profiling.h"
 #include "xenia/base/reset_scope.h"
 #include "xenia/base/string.h"
@@ -74,8 +75,47 @@ bool A64Assembler::Assemble(GuestFunction* function, HIRBuilder* builder,
   // Lower HIR -> ARM64.
   void* machine_code = nullptr;
   size_t code_size = 0;
-  if (!emitter_->Emit(function, builder, debug_info_flags, debug_info.get(),
-                      &machine_code, &code_size, &function->source_map())) {
+
+  // [ANDROID CRASH FIX] Wrap Emit() in try/catch.
+  //
+  // Xbyak_aarch64 throws Error() exceptions for various failure conditions:
+  //   - ERR_CODE_IS_TOO_BIG: function's emitted code exceeds kMaxCodeSize
+  //   - ERR_LABEL_IS_NOT_FOUND: undefined label in ready()
+  //   - ERR_OFFSET_IS_TOO_BIG: branch offset exceeds ±128MB
+  //   - ERR_CANT_PROTECT: mprotect failure
+  //
+  // Without this try/catch, any of these would call std::terminate → SIGABRT,
+  // crashing the entire emulator process. This is the crash observed in the
+  // Forza Horizon 2 log:
+  //   "terminating due to uncaught exception of type Xbyak_aarch64::Error:
+  //    code is too big"
+  //
+  // With the try/catch, we log the error and return false. The caller
+  // (Processor::CompileFunction) will then mark the function as
+  // uncompiled, and the JIT will fall back to interpreting it on next
+  // call. This is slow but doesn't crash — the game continues running.
+  //
+  // We also call emitter_->reset() in the catch block to ensure the
+  // emitter's internal state (size_, labels, etc.) is clean for the next
+  // function, since the throw may have left it in an inconsistent state.
+  bool emit_ok = false;
+  try {
+    emit_ok = emitter_->Emit(function, builder, debug_info_flags,
+                             debug_info.get(), &machine_code, &code_size,
+                             &function->source_map());
+  } catch (const Xbyak_aarch64::Error& e) {
+    XELOGE("A64Assembler: Xbyak error compiling function {:08X} '{}': {}",
+           function->address(), function->name(), e.what());
+    // Reset the emitter state so the next function starts fresh.
+    emitter_->reset();
+    return false;
+  } catch (const std::exception& e) {
+    XELOGE("A64Assembler: std::exception compiling function {:08X} '{}': {}",
+           function->address(), function->name(), e.what());
+    emitter_->reset();
+    return false;
+  }
+  if (!emit_ok) {
     return false;
   }
 
