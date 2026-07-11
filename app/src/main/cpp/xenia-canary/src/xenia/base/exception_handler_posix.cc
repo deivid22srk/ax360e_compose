@@ -16,6 +16,7 @@
 #include "xenia/base/host_thread_context.h"
 #include "xenia/base/logging.h"
 #include "xenia/base/math.h"
+#include "xenia/base/memory.h"
 #include "xenia/base/platform.h"
 
 namespace xe {
@@ -106,6 +107,7 @@ static void ExceptionHandlerCallback(int signal_number, siginfo_t* signal_info,
       break;
     case SIGSEGV: {
       Exception::AccessViolationOperation access_violation_operation;
+#if XE_ARCH_AMD64
       // x86_pf_error_code::X86_PF_WRITE
       constexpr uint64_t kX86PageFaultErrorCodeWrite = UINT64_C(1) << 1;
       access_violation_operation =
