@@ -59,6 +59,16 @@ protected:
 public:
     void UpdateSurface();
     void Paint();
+
+private:
+    // Surface recovery tracking
+    std::atomic<int> surface_recovery_attempts_{0};
+    std::atomic<int64_t> last_surface_recovery_time_ms_{0};
+    static constexpr int kMaxRecoveryAttempts = 5;
+    static constexpr int64_t kRecoveryCooldownMs = 2000; // 2 seconds
+
+    bool TrySurfaceRecovery();
+    void ResetRecoveryTracking();
 };
 
 class android_menu_item final : public xe::ui::MenuItem {

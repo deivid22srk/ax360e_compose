@@ -23,6 +23,7 @@
 #include <sched.h>
 #include <unistd.h>
 #include <errno.h>
+#include <chrono>
 
 #include "xenia/apu/nop/nop_audio_system.h"
 #include "xenia/base/cvar.h"
@@ -207,10 +208,18 @@ void AndroidWindow::RequestCloseImpl() {
 }
 
 std::unique_ptr<xe::ui::Surface> AndroidWindow::CreateSurfaceImpl(xe::ui::Surface::TypeFlags allowed_types) {
-    XELOGI("Creating Android surface...");
+    XELOGI("[SURFACE CREATE] CreateSurfaceImpl called, allowed_types={}", allowed_types);
     if(allowed_types&xe::ui::Surface::kTypeFlag_AndroidNativeWindow) {
         ANativeWindow *window = ae::window;
-        return std::make_unique<xe::ui::AndroidNativeWindowSurface>(window);
+        if (window) {
+            int w = ANativeWindow_getWidth(window);
+            int h = ANativeWindow_getHeight(window);
+            XELOGI("[SURFACE CREATE] Creating AndroidNativeWindowSurface with window={}, size={}x{}",
+                   (void*)window, w, h);
+            return std::make_unique<xe::ui::AndroidNativeWindowSurface>(window);
+        } else {
+            XELOGE("[SURFACE CREATE] ae::window is null, cannot create surface!");
+        }
     }
     return nullptr;
 }
@@ -221,23 +230,79 @@ void AndroidWindow::RequestPaintImpl() {
 }
 
 void AndroidWindow::UpdateSurface(){
+    XELOGI("[SURFACE UPDATE] UpdateSurface called");
+
+    // Try recovery with rate limiting
+    if (!TrySurfaceRecovery()) {
+        XELOGW("[SURFACE UPDATE] Recovery blocked by rate limiter, skipping");
+        return;
+    }
+
     if (ae::window) {
         int w = ANativeWindow_getWidth(ae::window);
         int h = ANativeWindow_getHeight(ae::window);
+        XELOGI("[SURFACE UPDATE] Current ae::window={} size={}x{}", (void*)ae::window, w, h);
+
         if (w > 0 && h > 0) {
             OnDesiredLogicalSizeUpdate(SizeToLogical(w), SizeToLogical(h));
             WindowDestructionReceiver destruction_receiver(this);
             OnActualSizeUpdate(uint32_t(w), uint32_t(h), destruction_receiver);
             if (destruction_receiver.IsWindowDestroyedOrClosed()) {
+                XELOGW("[SURFACE UPDATE] Window destroyed during size update");
                 return;
             }
+        } else {
+            XELOGW("[SURFACE UPDATE] Invalid window size: {}x{}", w, h);
         }
+    } else {
+        XELOGW("[SURFACE UPDATE] ae::window is null");
     }
+
+    // Force surface recreation to handle outdated swapchain
+    XELOGI("[SURFACE RECOVERY] Forcing surface recreation to recover from outdated state");
     OnSurfaceChanged(true);
+    XELOGI("[SURFACE RECOVERY] Surface recreation completed");
 }
 
 void AndroidWindow::Paint(){
+    XELOGI("[PAINT] AndroidWindow::Paint called");
     OnPaint(false);
+    XELOGI("[PAINT] AndroidWindow::Paint completed");
+}
+
+bool AndroidWindow::TrySurfaceRecovery() {
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+
+    int64_t last_time = last_surface_recovery_time_ms_.load();
+
+    // Check if we're in cooldown period
+    if (now - last_time < kRecoveryCooldownMs) {
+        int attempts = surface_recovery_attempts_.load();
+        if (attempts >= kMaxRecoveryAttempts) {
+            XELOGE("[SURFACE RECOVERY] Max recovery attempts ({}) reached, waiting for cooldown",
+                   kMaxRecoveryAttempts);
+            return false;
+        }
+    } else {
+        // Cooldown passed, reset counter
+        surface_recovery_attempts_.store(0);
+    }
+
+    surface_recovery_attempts_.fetch_add(1);
+    last_surface_recovery_time_ms_.store(now);
+
+    int current_attempts = surface_recovery_attempts_.load();
+    XELOGI("[SURFACE RECOVERY] Attempt {}/{} - forcing surface recreation",
+           current_attempts, kMaxRecoveryAttempts);
+
+    return true;
+}
+
+void AndroidWindow::ResetRecoveryTracking() {
+    surface_recovery_attempts_.store(0);
+    last_surface_recovery_time_ms_.store(0);
+    XELOGI("[SURFACE RECOVERY] Recovery tracking reset");
 }
 
 std::unique_ptr<xe::ui::Window> xe::ui::Window::Create(WindowedAppContext& app_context,
