@@ -7,6 +7,8 @@
  ******************************************************************************
  */
 
+#include <cstring>
+
 #include "xenia/base/clock.h"
 #include "xenia/base/cvar.h"
 #include "xenia/base/logging.h"
@@ -601,7 +603,7 @@ DECLARE_XAM_EXPORT2(XamXStudioRequest, kNone, kStub, kHighFrequency);
 dword_result_t XamInputRawState_entry(dword_t user_index, dword_t flags,
                                       pointer_t<uint8_t> state_out) {
   if (state_out) {
-    state_out.Zero(0x20);  // X_INPUT_STATE is ~32 bytes
+    std::memset(state_out, 0, 0x20);  // X_INPUT_STATE is ~32 bytes
   }
   return X_ERROR_SUCCESS;
 }
@@ -659,7 +661,7 @@ DECLARE_XAM_EXPORT1(XamWriteBiometricData, kNone, kStub);
 dword_result_t XamNuiGetDeviceSerialNumber_entry(pointer_t<uint8_t> serial_out,
                                                  dword_t serial_size) {
   if (serial_out && serial_size > 0) {
-    serial_out.Zero(serial_size);
+    std::memset(serial_out, 0, serial_size);
   }
   return X_E_DEVICE_NOT_CONNECTED;
 }

@@ -7,6 +7,8 @@
  ******************************************************************************
  */
 
+#include <cstring>
+
 #include "xenia/base/logging.h"
 #include "xenia/kernel/kernel_state.h"
 #include "xenia/kernel/util/shim_utils.h"
@@ -1195,7 +1197,7 @@ DECLARE_XAM_EXPORT1(NetDll_WSASend, kNetworking, kStub);
 // XNetLogonGetMachineID (ordinal 0x135)
 dword_result_t XNetLogonGetMachineID_entry(pointer_t<uint8_t> machine_id_out) {
   if (machine_id_out) {
-    machine_id_out.Zero(0x14);  // XNET_MACHINE_ID is ~20 bytes
+    std::memset(machine_id_out, 0, 0x14);  // XNET_MACHINE_ID is ~20 bytes
   }
   return 0x80151802;
 }
