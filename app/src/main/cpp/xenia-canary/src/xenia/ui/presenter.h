@@ -329,6 +329,14 @@ class Presenter {
   void SetGuestOutputPaintConfigFromUIThread(
       const GuestOutputPaintConfig& new_config);
 
+  // [FPS COUNTER] Returns the current presentation FPS, computed from the
+  // number of frames successfully presented (kPresented or
+  // kPresentedSuboptimal) over the last ~500ms window. Thread-safe.
+  // Returns 0 if no frames have been presented yet.
+  uint32_t GetFPS() const {
+    return fps_current_.load(std::memory_order_relaxed);
+  }
+
   void AddUIDrawerFromUIThread(UIDrawer* drawer, size_t z_order);
   void RemoveUIDrawerFromUIThread(UIDrawer* drawer);
 
@@ -896,6 +904,27 @@ class Presenter {
   // thread regardless of the paint mode) while (re)connecting painting to the
   // surface.
   bool surface_paint_connection_has_implicit_vsync_ = false;
+
+  // [FPS COUNTER] Real presentation FPS measurement.
+  //
+  // frames_presented_total_ is incremented atomically every time a frame is
+  // successfully presented (kPresented or kPresentedSuboptimal). It can be
+  // written from either the UI thread or the guest output thread depending on
+  // the paint mode, so it's atomic.
+  //
+  // fps_last_frame_count_ and fps_last_timestamp_ns_ are used to compute the
+  // FPS over a sliding window. They are accessed only from within
+  // PaintAndPresent, which is already serialized by paint_mode_mutex_, so no
+  // additional locking is needed for them.
+  //
+  // fps_current_ is the computed FPS value, updated atomically so it can be
+  // read from any thread via GetFPS().
+  std::atomic<uint64_t> frames_presented_total_{0};
+  uint64_t fps_last_frame_count_ = 0;
+  int64_t fps_last_timestamp_ns_ = 0;
+  std::atomic<uint32_t> fps_current_{0};
+  static constexpr int64_t kFpsMeasurementIntervalNs = 500'000'000LL;  // 500ms
+
   // Modifiable only by the UI thread, can be read by the thread that's
   // painting.
   uint32_t surface_width_in_paint_connection_ = 0;

@@ -9,6 +9,8 @@
 
 #include "xenia/ui/presenter.h"
 
+#include <chrono>
+
 #include "xenia/base/assert.h"
 #include "xenia/base/cvar.h"
 #include "xenia/base/logging.h"
@@ -1297,6 +1299,47 @@ Presenter::PaintResult Presenter::PaintAndPresent(bool execute_ui_drawers) {
       // Another issue not directly related to the surface connection.
       break;
   }
+
+  // [FPS COUNTER] Increment the total frame counter for any successfully
+  // presented frame (kPresented or kPresentedSuboptimal — both mean the
+  // image was sent to the OS presentation). Then, every ~500ms, compute the
+  // FPS from the delta in frame count and time.
+  //
+  // This code runs in PaintAndPresent, which is called either from the UI
+  // thread (PaintFromUIThread) or the guest output thread
+  // (GuestOutputRefreshAndPresent), but never both at the same time — the
+  // paint_mode_mutex_ held by the caller serializes access. So
+  // fps_last_frame_count_ and fps_last_timestamp_ns_ are safe without
+  // additional locking.
+  if (result == PaintResult::kPresented ||
+      result == PaintResult::kPresentedSuboptimal) {
+    uint64_t total_frames =
+        frames_presented_total_.fetch_add(1, std::memory_order_relaxed) + 1;
+
+    int64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                          std::chrono::steady_clock::now()
+                              .time_since_epoch())
+                          .count();
+
+    if (fps_last_timestamp_ns_ == 0) {
+      // First frame — initialize the baseline, don't compute FPS yet.
+      fps_last_timestamp_ns_ = now_ns;
+      fps_last_frame_count_ = total_frames;
+    } else {
+      int64_t elapsed_ns = now_ns - fps_last_timestamp_ns_;
+      if (elapsed_ns >= kFpsMeasurementIntervalNs) {
+        uint64_t frame_delta = total_frames - fps_last_frame_count_;
+        // Compute FPS = frames * 1e9 / elapsed_ns, rounded.
+        uint32_t fps = static_cast<uint32_t>(
+            (frame_delta * 1'000'000'000ULL) /
+            static_cast<uint64_t>(elapsed_ns));
+        fps_current_.store(fps, std::memory_order_relaxed);
+        fps_last_timestamp_ns_ = now_ns;
+        fps_last_frame_count_ = total_frames;
+      }
+    }
+  }
+
   return result;
 }
 

@@ -129,4 +129,13 @@ public class Emulator {
      */
     public native void flush_log();
 
+    /**
+     * [FPS COUNTER] Returns the current presentation FPS.
+     * Computed by counting successfully presented frames (vkQueuePresentKHR
+     * returning VK_SUCCESS or VK_SUBOPTIMAL_KHR) over a ~500ms sliding window.
+     * Thread-safe, safe to call from any thread.
+     * @return FPS as int, or 0 if emulator not initialized / no frames yet
+     */
+    public native int get_fps();
+
 }

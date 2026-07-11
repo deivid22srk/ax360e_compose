@@ -915,4 +915,23 @@ namespace ae{
         xe::ShutdownLogging();
     }
 
+    // [FPS COUNTER] Returns the current presentation FPS from the Vulkan
+    // presenter. The FPS is computed in Presenter::PaintAndPresent by counting
+    // successfully presented frames over a ~500ms sliding window.
+    //
+    // This function is called from JNI (j_get_fps) which is called from the
+    // Kotlin FPS overlay's polling loop. It's safe to call from any thread —
+    // GetFPS() does an atomic relaxed load.
+    //
+    // Returns 0 if the emulator or presenter is not yet initialized, or if no
+    // frames have been presented yet.
+    int get_fps() {
+        if (!g_windowed_app) return 0;
+        auto* app = static_cast<EmulatorApp*>(g_windowed_app.get());
+        if (!app || !app->emu_window) return 0;
+        xe::ui::Presenter* presenter = app->emu_window->GetGraphicsSystemPresenter();
+        if (!presenter) return 0;
+        return static_cast<int>(presenter->GetFPS());
+    }
+
 }

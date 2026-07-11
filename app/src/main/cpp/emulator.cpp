@@ -515,6 +515,13 @@ static void j_flush_log(JNIEnv* env,jobject self){
     ae::flush_log();
 }
 
+// [FPS COUNTER] JNI bridge for ae::get_fps().
+// Called from the Kotlin FPS overlay's polling loop (every ~500ms) to read
+// the current presentation FPS from the Vulkan presenter.
+static jint j_get_fps(JNIEnv* env,jobject self){
+    return static_cast<jint>(ae::get_fps());
+}
+
 int register_Emulator(JNIEnv* env){
     static const JNINativeMethod methods[] = {
             { "setup_game_path", "(Ljava/lang/String;)V", (void *) j_setup_game_path },
@@ -530,6 +537,7 @@ int register_Emulator(JNIEnv* env){
             { "change_surface", "(II)V", (void *) j_change_surface },
             { "surface_changed", "()V", (void *) j_surface_changed },
             { "flush_log", "()V", (void *) j_flush_log },
+            { "get_fps", "()I", (void *) j_get_fps },
     };
     return env->RegisterNatives(env->FindClass("aenu/emulator/Emulator"),methods, sizeof(methods)/sizeof(methods[0]));
 }

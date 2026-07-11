@@ -19,19 +19,32 @@ import android.view.SurfaceView
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.documentfile.provider.DocumentFile
 import aenu.ax360e.ui.theme.Ax360eTheme
@@ -373,6 +386,23 @@ private fun EmulatorScreen(
     onSurfaceCreated: (SurfaceView) -> Unit,
     onVirtualControlCreated: (VirtualControl) -> Unit
 ) {
+    val context = LocalContext.current
+    val prefs = remember { PreferenceManager.getDefaultSharedPreferences(context) }
+    var showFps by remember {
+        mutableStateOf(prefs.getBoolean("show_fps_counter", false))
+    }
+    var fpsValue by remember { mutableIntStateOf(0) }
+
+    // [FPS COUNTER] Poll the native presenter for the current FPS every 500ms.
+    // The FPS is computed in Presenter::PaintAndPresent by counting
+    // successfully presented frames over a ~500ms sliding window.
+    LaunchedEffect(showFps) {
+        while (showFps) {
+            fpsValue = try { Emulator.get.get_fps() } catch (_: Exception) { 0 }
+            kotlinx.coroutines.delay(500)
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
             factory = { ctx ->
@@ -390,6 +420,44 @@ private fun EmulatorScreen(
             },
             modifier = Modifier.fillMaxSize()
         )
+
+        // [FPS COUNTER] Toggle button — always visible, top-right corner.
+        // Tapping it toggles the FPS overlay on/off and persists the choice.
+        IconButton(
+            onClick = {
+                showFps = !showFps
+                prefs.edit().putBoolean("show_fps_counter", showFps).apply()
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .size(40.dp)
+                .background(
+                    Color.Black.copy(alpha = 0.5f),
+                    CircleShape
+                )
+        ) {
+            Icon(
+                Icons.Default.Speed,
+                contentDescription = "Toggle FPS",
+                tint = if (showFps) Color.Green else Color.White
+            )
+        }
+
+        // [FPS COUNTER] FPS text overlay — top-left corner, only when enabled.
+        if (showFps) {
+            Text(
+                text = "$fpsValue FPS",
+                color = Color.Green,
+                fontSize = 16.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp)
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            )
+        }
     }
 }
 

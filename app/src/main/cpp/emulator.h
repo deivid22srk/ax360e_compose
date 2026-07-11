@@ -29,5 +29,6 @@ namespace ae{
     extern void resume();
     extern void quit();
     extern void flush_log();  // [ANDROID LOG FLUSH] — see ax360e_emu.cpp
+    extern int get_fps();     // [FPS COUNTER] — returns current presentation FPS
 }
 #endif //APS3E_EMULATOR_H
