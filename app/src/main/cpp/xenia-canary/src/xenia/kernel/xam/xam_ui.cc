@@ -1069,7 +1069,7 @@ dword_result_t XamShowFriendsUI_entry(dword_t user_index,
                                        pointer_t<XAM_OVERLAPPED> overlapped) {
   if (cvars::headless) return X_ERROR_SUCCESS;
   const Emulator* emulator = kernel_state()->emulator();
-  ui::ImGuiDrawer* imgui_drawer = emulator->imgui_drawer();
+  xe::ui::ImGuiDrawer* imgui_drawer = emulator->imgui_drawer();
   if (imgui_drawer) {
     xe::threading::Fence fence;
     if (emulator->display_window()->app_context().CallInUIThreadSynchronous(
@@ -1102,7 +1102,7 @@ dword_result_t XamShowGamerCardUIForXUID_entry(
     pointer_t<XAM_OVERLAPPED> overlapped) {
   if (cvars::headless) return X_ERROR_SUCCESS;
   const Emulator* emulator = kernel_state()->emulator();
-  ui::ImGuiDrawer* imgui_drawer = emulator->imgui_drawer();
+  xe::ui::ImGuiDrawer* imgui_drawer = emulator->imgui_drawer();
   if (imgui_drawer) {
     xe::threading::Fence fence;
     if (emulator->display_window()->app_context().CallInUIThreadSynchronous(
