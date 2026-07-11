@@ -120,7 +120,7 @@ void AndroidWindowedAppContext::request_paint() {
     if (!paint_pending_.compare_exchange_strong(expected, true)) {
         return;
     }
-    // [ANDROID SURFACE RECOVERY] Detect if this paint request comes from
+    // [ANDROID SURFACE RECOVERY v2] Detect if this paint request comes from
     // the guest output thread (GPU Commands thread) rather than the UI
     // thread. The guest output thread calls window->RequestPaint() via
     // Presenter::RequestPaintOrConnectionRecoveryViaWindow(true) ONLY when
@@ -129,10 +129,9 @@ void AndroidWindowedAppContext::request_paint() {
     // vkQueuePresentKHR directly, NOT through RequestPaint.
     //
     // So if the caller is not the UI thread, this is a surface recovery
-    // request. We set a flag so the main_loop can force a full surface
-    // recreation (UpdateSurface) before painting, which destroys the old
-    // VkSurface and creates a new one — breaking the stuck state where
-    // the presenter can't recover because the old VkSurface is invalid.
+    // request. We set a flag so the main_loop can validate ae::window and
+    // decide whether to force a full surface recreation (UpdateSurface)
+    // before painting.
     if (WindowedAppContext::ui_thread_id_ != std::thread::id{} &&
         std::this_thread::get_id() != WindowedAppContext::ui_thread_id_) {
         paint_from_guest_thread_.store(true, std::memory_order_relaxed);
@@ -179,40 +178,59 @@ void AndroidWindowedAppContext::main_loop(){
             EmulatorApp* app=static_cast<EmulatorApp*>(ae::g_windowed_app.get());
             AndroidWindow* win=static_cast<AndroidWindow*>(app->emu_window->window());
 
-            // [ANDROID SURFACE RECOVERY] If this paint was requested by the
-            // guest output thread (GPU Commands thread), it means the Vulkan
-            // surface is outdated. The presenter's normal recovery path tries
-            // to recreate the swapchain using the SAME VkSurface, but on
-            // Android the VkSurface itself may be invalid (SurfaceFlinger
-            // recycled the ANativeWindow's buffer queue). In that case, the
-            // swapchain recreation fails and the presenter enters
-            // kUnconnectedRetryAtStateChange — a stuck state.
+            // [ANDROID SURFACE RECOVERY v2]
             //
-            // To break out of this stuck state, we force a full surface
-            // recreation by calling UpdateSurface(), which:
-            //   1. Destroys the old presenter_surface_ (AndroidNativeWindowSurface)
-            //   2. Calls presenter->SetWindowSurfaceFromUIThread(this, nullptr)
-            //      — disconnects the presenter from the old surface
-            //   3. Creates a new presenter_surface_ from the current ANativeWindow
-            //   4. Calls presenter->SetWindowSurfaceFromUIThread(this, new_surface)
-            //      — reconnects the presenter, creating a NEW VkSurface + swapchain
+            // If this paint was requested by the guest output thread (GPU
+            // Commands thread), it means the Vulkan surface is outdated.
             //
-            // This is the same flow as Android's surfaceChanged callback, but
-            // triggered proactively when we detect the surface is outdated.
+            // Before forcing UpdateSurface(), we MUST validate that ae::window
+            // is still usable. If surfaceDestroyed was called (ae::window ==
+            // nullptr), calling UpdateSurface() would create a surface with a
+            // null ANativeWindow, and the internal
+            // AwaitAllSubmissionsCompletion() would wait for GPU fences that
+            // may never be signaled — hanging the UI thread.
             //
-            // Cooldown: 500ms to avoid excessive surface recreation if the
-            // recovery itself fails (e.g., ANativeWindow is truly gone).
+            // With the companion fix in vulkan_submission_tracker.cc (5-second
+            // fence wait timeout instead of UINT64_MAX), even if we DO proceed
+            // with UpdateSurface(), the UI thread will no longer hang forever.
+            // But it's still better to skip the forced recovery when the
+            // window is clearly gone, and let the normal PaintFromUIThread
+            // recovery path handle it gracefully.
+            //
+            // When surfaceCreated provides a new ANativeWindow, it calls
+            // surface_changed() which pushes EVENT_SURFACE_CHANGED, and the
+            // presenter reconnects cleanly via the normal surface-changed flow.
             bool from_guest = paint_from_guest_thread_.exchange(false,
                                                                 std::memory_order_relaxed);
             if (from_guest) {
-                auto now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    std::chrono::steady_clock::now().time_since_epoch()).count();
-                int64_t last_ns = last_surface_recovery_ns_.load(std::memory_order_relaxed);
-                if (now_ns - last_ns > SURFACE_RECOVERY_COOLDOWN_NS) {
-                    last_surface_recovery_ns_.store(now_ns, std::memory_order_relaxed);
-                    XELOGI("[SURFACE RECOVERY] Guest output thread reported outdated "
-                           "surface — forcing UpdateSurface() before paint");
-                    win->UpdateSurface();
+                bool can_recover = false;
+                if (ae::window) {
+                    int w = ANativeWindow_getWidth(ae::window);
+                    int h = ANativeWindow_getHeight(ae::window);
+                    if (w > 0 && h > 0) {
+                        can_recover = true;
+                    } else {
+                        XELOGW("[SURFACE RECOVERY] ae::window has invalid size "
+                               "({}x{}) — skipping forced UpdateSurface(), "
+                               "waiting for new surface from Java", w, h);
+                    }
+                } else {
+                    XELOGW("[SURFACE RECOVERY] ae::window is null "
+                           "(surface destroyed) — skipping forced "
+                           "UpdateSurface(), waiting for surfaceCreated");
+                }
+
+                if (can_recover) {
+                    auto now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        std::chrono::steady_clock::now().time_since_epoch()).count();
+                    int64_t last_ns = last_surface_recovery_ns_.load(std::memory_order_relaxed);
+                    if (now_ns - last_ns > SURFACE_RECOVERY_COOLDOWN_NS) {
+                        last_surface_recovery_ns_.store(now_ns, std::memory_order_relaxed);
+                        XELOGI("[SURFACE RECOVERY] Guest output thread reported "
+                               "outdated surface — forcing UpdateSurface() "
+                               "before paint (ae::window is valid)");
+                        win->UpdateSurface();
+                    }
                 }
             }
 

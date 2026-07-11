@@ -12,6 +12,7 @@
 #include <cstdint>
 
 #include "xenia/base/assert.h"
+#include "xenia/base/logging.h"
 #include "xenia/ui/vulkan/vulkan_util.h"
 
 namespace xe {
@@ -111,6 +112,19 @@ bool VulkanSubmissionTracker::AwaitSubmissionCompletion(
   // "Fence signal operations that are defined by vkQueueSubmit additionally
   // include in the first synchronization scope all commands that occur earlier
   // in submission order."
+  //
+  // [ANDROID SURFACE RECOVERY] Use a finite timeout (5 seconds) instead of
+  // UINT64_MAX. On Android, when the Vulkan surface becomes outdated
+  // (VK_ERROR_OUT_OF_DATE_KHR), the GPU may have pending submissions whose
+  // fences will never be signaled because the swapchain is being retired.
+  // Waiting with UINT64_MAX causes the UI thread to hang indefinitely during
+  // surface recovery, freezing the game. With a finite timeout, if the GPU
+  // doesn't complete within 5 seconds, we proceed anyway (the swapchain will
+  // be destroyed regardless). This is a calculated risk: the GPU MIGHT still
+  // be referencing the old swapchain images, but on Android the WSI handles
+  // this internally, and hanging forever is worse than a potential transient
+  // rendering glitch.
+  constexpr uint64_t kFenceWaitTimeoutNs = 5'000'000'000ULL;  // 5 seconds
   size_t reclaim_end = fences_pending_.size();
   if (reclaim_end) {
     const VulkanDevice::Functions& dfn = vulkan_device_->functions();
@@ -120,11 +134,29 @@ bool VulkanSubmissionTracker::AwaitSubmissionCompletion(
           fences_pending_[reclaim_end - 1];
       assert_true(pending_pair.first > submission_completed_on_gpu_);
       if (pending_pair.first <= submission_index) {
-        // Wait if requested.
-        if (dfn.vkWaitForFences(device, 1, &pending_pair.second, VK_TRUE,
-                                UINT64_MAX) == VK_SUCCESS) {
+        // Wait if requested, with a finite timeout to avoid permanent hangs
+        // on Android when the surface becomes outdated.
+        VkResult wait_result = dfn.vkWaitForFences(
+            device, 1, &pending_pair.second, VK_TRUE, kFenceWaitTimeoutNs);
+        if (wait_result == VK_SUCCESS) {
           break;
         }
+        if (wait_result == VK_TIMEOUT) {
+          // The GPU didn't signal the fence within the timeout. This typically
+          // happens during surface recovery on Android when the swapchain is
+          // being retired. Proceed with reclaiming the fence to avoid hanging
+          // the UI thread forever.
+          XELOGW("VulkanSubmissionTracker: Fence wait timed out after 5s "
+                 "(submission {}, current {}) — proceeding to avoid UI thread "
+                 "hang during surface recovery",
+                 pending_pair.first, submission_index);
+          break;
+        }
+        // VK_ERROR_DEVICE_LOST or other error — proceed anyway.
+        XELOGE("VulkanSubmissionTracker: vkWaitForFences returned error {} "
+               "(submission {}) — proceeding",
+               static_cast<int>(wait_result), pending_pair.first);
+        break;
       }
       // Just refresh the completed submission.
       if (dfn.vkGetFenceStatus(device, pending_pair.second) == VK_SUCCESS) {

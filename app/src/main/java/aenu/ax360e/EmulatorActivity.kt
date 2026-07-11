@@ -224,7 +224,23 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         if (!started) return
+        // [ANDROID SURFACE RECOVERY v2]
+        //
+        // Clear ae::window immediately so the native side knows the ANativeWindow
+        // is gone. This prevents the guest output thread from trying to recover
+        // using a stale ANativeWindow (which can hang vkCreateSwapchainKHR).
+        //
+        // ALSO call surface_changed() to push EVENT_SURFACE_CHANGED. This
+        // notifies the native UI thread to disconnect the presenter
+        // (OnSurfaceChanged(false) path) proactively, rather than waiting for
+        // the guest output thread to detect VK_ERROR_OUT_OF_DATE_KHR and
+        // trigger the recovery path — by which point the GPU may have pending
+        // work referencing the old swapchain, and the forced recovery can hang.
+        //
+        // When surfaceCreated provides a new ANativeWindow, it calls
+        // surface_changed() again, which reconnects the presenter cleanly.
         Emulator.get.setup_surface(null)
+        Emulator.get.surface_changed()
     }
 
     private fun handleDpad(event: InputEvent): Boolean {
