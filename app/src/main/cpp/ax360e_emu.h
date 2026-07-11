@@ -99,6 +99,32 @@ public:
                       std::function<void()> callback);
 };
 
+// [FPS COUNTER] FPS counter class for displaying real-time FPS
+class FPSCounter {
+public:
+    FPSCounter();
+    ~FPSCounter();
+    
+    // Call this once per frame to update FPS calculation
+    void Update();
+    
+    // Draw the FPS counter using ImGui (call during UI drawing)
+    void Draw();
+    
+    // Enable/disable the FPS counter
+    void SetEnabled(bool enabled) { enabled_ = enabled; }
+    bool IsEnabled() const { return enabled_; }
+    
+private:
+    bool enabled_;
+    double fps_;
+    double frame_time_ms_;
+    uint32_t frame_count_;
+    double last_time_;
+    double fps_update_interval_;
+    double fps_last_update_time_;
+};
+
 
 class EmulatorApp final : public xe::ui::WindowedApp {
 public:
@@ -110,6 +136,19 @@ public:
 
     std::atomic<bool> emu_thr_quit_requested;
     std::thread emu_thr;
+
+    // [FPS COUNTER] FPS counter state
+    bool fps_counter_enabled_ = false;
+    double fps_current_ = 0.0;
+    double fps_frame_time_ms_ = 0.0;
+    uint32_t fps_frame_count_ = 0;
+    double fps_last_time_ = 0.0;
+    double fps_update_accum_ = 0.0;
+
+    void UpdateFPS();
+    void DrawFPS();
+    void ToggleFPSCounter() { fps_counter_enabled_ = !fps_counter_enabled_; }
+    bool IsFPSCounterEnabled() const { return fps_counter_enabled_; }
 
     template <typename T, typename... Args>
     class Factory {

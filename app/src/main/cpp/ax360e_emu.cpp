@@ -349,6 +349,59 @@ void AndroidWindow::Paint(){
     OnPaint(false);
 }
 
+// [FPS COUNTER] FPS Counter implementation
+FPSCounter::FPSCounter() : enabled_(false), fps_(0.0), frame_time_ms_(0.0),
+    frame_count_(0), last_time_(0.0), fps_update_interval_(0.5), fps_last_update_time_(0.0) {
+}
+
+FPSCounter::~FPSCounter() {
+}
+
+void FPSCounter::Update() {
+    if (!enabled_) return;
+    
+    double current_time = ImGui::GetTime();
+    
+    if (last_time_ == 0.0) {
+        last_time_ = current_time;
+        fps_last_update_time_ = current_time;
+        frame_count_ = 0;
+        return;
+    }
+    
+    frame_count_++;
+    frame_time_ms_ = (current_time - last_time_) * 1000.0;
+    last_time_ = current_time;
+    
+    // Update FPS every fps_update_interval_ seconds
+    if (current_time - fps_last_update_time_ >= fps_update_interval_) {
+        fps_ = frame_count_ / (current_time - fps_last_update_time_);
+        frame_count_ = 0;
+        fps_last_update_time_ = current_time;
+    }
+}
+
+void FPSCounter::Draw() {
+    if (!enabled_) return;
+    
+    ImGuiIO& io = ImGui::GetIO();
+    
+    // Set position to top-right corner
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 100, 10), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(90, 40), ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.35f);
+    
+    if (ImGui::Begin("FPS", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
+                              ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings)) {
+        ImGui::Text("FPS: %.1f", fps_);
+        ImGui::Text("%.1f ms", frame_time_ms_);
+        ImGui::End();
+    }
+}
+
+// Global FPS counter instance
+std::unique_ptr<FPSCounter> g_fps_counter;
+
 std::unique_ptr<xe::ui::Window> xe::ui::Window::Create(WindowedAppContext& app_context,
                                                        const std::string_view title,
                                                        uint32_t desired_logical_width,
@@ -445,6 +498,9 @@ bool EmulatorApp::OnInitialize() {
     emu_thr_event = xe::threading::Event::CreateAutoResetEvent(false);
     assert_not_null(emu_thr_event);
     emu_thr = std::thread(&EmulatorApp::emu_thr_main, this);
+
+    // [FPS COUNTER] Initialize FPS counter
+    g_fps_counter = std::make_unique<FPSCounter>();
 
     return true;
 }
@@ -804,6 +860,50 @@ void EmulatorApp::emu_thr_main() {
     app_context().QuitFromUIThread();
 }
 
+// [FPS COUNTER] FPS calculation methods for EmulatorApp
+void EmulatorApp::UpdateFPS() {
+    if (!fps_counter_enabled_) return;
+    
+    double current_time = ImGui::GetTime();
+    
+    if (fps_last_time_ == 0.0) {
+        fps_last_time_ = current_time;
+        return;
+    }
+    
+    fps_frame_count_++;
+    fps_update_accum_ += (current_time - fps_last_time_);
+    fps_last_time_ = current_time;
+    
+    // Update FPS every 0.5 seconds
+    if (fps_update_accum_ >= 0.5) {
+        fps_current_ = fps_frame_count_ / fps_update_accum_;
+        fps_frame_time_ms_ = (fps_update_accum_ * 1000.0) / fps_frame_count_;
+        fps_frame_count_ = 0;
+        fps_update_accum_ = 0.0;
+    }
+}
+
+void EmulatorApp::DrawFPS() {
+    if (!fps_counter_enabled_) return;
+    
+    ImGuiIO& io = ImGui::GetIO();
+    
+    // Set position to top-right corner with padding
+    ImVec2 window_pos = ImVec2(io.DisplaySize.x - 110, 10);
+    ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(100, 50), ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.35f);
+    
+    if (ImGui::Begin("FPS", nullptr, 
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
+            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings)) {
+        ImGui::Text("FPS: %.1f", fps_current_);
+        ImGui::Text("%.1f ms", fps_frame_time_ms_);
+        ImGui::End();
+    }
+}
+
 XE_DEFINE_WINDOWED_APP(ax36e,EmulatorApp::create);
 
 namespace ae{
@@ -923,6 +1023,28 @@ namespace ae{
     }
 
     void init(){
+    }
+
+    // [FPS COUNTER] FPS counter methods
+    void UpdateFPS(){
+        EmulatorApp* app = static_cast<EmulatorApp*>(g_windowed_app.get());
+        if (app) {
+            // Will be implemented in EmulatorApp
+        }
+    }
+    
+    void DrawFPS(){
+        EmulatorApp* app = static_cast<EmulatorApp*>(g_windowed_app.get());
+        if (app && app->IsFPSCounterEnabled()) {
+            app->DrawFPS();
+        }
+    }
+    
+    void ToggleFPS(){
+        EmulatorApp* app = static_cast<EmulatorApp*>(g_windowed_app.get());
+        if (app) {
+            app->ToggleFPSCounter();
+        }
     }
 
     // [ANDROID LOG FLUSH] Flushes the xenia-canary log file to disk.

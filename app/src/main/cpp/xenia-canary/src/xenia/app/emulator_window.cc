@@ -850,6 +850,20 @@ bool EmulatorWindow::Initialize() {
   }
   display_menu->AddChild(MenuItem::Create(MenuItem::Type::kSeparator));
   {
+    // [FPS COUNTER] Add FPS counter toggle menu item
+    display_menu->AddChild(MenuItem::Create(
+        MenuItem::Type::kString, "Show &FPS", "F7",
+        []() { 
+            // Access the global emulator app instance
+            if (ae::g_windowed_app) {
+                EmulatorApp* app = static_cast<EmulatorApp*>(ae::g_windowed_app.get());
+                if (app) {
+                    app->ToggleFPSCounter();
+                }
+            }
+        }));
+  }
+  {
     display_menu->AddChild(
         MenuItem::Create(MenuItem::Type::kString, "&Fullscreen", "F11",
                          std::bind(&EmulatorWindow::ToggleFullscreen, this)));

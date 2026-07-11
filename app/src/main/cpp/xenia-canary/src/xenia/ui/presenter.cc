@@ -1053,6 +1053,14 @@ void Presenter::ExecuteUIDrawersFromUIThread(UIDrawContext& ui_draw_context) {
   }
   is_executing_ui_drawers_ = false;
   ++ui_draw_current_;
+
+  // [FPS COUNTER] Draw FPS counter after all other UI drawers
+  if (ae::g_windowed_app) {
+    EmulatorApp* app = static_cast<EmulatorApp*>(ae::g_windowed_app.get());
+    if (app && app->IsFPSCounterEnabled()) {
+      app->DrawFPS();
+    }
+  }
 }
 
 void Presenter::SetPaintModeFromUIThread(PaintMode new_mode) {

@@ -2116,8 +2116,22 @@ Presenter::PaintResult VulkanPresenter::PaintAndPresentImpl(
   }
   switch (present_result) {
     case VK_SUCCESS:
+      // [FPS COUNTER] Update FPS counter after successful present
+      if (ae::g_windowed_app) {
+        EmulatorApp* app = static_cast<EmulatorApp*>(ae::g_windowed_app.get());
+        if (app) {
+          app->UpdateFPS();
+        }
+      }
       return PaintResult::kPresented;
     case VK_SUBOPTIMAL_KHR:
+      // [FPS COUNTER] Update FPS counter after successful present (suboptimal)
+      if (ae::g_windowed_app) {
+        EmulatorApp* app = static_cast<EmulatorApp*>(ae::g_windowed_app.get());
+        if (app) {
+          app->UpdateFPS();
+        }
+      }
       return PaintResult::kPresentedSuboptimal;
     case VK_ERROR_DEVICE_LOST:
       XELOGE(
