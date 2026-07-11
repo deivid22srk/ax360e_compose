@@ -506,6 +506,10 @@ static void j_quit(JNIEnv* env,jobject self){
     ae::quit();
 }
 
+static jint j_get_fps(JNIEnv* env,jobject self){
+    return AndroidWindow::GetCurrentFPS();
+}
+
 int register_Emulator(JNIEnv* env){
     static const JNINativeMethod methods[] = {
             { "setup_game_path", "(Ljava/lang/String;)V", (void *) j_setup_game_path },
@@ -520,6 +524,7 @@ int register_Emulator(JNIEnv* env){
             { "resume", "()V", (void *) j_resume },
             { "change_surface", "(II)V", (void *) j_change_surface },
             { "surface_changed", "()V", (void *) j_surface_changed },
+            { "get_fps", "()I", (void *) j_get_fps },
     };
     return env->RegisterNatives(env->FindClass("aenu/emulator/Emulator"),methods, sizeof(methods)/sizeof(methods[0]));
 }

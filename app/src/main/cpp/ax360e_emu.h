@@ -60,6 +60,11 @@ public:
     void UpdateSurface();
     void Paint();
 
+    // FPS tracking
+    double GetFPS() const;
+    void SetShowFPS(bool show);
+    bool GetShowFPS() const;
+
 private:
     // Surface recovery tracking
     std::atomic<int> surface_recovery_attempts_{0};
@@ -67,8 +72,16 @@ private:
     static constexpr int kMaxRecoveryAttempts = 5;
     static constexpr int64_t kRecoveryCooldownMs = 2000; // 2 seconds
 
+    // FPS tracking
+    std::atomic<int64_t> frame_count_{0};
+    std::atomic<int64_t> fps_last_update_ms_{0};
+    std::atomic<double> current_fps_{0.0};
+    std::atomic<bool> show_fps_{false};
+    mutable std::mutex fps_mutex_;
+
     bool TrySurfaceRecovery();
     void ResetRecoveryTracking();
+    void UpdateFPS();
 };
 
 class android_menu_item final : public xe::ui::MenuItem {

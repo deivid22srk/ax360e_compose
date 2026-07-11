@@ -50,6 +50,11 @@
 #include "ax360e_emu.h"
 //#include "nlohmann/json.hpp"
 
+// FPS counter static variables
+std::atomic<int> AndroidWindow::fps_frame_count_{0};
+std::atomic<int> AndroidWindow::fps_current_{0};
+std::atomic<int64_t> AndroidWindow::fps_last_sample_time_ms_{0};
+
 #define LOG_TAG "ax360e_native"
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG,__VA_ARGS__);
 
@@ -266,8 +271,34 @@ void AndroidWindow::UpdateSurface(){
 
 void AndroidWindow::Paint(){
     XELOGI("[PAINT] AndroidWindow::Paint called");
+    TickFPS();
     OnPaint(false);
     XELOGI("[PAINT] AndroidWindow::Paint completed");
+}
+
+void AndroidWindow::TickFPS() {
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+
+    fps_frame_count_.fetch_add(1, std::memory_order_relaxed);
+
+    int64_t last_time = fps_last_sample_time_ms_.load(std::memory_order_relaxed);
+    if (last_time == 0) {
+        fps_last_sample_time_ms_.store(now, std::memory_order_relaxed);
+        return;
+    }
+
+    int64_t elapsed = now - last_time;
+    if (elapsed >= 1000) {
+        int frames = fps_frame_count_.exchange(0, std::memory_order_relaxed);
+        int fps = static_cast<int>((frames * 1000.0) / elapsed);
+        fps_current_.store(fps, std::memory_order_relaxed);
+        fps_last_sample_time_ms_.store(now, std::memory_order_relaxed);
+    }
+}
+
+int AndroidWindow::GetCurrentFPS() {
+    return fps_current_.load(std::memory_order_relaxed);
 }
 
 bool AndroidWindow::TrySurfaceRecovery() {

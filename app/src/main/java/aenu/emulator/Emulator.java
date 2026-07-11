@@ -121,4 +121,6 @@ public class Emulator {
 
     public native void surface_changed();
 
+    public native int get_fps();
+
 }

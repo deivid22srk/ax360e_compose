@@ -50,6 +50,19 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
     private var vibrationEffect: VibrationEffect? = null
     private var started = false
     private var delayDialog: Dialog? = null
+    private var showFpsOverlay by mutableStateOf(false)
+
+    // FPS counter state
+    private var showFps = false
+    private var fpsText: Text? = null
+    private val fpsHandler = Handler(Handler.Callback { msg ->
+        if (msg.what == MSG_UPDATE_FPS) {
+            updateFpsDisplay()
+            fpsHandler.sendEmptyMessageDelayed(MSG_UPDATE_FPS, 500) // Update every 500ms
+            true
+        } else false
+    })
+    private val MSG_UPDATE_FPS = 0xAEAE0002
 
     private val delayOnCreate = Handler(Handler.Callback { msg ->
         if (msg.what != DELAY_ON_CREATE) return@Callback false
@@ -119,7 +132,8 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
                     },
                     onVirtualControlCreated = { vc ->
                         virtualControl = vc
-                    }
+                    },
+                    showFpsOverlay = showFpsOverlay
                 )
             }
         }
@@ -138,6 +152,20 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
         if (sPrefs.getBoolean("enable_vibrator", false)) {
             vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
             vibrationEffect = VibrationEffect.createOneShot(25, VibrationEffect.DEFAULT_AMPLITUDE)
+        }
+        // Load FPS overlay preference from emulator config file
+        showFpsOverlay = try {
+            val configPath = Application.get_global_config_file().absolutePath
+            if (java.io.File(configPath).exists()) {
+                val config = aenu.emulator.Emulator.Config.open_config_file(configPath)
+                val value = config.load_config_entry("UI|show_fps_counter").toBooleanStrictOrNull() ?: false
+                config.close_config_file()
+                value
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
         }
     }
 
@@ -343,7 +371,8 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
 @Composable
 private fun EmulatorScreen(
     onSurfaceCreated: (SurfaceView) -> Unit,
-    onVirtualControlCreated: (VirtualControl) -> Unit
+    onVirtualControlCreated: (VirtualControl) -> Unit,
+    showFpsOverlay: Boolean
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
@@ -362,6 +391,28 @@ private fun EmulatorScreen(
             },
             modifier = Modifier.fillMaxSize()
         )
+
+        // FPS Counter Overlay
+        if (showFpsOverlay) {
+            var fps by remember { mutableStateOf(0) }
+
+            // Update FPS every 500ms
+            LaunchedEffect(Unit) {
+                while (true) {
+                    fps = Emulator.get.get_fps()
+                    kotlinx.coroutines.delay(500)
+                }
+            }
+
+            Text(
+                text = "$fps FPS",
+                color = Color.Green,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp)
+            )
+        }
     }
 }
 

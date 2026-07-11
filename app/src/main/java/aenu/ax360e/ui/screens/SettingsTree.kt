@@ -231,6 +231,7 @@ object SettingsTree {
                     SettingsEntry.Bool(key = "UI|headless", title = context.getString(R.string.es_ui_headless)),
                     SettingsEntry.Bool(key = "UI|profiler_dpi_scaling", title = context.getString(R.string.es_ui_profiler_dpi_scaling)),
                     SettingsEntry.Bool(key = "UI|show_achievement_notification", title = context.getString(R.string.es_ui_show_achievement_notification)),
+                    SettingsEntry.Bool(key = "UI|show_fps_counter", title = "Show FPS Counter"),
                     SettingsEntry.Bool(key = "UI|show_profiler", title = context.getString(R.string.es_ui_show_profiler)),
                     SettingsEntry.Bool(key = "UI|storage_selection_dialog", title = context.getString(R.string.es_ui_storage_selection_dialog)),
                 )
