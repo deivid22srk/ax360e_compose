@@ -1976,7 +1976,7 @@ dword_result_t KeSetTimer_entry(pointer_t<X_KTIMER> timer,
     return X_STATUS_INVALID_PARAMETER_1;
   }
   timer->header.inserted = 1;
-  timer->due_time = due_time;
+  timer->due_time = due_time.value();
   timer->period = 0;  // KeSetTimer = KeSetTimerEx with no period
   // Signal the timer immediately (we don't have a real timer queue)
   timer->header.signal_state = 1;
