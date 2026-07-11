@@ -187,28 +187,32 @@ DECLARE_XBOXKRNL_EXPORT1(__C_specific_handler, kNone, kStub);
 // Captures the current thread's context (registers) into a CONTEXT structure.
 // On Xbox 360, this captures the PPC register file.
 //
-// We capture the PPC context that Xenia already maintains.
+// We capture the PPC context that Xenia already maintains. Note: PPCContext
+// has no 'pc' or 'xer' field — PC is managed by the JIT, and XER is split
+// into xer_ca/xer_ov/xer_so. We capture what's available.
 void RtlCaptureContext_entry(pointer_t<uint8_t> context_ptr,
                              const ppc_context_t& ctx) {
   if (!context_ptr) return;
   // Zero the context structure first
   std::memset(context_ptr, 0, 0x300);  // X_CONTEXT is ~768 bytes
-  // Copy GPRs (r0-r31 = 32 * 4 = 128 bytes)
   uint8_t* ptr = context_ptr;
-  // Offset 0x80 = GPRs in X_CONTEXT (Windows layout approximation)
+  // GPRs (r0-r31) — PPCContext stores them as uint64_t, guest is uint32_t
   for (int i = 0; i < 32; ++i) {
-    xe::store_and_swap<uint32_t>(ptr + 0x80 + i * 4, uint32_t(ctx->r[i]));
+    xe::store_and_swap<uint32_t>(ptr + 0x80 + i * 4,
+                                  static_cast<uint32_t>(ctx->r[i]));
   }
-  // Offset 0x100 = CR
-  xe::store_and_swap<uint32_t>(ptr + 0x100, uint32_t(ctx->cr));
-  // Offset 0x108 = LR
-  xe::store_and_swap<uint32_t>(ptr + 0x108, ctx->lr);
-  // Offset 0x110 = CTR
-  xe::store_and_swap<uint32_t>(ptr + 0x110, ctx->ctr);
-  // Offset 0x118 = XER
-  xe::store_and_swap<uint32_t>(ptr + 0x118, ctx->xer);
-  // NIP (PC) at offset 0x120
-  xe::store_and_swap<uint32_t>(ptr + 0x120, ctx->pc);
+  // CR (condition register) — accessed via cr() method
+  xe::store_and_swap<uint32_t>(ptr + 0x100, static_cast<uint32_t>(ctx->cr()));
+  // LR (link register)
+  xe::store_and_swap<uint32_t>(ptr + 0x108, static_cast<uint32_t>(ctx->lr));
+  // CTR (count register)
+  xe::store_and_swap<uint32_t>(ptr + 0x110, static_cast<uint32_t>(ctx->ctr));
+  // XER — combine xer_ca, xer_ov, xer_so into a single uint32_t
+  uint32_t xer = 0;
+  if (ctx->xer_ca) xer |= 0x20000000;  // XER_CA bit
+  if (ctx->xer_ov) xer |= 0x40000000;  // XER_OV bit
+  if (ctx->xer_so) xer |= 0x80000000;  // XER_SO bit
+  xe::store_and_swap<uint32_t>(ptr + 0x118, xer);
 }
 DECLARE_XBOXKRNL_EXPORT1(RtlCaptureContext, kNone, kImplemented);
 
