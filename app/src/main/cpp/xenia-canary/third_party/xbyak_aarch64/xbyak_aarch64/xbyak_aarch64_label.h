@@ -87,7 +87,43 @@ class LabelManager {
       const JmpLabel *jmp = &itr->second;
       const size_t offset = jmp->endOfJmp;
       int64_t labelOffset = (addrOffset - offset) * CSIZE;
-      uint32_t disp = jmp->encFunc(labelOffset);
+      // [LONG BRANCH VENEER FIX] When the label offset is too large for the
+      // branch instruction (conditional B.cond = ±1MB, CBZ/CBNZ = ±1MB,
+      // TBZ/TBNZ = ±32KB), the encoding function throws ERR_LABEL_IS_TOO_FAR.
+      // Instead of crashing, we emit a veneer: an unconditional B (±128MB
+      // range) at the current code position that jumps to the real target.
+      // The original branch is rewritten to jump to the veneer instead.
+      //
+      // This happens with very large JIT-compiled functions (>1MB of ARM64
+      // code), which occur in games like Forza Horizon 2.
+      uint32_t disp;
+      try {
+        disp = jmp->encFunc(labelOffset);
+      } catch (const Error& e) {
+        if ((int)e != ERR_LABEL_IS_TOO_FAR) throw;
+        // Emit a veneer: unconditional B to the real target.
+        // The veneer is placed at the current end of code.
+        // We need: original branch -> veneer (short, within range now)
+        //          veneer -> label (unconditional B, ±128MB)
+        //
+        // base_->getSize() returns bytes. addrOffset and offset are in
+        // dd units (instruction index, 4 bytes each = CSIZE).
+        size_t veneer_pos_dd = base_->getSize() / CSIZE;  // current end, in dd units
+        // offset from veneer to label (in bytes)
+        int64_t veneer_to_label = (int64_t)((int64_t)addrOffset - (int64_t)veneer_pos_dd) * (int64_t)CSIZE;
+        // Step 1: Emit unconditional B at current position.
+        // ARM64 B encoding: 0b000101 imm26 — opcode 0x14000000 | (imm26 & 0x3FFFFFF)
+        // imm26 = (offset / 4) & 0x3FFFFFF, range ±128MB
+        uint32_t b_imm26 = static_cast<uint32_t>((veneer_to_label >> 2) & 0x3FFFFFF);
+        uint32_t veneer_code = 0x14000000u | b_imm26;  // B label
+        base_->dd(veneer_code);
+        // Step 2: Rewrite the original branch to jump to the veneer.
+        // offset from original branch to veneer (in bytes):
+        //   (veneer_pos_dd - offset) * CSIZE
+        int64_t branch_to_veneer = (int64_t)((int64_t)veneer_pos_dd - (int64_t)offset) * (int64_t)CSIZE;
+        // Re-encode the original branch with the shorter offset to the veneer.
+        disp = jmp->encFunc(branch_to_veneer);
+      }
       base_->rewrite(offset, disp);
       undefList.erase(itr);
     }
