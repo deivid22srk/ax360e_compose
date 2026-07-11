@@ -507,8 +507,31 @@ uint32_t CodeGenerator::CondBrImmEnc(uint32_t cond, int64_t labelOffset) {
 void CodeGenerator::CondBrImm(Cond cond, const Label &label) {
   auto encFunc = [&, cond](int64_t labelOffset) { return CondBrImmEnc(cond, labelOffset); };
   JmpLabel jmpL = JmpLabel(encFunc, size_);
-  uint32_t code = CondBrImmEnc(cond, genLabelOffset(label, jmpL));
-  dd(code);
+  int64_t offset = genLabelOffset(label, jmpL);
+  // [LONG BRANCH VENEER] For backward branches (label already defined),
+  // the offset may be too large for B.cond (±1MB). If so, emit a veneer:
+  //   B.INV cond, veneer   (skip veneer if condition NOT met)
+  //   B label              (unconditional, ±128MB)
+  //   veneer:
+  // This adds 2 instructions (8 bytes) but handles any distance.
+  try {
+    uint32_t code = CondBrImmEnc(cond, offset);
+    dd(code);
+  } catch (const Error& e) {
+    if ((int)e != ERR_LABEL_IS_TOO_FAR) throw;
+    // Invert condition: cond ^ 1
+    uint32_t inv_cond = cond ^ 1;
+    // Emit: B.INV cond, +8 (skip the next B instruction)
+    // imm19 = 8/4 = 2 (forward by 2 instructions)
+    uint32_t skip_code = concat({F(0x2a, 25), F(2, 5), F(inv_cond, 0)});
+    dd(skip_code);
+    // Emit: B label (unconditional, ±128MB)
+    uint32_t b_imm26 = static_cast<uint32_t>((offset >> 2) & 0x3FFFFFF);
+    // Adjust offset: we're now 4 bytes further from the label
+    b_imm26 = static_cast<uint32_t>(((offset - 4) >> 2) & 0x3FFFFFF);
+    uint32_t b_code = 0x14000000u | b_imm26;
+    dd(b_code);
+  }
 }
 
 void CodeGenerator::CondBrImm(Cond cond, int64_t label) {
@@ -660,8 +683,28 @@ uint32_t CodeGenerator::CompareBrEnc(uint32_t op, const RReg &rt, int64_t labelO
 void CodeGenerator::CompareBr(uint32_t op, const RReg &rt, const Label &label) {
   auto encFunc = [=](int64_t labelOffset) { return CompareBrEnc(op, rt, labelOffset); };
   JmpLabel jmpL = JmpLabel(encFunc, size_);
-  uint32_t code = CompareBrEnc(op, rt, genLabelOffset(label, jmpL));
-  dd(code);
+  int64_t offset = genLabelOffset(label, jmpL);
+  // [LONG BRANCH VENEER] For backward branches that exceed ±1MB range.
+  // CBZ/CBNZ can't be inverted like B.cond, so we use:
+  //   CBNZ rt, +8  (or CBZ rt, +8 to skip)
+  //   B label       (unconditional, ±128MB)
+  // For CBZ (op=0): if rt==0, we want to branch. Invert: CBNZ (op=1) skips.
+  // For CBNZ (op=1): if rt!=0, we want to branch. Invert: CBZ (op=0) skips.
+  try {
+    uint32_t code = CompareBrEnc(op, rt, offset);
+    dd(code);
+  } catch (const Error& e) {
+    if ((int)e != ERR_LABEL_IS_TOO_FAR) throw;
+    // Inverted compare branch: skip next instruction if condition NOT met
+    uint32_t inv_op = op ^ 1;  // CBZ<->CBNZ
+    uint32_t sf = genSf(rt);
+    uint32_t skip_code = concat({F(sf, 31), F(0x1a, 25), F(inv_op, 24), F(2, 5), F(rt.getIdx(), 0)});
+    dd(skip_code);
+    // Unconditional B to label (±128MB)
+    uint32_t b_imm26 = static_cast<uint32_t>(((offset - 4) >> 2) & 0x3FFFFFF);
+    uint32_t b_code = 0x14000000u | b_imm26;
+    dd(b_code);
+  }
 }
 
 void CodeGenerator::CompareBr(uint32_t op, const RReg &rt, int64_t label) {
@@ -687,8 +730,27 @@ uint32_t CodeGenerator::TestBrEnc(uint32_t op, const RReg &rt, uint32_t imm, int
 void CodeGenerator::TestBr(uint32_t op, const RReg &rt, uint32_t imm, const Label &label) {
   auto encFunc = [=](int64_t labelOffset) { return TestBrEnc(op, rt, imm, labelOffset); };
   JmpLabel jmpL = JmpLabel(encFunc, size_);
-  uint32_t code = TestBrEnc(op, rt, imm, genLabelOffset(label, jmpL));
-  dd(code);
+  int64_t offset = genLabelOffset(label, jmpL);
+  // [LONG BRANCH VENEER] For backward branches that exceed ±32KB range.
+  // TBZ/TBNZ: invert and skip, then unconditional B.
+  try {
+    uint32_t code = TestBrEnc(op, rt, imm, offset);
+    dd(code);
+  } catch (const Error& e) {
+    if ((int)e != ERR_LABEL_IS_TOO_FAR) throw;
+    // Inverted test branch: skip next instruction if condition NOT met
+    uint32_t inv_op = op ^ 1;  // TBZ<->TBNZ
+    uint32_t b5 = field(imm, 5, 5);
+    uint32_t b40 = field(imm, 4, 0);
+    uint32_t sf = genSf(rt);
+    // imm14 = 2 (skip 2 instructions forward = 8 bytes)
+    uint32_t skip_code = concat({F(b5, 31), F(0x36, 25), F(sf, 24), F(inv_op, 23), F(b40, 19), F(2, 5), F(rt.getIdx(), 0)});
+    dd(skip_code);
+    // Unconditional B to label (±128MB)
+    uint32_t b_imm26 = static_cast<uint32_t>(((offset - 4) >> 2) & 0x3FFFFFF);
+    uint32_t b_code = 0x14000000u | b_imm26;
+    dd(b_code);
+  }
 }
 
 void CodeGenerator::TestBr(uint32_t op, const RReg &rt, uint32_t imm, int64_t label) {

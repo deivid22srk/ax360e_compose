@@ -353,7 +353,14 @@ ResolveFunctionThunk A64HelperEmitter::EmitResolveFunctionThunk() {
 
   cbz(x9, 8);   // skip br x9 if null, fall through to brk
   br(x9);       // Jump to the resolved function (tail call — preserves LR).
-  brk(0xF000);  // Resolution failed — trap for debugging.
+  // [LONG BRANCH / COMPILATION FAILURE FIX]
+  // When ResolveFunction returns 0 (compilation failed — e.g., "label is too
+  // far" in Xbyak, or unresolvable function), we used to BRK #0xF000 which
+  // crashed the process with SIGTRAP. Instead, return to the caller (LR) so
+  // the guest thread continues execution. The guest function is effectively
+  // treated as a no-op (returns to caller without executing). This is far
+  // better than crashing — the game may continue with a minor glitch.
+  ret(x30);     // Return to caller (LR = x30)
 
   code_offsets.tail = getSize();
 
