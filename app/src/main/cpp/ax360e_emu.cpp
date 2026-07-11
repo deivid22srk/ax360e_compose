@@ -127,12 +127,6 @@ void AndroidWindowedAppContext::request_paint() {
     // the Vulkan surface is outdated (VK_ERROR_OUT_OF_DATE_KHR from
     // vkAcquireNextImageKHR). Normal frame presentation goes through
     // vkQueuePresentKHR directly, NOT through RequestPaint.
-    //
-    // So if the caller is not the UI thread, this is a surface recovery
-    // request. We set a flag so the main_loop can force a full surface
-    // recreation (UpdateSurface) before painting, which destroys the old
-    // VkSurface and creates a new one — breaking the stuck state where
-    // the presenter can't recover because the old VkSurface is invalid.
     if (WindowedAppContext::ui_thread_id_ != std::thread::id{} &&
         std::this_thread::get_id() != WindowedAppContext::ui_thread_id_) {
         paint_from_guest_thread_.store(true, std::memory_order_relaxed);
@@ -146,6 +140,28 @@ void AndroidWindowedAppContext::request_surface_changed() {
     std::lock_guard<std::mutex> lock(mutex);
     events.push({EVENT_SURFACE_CHANGED, nullptr});
     cv.notify_one();
+}
+
+void AndroidWindowedAppContext::schedule_surface_recovery_retry() {
+    bool expected = false;
+    if (!surface_recovery_retry_scheduled_.compare_exchange_strong(
+            expected, true, std::memory_order_relaxed)) {
+        return;
+    }
+    // Detach a short-lived timer so we don't block the UI loop. After the
+    // delay, push EVENT_SURFACE_RECOVERY_RETRY. If the process is quitting,
+    // the main_loop will ignore it.
+    std::thread([this]() {
+        std::this_thread::sleep_for(
+            std::chrono::nanoseconds(SURFACE_RECOVERY_RETRY_NS));
+        surface_recovery_retry_scheduled_.store(false, std::memory_order_relaxed);
+        std::lock_guard<std::mutex> lock(mutex);
+        if (WindowedAppContext::HasQuitFromUIThread()) {
+            return;
+        }
+        events.push({EVENT_SURFACE_RECOVERY_RETRY, nullptr});
+        cv.notify_one();
+    }).detach();
 }
 
 void AndroidWindowedAppContext::setup_ui_thr_id(std::thread::id id){
@@ -179,29 +195,19 @@ void AndroidWindowedAppContext::main_loop(){
             EmulatorApp* app=static_cast<EmulatorApp*>(ae::g_windowed_app.get());
             AndroidWindow* win=static_cast<AndroidWindow*>(app->emu_window->window());
 
-            // [ANDROID SURFACE RECOVERY] If this paint was requested by the
-            // guest output thread (GPU Commands thread), it means the Vulkan
-            // surface is outdated. The presenter's normal recovery path tries
-            // to recreate the swapchain using the SAME VkSurface, but on
-            // Android the VkSurface itself may be invalid (SurfaceFlinger
-            // recycled the ANativeWindow's buffer queue). In that case, the
-            // swapchain recreation fails and the presenter enters
-            // kUnconnectedRetryAtStateChange — a stuck state.
+            // [ANDROID SURFACE RECOVERY]
+            // Guest-thread paint request => surface is outdated.
             //
-            // To break out of this stuck state, we force a full surface
-            // recreation by calling UpdateSurface(), which:
-            //   1. Destroys the old presenter_surface_ (AndroidNativeWindowSurface)
-            //   2. Calls presenter->SetWindowSurfaceFromUIThread(this, nullptr)
-            //      — disconnects the presenter from the old surface
-            //   3. Creates a new presenter_surface_ from the current ANativeWindow
-            //   4. Calls presenter->SetWindowSurfaceFromUIThread(this, new_surface)
-            //      — reconnects the presenter, creating a NEW VkSurface + swapchain
-            //
-            // This is the same flow as Android's surfaceChanged callback, but
-            // triggered proactively when we detect the surface is outdated.
-            //
-            // Cooldown: 500ms to avoid excessive surface recreation if the
-            // recovery itself fails (e.g., ANativeWindow is truly gone).
+            // Important ordering to avoid permanent freeze:
+            //  1. Prefer SOFT recovery first (OnSurfaceResize via UpdateSurface(false)):
+            //     recreates the swapchain on the existing VkSurface.
+            //  2. After SURFACE_RECOVERY_SOFT_ATTEMPTS soft failures, escalate to
+            //     HARD recovery (full OnSurfaceChanged).
+            //  3. Always force-paint after recovery so the connection is revalidated
+            //     immediately.
+            //  4. If recovery still leaves no surface, schedule a timed retry.
+            //     Without this, paint_mode_ kNone is a permanent freeze
+            //     (the exact log signature: ends at "Creating Android surface...").
             bool from_guest = paint_from_guest_thread_.exchange(false,
                                                                 std::memory_order_relaxed);
             if (from_guest) {
@@ -210,18 +216,105 @@ void AndroidWindowedAppContext::main_loop(){
                 int64_t last_ns = last_surface_recovery_ns_.load(std::memory_order_relaxed);
                 if (now_ns - last_ns > SURFACE_RECOVERY_COOLDOWN_NS) {
                     last_surface_recovery_ns_.store(now_ns, std::memory_order_relaxed);
-                    XELOGI("[SURFACE RECOVERY] Guest output thread reported outdated "
-                           "surface — forcing UpdateSurface() before paint");
-                    win->UpdateSurface();
+                    int attempt = surface_recovery_attempts_.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    bool hard = attempt > SURFACE_RECOVERY_SOFT_ATTEMPTS;
+                    XELOGI("[SURFACE RECOVERY] Guest reported outdated surface — "
+                           "attempt {} ({})",
+                           attempt, hard ? "HARD full rebind" : "SOFT swapchain recreate");
+                    if (!ae::window) {
+                        XELOGW("[SURFACE RECOVERY] ANativeWindow is null — cannot recover");
+                    } else {
+                        win->UpdateSurface(hard);
+                    }
+                    // Force paint so UpdateSurfacePaintConnection / PaintAndPresent
+                    // runs immediately and either succeeds or re-marks outdated.
+                    win->Paint(true);
+
+                    // Connect may fail even when a surface *object* exists
+                    // (kUnconnectedRetryAtStateChange + paint_mode kNone). In
+                    // that state the guest stops requesting paints forever.
+                    // Schedule a limited burst of autonomous retries after each
+                    // guest-triggered recovery, but do NOT thrash forever if
+                    // the surface looks healthy (would recreate swapchain
+                    // every 500ms and cause more OUT_OF_DATE).
+                    bool need_retry = !win->HasPresenterSurface();
+                    // Always do a couple of follow-ups after a hard rebind, or
+                    // when soft attempts are still escalating — covers the
+                    // "surface object exists but connect failed" case.
+                    if (hard || attempt <= SURFACE_RECOVERY_SOFT_ATTEMPTS + 1) {
+                        need_retry = true;
+                    }
+                    if (need_retry && attempt < SURFACE_RECOVERY_MAX_ATTEMPTS) {
+                        XELOGI("[SURFACE RECOVERY] Scheduling follow-up retry "
+                               "(attempt {}, has_surface={})",
+                               attempt, win->HasPresenterSurface());
+                        schedule_surface_recovery_retry();
+                    } else if (attempt >= SURFACE_RECOVERY_MAX_ATTEMPTS) {
+                        XELOGE("[SURFACE RECOVERY] Exhausted {} attempts — giving up "
+                               "until next surfaceChanged from Android",
+                               attempt);
+                        surface_recovery_attempts_.store(0, std::memory_order_relaxed);
+                    } else {
+                        // Soft recovery with surface present and past soft window —
+                        // assume healthy; reset so next OUT_OF_DATE starts soft.
+                        surface_recovery_attempts_.store(0, std::memory_order_relaxed);
+                    }
+                    // Already force-painted above.
+                    continue;
                 }
             }
 
-            win->Paint();
+            win->Paint(false);
         }
         else if(item.type==EVENT_SURFACE_CHANGED){
             EmulatorApp* app=static_cast<EmulatorApp*>(ae::g_windowed_app.get());
             AndroidWindow* win=static_cast<AndroidWindow*>(app->emu_window->window());
-            win->UpdateSurface();
+            // Real Android surfaceChanged: always hard rebind + reset attempts.
+            surface_recovery_attempts_.store(0, std::memory_order_relaxed);
+            win->UpdateSurface(true);
+            win->Paint(true);
+        }
+        else if(item.type==EVENT_SURFACE_RECOVERY_RETRY){
+            EmulatorApp* app=static_cast<EmulatorApp*>(ae::g_windowed_app.get());
+            if (!app || !app->emu_window) {
+                continue;
+            }
+            AndroidWindow* win=static_cast<AndroidWindow*>(app->emu_window->window());
+            if (!ae::window) {
+                XELOGW("[SURFACE RECOVERY RETRY] ANativeWindow still null");
+                schedule_surface_recovery_retry();
+                continue;
+            }
+            int attempt = surface_recovery_attempts_.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (attempt > SURFACE_RECOVERY_MAX_ATTEMPTS) {
+                XELOGE("[SURFACE RECOVERY RETRY] Exhausted {} attempts",
+                       SURFACE_RECOVERY_MAX_ATTEMPTS);
+                surface_recovery_attempts_.store(0, std::memory_order_relaxed);
+                continue;
+            }
+            bool hard = attempt > SURFACE_RECOVERY_SOFT_ATTEMPTS;
+            XELOGI("[SURFACE RECOVERY RETRY] attempt {} ({})",
+                   attempt, hard ? "HARD" : "SOFT");
+            last_surface_recovery_ns_.store(
+                std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    std::chrono::steady_clock::now().time_since_epoch()).count(),
+                std::memory_order_relaxed);
+            win->UpdateSurface(hard);
+            win->Paint(true);
+            bool need_retry = !win->HasPresenterSurface() ||
+                              hard ||
+                              attempt <= SURFACE_RECOVERY_SOFT_ATTEMPTS + 1;
+            if (need_retry && attempt < SURFACE_RECOVERY_MAX_ATTEMPTS) {
+                schedule_surface_recovery_retry();
+            } else if (attempt >= SURFACE_RECOVERY_MAX_ATTEMPTS) {
+                XELOGE("[SURFACE RECOVERY RETRY] Exhausted {} attempts",
+                       SURFACE_RECOVERY_MAX_ATTEMPTS);
+                surface_recovery_attempts_.store(0, std::memory_order_relaxed);
+            } else {
+                surface_recovery_attempts_.store(0, std::memory_order_relaxed);
+            }
         }
         else if(item.type==EVENT_QUIT){
             WindowedAppContext::QuitFromUIThread();
@@ -265,8 +358,25 @@ void AndroidWindow::RequestCloseImpl() {
 
 std::unique_ptr<xe::ui::Surface> AndroidWindow::CreateSurfaceImpl(xe::ui::Surface::TypeFlags allowed_types) {
     XELOGI("Creating Android surface...");
+    if (!ae::window) {
+        XELOGW("CreateSurfaceImpl: ae::window is null");
+        return nullptr;
+    }
     if(allowed_types&xe::ui::Surface::kTypeFlag_AndroidNativeWindow) {
         ANativeWindow *window = ae::window;
+        // Ensure the native window has a valid buffer format/size before
+        // vkCreateAndroidSurfaceKHR. Adreno drivers have been observed to hang
+        // or fail silently if the buffer queue was recycled by SurfaceFlinger
+        // without a fresh geometry negotiation.
+        int w = ANativeWindow_getWidth(window);
+        int h = ANativeWindow_getHeight(window);
+        if (w <= 0 || h <= 0) {
+            XELOGW("CreateSurfaceImpl: ANativeWindow has invalid size {}x{}", w, h);
+            return nullptr;
+        }
+        // format 0 keeps the current format; we only reassert size.
+        ANativeWindow_setBuffersGeometry(window, w, h, 0);
+        XELOGI("CreateSurfaceImpl: ANativeWindow {}x{}", w, h);
         return std::make_unique<xe::ui::AndroidNativeWindowSurface>(window);
     }
     return nullptr;
@@ -277,24 +387,60 @@ void AndroidWindow::RequestPaintImpl() {
     static_cast<AndroidWindowedAppContext&>(app_context()).request_paint();
 }
 
-void AndroidWindow::UpdateSurface(){
-    if (ae::window) {
-        int w = ANativeWindow_getWidth(ae::window);
-        int h = ANativeWindow_getHeight(ae::window);
-        if (w > 0 && h > 0) {
-            OnDesiredLogicalSizeUpdate(SizeToLogical(w), SizeToLogical(h));
-            WindowDestructionReceiver destruction_receiver(this);
+void AndroidWindow::UpdateSurface(bool hard_recreate){
+    if (!ae::window) {
+        XELOGW("UpdateSurface: ae::window is null — detaching surface");
+        OnSurfaceChanged(false);
+        return;
+    }
+
+    int w = ANativeWindow_getWidth(ae::window);
+    int h = ANativeWindow_getHeight(ae::window);
+    if (w > 0 && h > 0) {
+        OnDesiredLogicalSizeUpdate(SizeToLogical(w), SizeToLogical(h));
+        WindowDestructionReceiver destruction_receiver(this);
+        // May return false if size is unchanged — common for pure OUT_OF_DATE.
+        bool size_changed =
             OnActualSizeUpdate(uint32_t(w), uint32_t(h), destruction_receiver);
-            if (destruction_receiver.IsWindowDestroyedOrClosed()) {
+        if (destruction_receiver.IsWindowDestroyedOrClosed()) {
+            return;
+        }
+        if (!hard_recreate) {
+            XELOGI("UpdateSurface: SOFT path (size_changed={})", size_changed);
+            if (!HasSurface()) {
+                XELOGI("UpdateSurface: no surface object — escalating to HARD");
+                OnSurfaceChanged(true);
                 return;
             }
+            // Soft reconnect for same-size OUT_OF_DATE:
+            // OnSurfaceResizeFromUIThread asserts paint_mode != kGuestOutput
+            // ThreadImmediately. When size_changed, OnActualSizeUpdate already
+            // called OnSurfaceResize (and it first downgrades kGuest→kUI).
+            // When size is unchanged, we must NOT call OnSurfaceResize while the
+            // guest may still hold kGuestOutputThreadImmediately — Paint(true)
+            // does the safe ownership transfer then reconnects kConnectedOutdated.
+            // Caller always force-paints after UpdateSurface for soft recovery.
+            if (!size_changed) {
+                XELOGI("UpdateSurface: SOFT — defer swapchain recreate to Paint");
+            }
+            return;
+        }
+    } else {
+        XELOGW("UpdateSurface: invalid ANativeWindow size {}x{}", w, h);
+        if (!hard_recreate) {
+            hard_recreate = true;
         }
     }
+
+    // Full rebind: destroy presenter_surface_ (VkSurfaceKHR), recreate from
+    // current ANativeWindow. Required when paint_mode is already kNone /
+    // connection is kUnconnectedRetryAtStateChange (Paint alone cannot recover).
+    XELOGI("UpdateSurface: HARD recreate (OnSurfaceChanged)");
     OnSurfaceChanged(true);
 }
 
-void AndroidWindow::Paint(){
-    OnPaint(false);
+void AndroidWindow::Paint(bool force_paint){
+    OnPaint(force_paint);
 }
 
 std::unique_ptr<xe::ui::Window> xe::ui::Window::Create(WindowedAppContext& app_context,
@@ -349,8 +495,6 @@ bool EmulatorApp::OnInitialize() {
     if (content_root.empty()) {
         content_root = storage_root / "content";
     } else {
-        // If content root isn't an absolute path, then it should be relative to the
-        // storage root.
         if (!content_root.is_absolute()) {
             content_root = storage_root / content_root;
         }
@@ -361,11 +505,7 @@ bool EmulatorApp::OnInitialize() {
     std::filesystem::path cache_root = cvars::cache_root;
     if (cache_root.empty()) {
         cache_root = storage_root / "cache";
-        // TODO(Triang3l): Point to the app's external storage "cache" directory on
-        // Android.
     } else {
-        // If content root isn't an absolute path, then it should be relative to the
-        // storage root.
         if (!cache_root.is_absolute()) {
             cache_root = storage_root / cache_root;
         }
@@ -373,14 +513,11 @@ bool EmulatorApp::OnInitialize() {
     cache_root = std::filesystem::absolute(cache_root);
     XELOGI("Host cache root: {}", cache_root);
 
-    // Create the emulator but don't initialize so we can setup the window.
     emu =
             std::make_unique<xe::Emulator>("", storage_root, content_root, cache_root);
 
-    // Determine window size based on user setting.
     auto res = xe::gpu::GraphicsSystem::GetInternalDisplayResolution();
 
-    // Main emulator display window.
     emu_window = xe::app::EmulatorWindow::Create(emu.get(), app_context(),
                                                  ae::window_width,ae::window_height);
 
@@ -432,7 +569,6 @@ std::vector<std::unique_ptr<xe::hid::InputDriver>> EmulatorApp::create_input_dri
         }
     }
     if (drivers.empty()) {
-        // Fallback to nop if none created.
         drivers.emplace_back(
                 xe::hid::nop::Create(window, xe::app::EmulatorWindow::kZOrderHidInput));
     }
@@ -449,63 +585,30 @@ void EmulatorApp::emu_thr_main() {
     xe::Profiler::ThreadEnter("Emulator");
 
     // [ANDROID PERF] Raise the emulator thread's scheduling priority.
-    // On Android, threads default to nice=0 (SCHED_OTHER). The emulator
-    // thread is the single hottest thread in the process - it runs the
-    // PPC JIT, the kernel, and drives the GPU command processor. Setting
-    // nice=-8 gives it priority over background GC, binder threads, and
-    // UI housekeeping without requiring SCHED_FIFO (which needs CAP_SYS_NICE
-    // and is blocked by Android's SELinux policy for unprivileged apps).
-    // -8 is chosen as a safe value: it's above foreground (-6) but below
-    // audio threads (-16) so audio glitching is avoided if AAudio uses
-    // its own high-priority thread.
-    // We use setpriority directly because xenia's threading::set_priority
-    // tries SCHED_FIFO first (which fails with EPERM on Android) and then
-    // falls back to nice, but logs a warning each time - calling
-    // setpriority directly avoids the warning noise.
     {
         int tid = static_cast<int>(gettid());
         if (setpriority(PRIO_PROCESS, tid, -8) != 0) {
-            // EPERM is expected if the process has already dropped privileges.
-            // Most Android apps can still lower nice to -8 within their
-            // scheduling class via setpriority - the kernel allows up to
-            // RLIMIT_NICE (default -10 on Android).
             XELOGW("Failed to set emulator thread priority: errno={}", errno);
         }
     }
 
     // [ANDROID PERF] Pin the emulator thread to the "big" cores on
-    // big.LITTLE ARM64 SoCs (Snapdragon, Exynos, Dimensity). On a typical
-    // 8-core SoC with 1 prime + 3 big + 4 little (e.g. Cortex-X2 + A710 +
-    // A510), the default scheduler may migrate the emulator thread to
-    // little cores during transient load drops, causing 5-10x slowdown
-    // when the workload ramps back up. By pinning to cores 4-7 (the big +
-    // prime cluster on most Android SoCs), we ensure consistent high-
-    // performance execution. This is a heuristic - if the SoC has a
-    // different topology (e.g. all-big), the affinity mask still works
-    // because sched_setaffinity ignores non-existent CPUs in the mask.
-    // The sysconf(_SC_NPROCESSORS_ONLN) check ensures we don't set bits
-    // for CPUs that don't exist (which would fail with EINVAL).
+    // big.LITTLE ARM64 SoCs.
     {
         int cpu_count = static_cast<int>(sysconf(_SC_NPROCESSORS_ONLN));
         if (cpu_count > 4) {
             cpu_set_t mask;
             CPU_ZERO(&mask);
-            // Pin to cores 4..cpu_count-1 (typically the big/prime cluster).
-            // On 8-core SoCs this is cores 4-7. On 6-core (3+3) it's 3-5.
             for (int i = 4; i < cpu_count; ++i) {
                 CPU_SET(i, &mask);
             }
             int tid = static_cast<int>(gettid());
             if (sched_setaffinity(tid, sizeof(cpu_set_t), &mask) != 0) {
-                // EPERM is possible on some Android versions for unprivileged
-                // apps, but most allow it within the same process.
                 XELOGW("Failed to set emulator thread affinity: errno={}", errno);
             }
         }
     }
 
-    // Setup and initialize all subsystems. If we can't do something
-    // (unsupported system, memory issues, etc) this will fail early.
     xe::X_STATUS result = emu->Setup(
             emu_window->window(), emu_window->imgui_drawer(), true,
             create_audio_system, create_graphics_system, create_input_drivers);
@@ -557,10 +660,6 @@ void EmulatorApp::emu_thr_main() {
             }
         }
 
-        // Some (older?) games try accessing cache:\ too
-        // NOTE: this must be registered _after_ the cache0/cache1 devices, due to
-        // substring/start_with logic inside VirtualFileSystem::ResolvePath, else
-        // accesses to those devices will go here instead
         auto cache_device = std::make_unique<xe::vfs::HostPathDevice>(
                 "\\CACHE", emu->storage_root() / "cache", false);
         if (!cache_device->Initialize()) {
@@ -605,24 +704,6 @@ void EmulatorApp::emu_thr_main() {
         fs->RegisterSymbolicLink("MU:", "\\MU");
     }
 
-// Set a debug handler.
-// This will respond to debugging requests so we can open the debug UI.
-    /*if (cvars::debug) {
-        emulator_->processor()->set_debug_listener_request_handler(
-                [this](xe::cpu::Processor* processor) {
-                    if (debug_window_) {
-                        return debug_window_.get();
-                    }
-                    app_context().CallInUIThreadSynchronous([this]() {
-                        debug_window_ = xe::debug::ui::DebugWindow::Create(emulator_.get(),
-                                                                           app_context());
-                        debug_window_->window()->AddListener(
-                                &debug_window_closed_listener_);
-                    });
-                    // If failed to enqueue the UI thread call, this will just be null.
-                    return debug_window_.get();
-                });
-    }*/
 #if 1
     emu->on_launch.AddListener([&](auto title_id, const auto& game_title) {
         XELOGI("on_launch {}",
@@ -632,23 +713,6 @@ void EmulatorApp::emu_thr_main() {
     });
 #else
     emu->on_launch.AddListener([&](auto title_id, const auto& game_title) {
-        /*nlohmann::json json;
-        if(std::filesystem::exists(g_uri_info_list_file_path)){
-            std::ifstream json_file(g_uri_info_list_file_path);
-            json = nlohmann::json::parse(json_file);
-            json_file.close();
-        }
-        if(!game_title.empty()){
-            nlohmann::json info;
-            info["name"] = game_title;
-
-            json[cvars::target.string()]=info;
-        }
-        std::ofstream json_file(g_uri_info_list_file_path);
-        json_file << json;
-        json_file.close();
-
-        emu_thr_event->Set();*/
     });
 #endif
     emu->on_shader_storage_initialization.AddListener(
@@ -669,11 +733,9 @@ void EmulatorApp::emu_thr_main() {
         XELOGI("Emulator terminated");
     });
 
-    // Enable emulator input now that the emulator is properly loaded.
     app_context().CallInUIThread(
             [this]() { emu_window->OnEmulatorInitialized(); });
 
-    // Grab path from the flag or unnamed argument.
     std::string path;
     if (!cvars::target.empty()) {
         path = cvars::target;
@@ -714,9 +776,6 @@ void EmulatorApp::emu_thr_main() {
                     [this, &file,&data_dir_file]() { return emu->LaunchStfsContainer(std::move(file), std::move(data_dir_file)); });
         }
 
-        /*result = emu->LaunchPath(abs_path);*//*app_context().CallInUIThread(
-                [this, abs_path]() { return emu_window->RunTitle(abs_path); });*/
-
         if (XFAILED(result)) {
             xe::FatalError(fmt::format("Failed to launch target: {:08X}", result));
             app_context().RequestDeferredQuit();
@@ -738,11 +797,6 @@ void EmulatorApp::emu_thr_main() {
         }
     }
 
-    // Now, we're going to use this thread to drive events related to emulation.
-    /*while (!emu_thr_quit_requested.load(std::memory_order_relaxed)) {
-        xe::threading::Wait(emu_thr_event.get(), false);
-        emu->WaitUntilExit();
-    }*/
     while (!emu_thr_quit_requested.load(std::memory_order_relaxed)) {
         xe::threading::Wait(emu_thr_event.get(), false);
         emu->WaitUntilExit();
@@ -771,7 +825,6 @@ namespace ae{
      std::unique_ptr<xe::ui::WindowedApp> g_windowed_app;
      EmulatorApp* g_windowed_app_ref;
 
-    // n->[n]
     static std::array<xe::ui::VirtualKey,24> key_maps={
             xe::ui::VirtualKey::kXInputPadDpadLeft,
             xe::ui::VirtualKey::kXInputPadDpadUp,
@@ -856,16 +909,8 @@ namespace ae{
         return g_windowed_app_ref->emu->is_paused();
     }
     void pause(){
-        //g_windowed_app_ref->emu->Pause();
-        /*g_windowed_app_ref->app_context().CallInUIThread([]{
-            g_windowed_app_ref->emu->Pause();
-        });*/
     }
     void resume(){
-        //g_windowed_app_ref->emu->Resume();
-        /*g_windowed_app_ref->app_context().CallInUIThread([]{
-            g_windowed_app_ref->emu->Resume();
-        });*/
     }
     void quit(){
     }
@@ -874,25 +919,6 @@ namespace ae{
     }
 
     // [ANDROID LOG FLUSH] Flushes the xenia-canary log file to disk.
-    //
-    // The FileLogSink (created in InitializeLogging when --log_file is set)
-    // uses stdio FILE* buffering. On normal exit, ~Logger() calls
-    // ~FileLogSink() which calls fflush+fclose. But if the process is killed
-    // by System.exit(0) (as EmulatorActivity.onDestroy does), the C++ static
-    // destructors may not run, and the last few KB of log data stays in the
-    // FILE* buffer and is lost.
-    //
-    // This function is called from EmulatorActivity.onDestroy BEFORE
-    // captureGameLog() and BEFORE System.exit(0), ensuring the log file has
-    // all flushed data on disk when captureGameLog copies it.
-    //
-    // We use ShutdownLogging() rather than a partial flush because:
-    //   1. It calls ~Logger() which calls ~FileLogSink() on all sinks,
-    //      guaranteeing both fflush AND fclose
-    //   2. After ShutdownLogging, logger_ is null, so any late XELOG* calls
-    //      from other threads are safely dropped (ShouldLog returns false)
-    //   3. The process is about to exit anyway, so we don't need the logger
-    //      anymore
     void flush_log() {
         xe::ShutdownLogging();
     }

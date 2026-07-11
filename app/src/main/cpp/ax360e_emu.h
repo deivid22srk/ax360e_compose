@@ -21,6 +21,9 @@ public:
     static const int EVENT_QUIT = 2;
     static const int EVENT_PAINT = 3;
     static const int EVENT_SURFACE_CHANGED = 4;
+    // Periodic retry after a failed surface recovery (guest can no longer
+    // request paints once paint_mode_ is kNone).
+    static const int EVENT_SURFACE_RECOVERY_RETRY = 5;
 
     std::mutex mutex;
     std::condition_variable cv;
@@ -30,28 +33,25 @@ public:
     // [ANDROID SURFACE RECOVERY] When the guest output thread (GPU Commands
     // thread) detects that the Vulkan surface is outdated (vkAcquireNextImageKHR
     // returns VK_ERROR_OUT_OF_DATE_KHR), it calls window->RequestPaint() to
-    // ask the UI thread to recover. The UI thread then tries to recreate the
-    // swapchain, but if the VkSurface itself is invalid (e.g., the ANativeWindow
-    // was recycled by Android's SurfaceFlinger), the swapchain recreation fails
-    // and the presenter enters kUnconnectedRetryAtStateChange — a stuck state
-    // that only a surface change event can recover from.
+    // ask the UI thread to recover. On Android the VkSurface itself may be
+    // invalid (SurfaceFlinger recycled the ANativeWindow buffer queue), so a
+    // plain swapchain recreate often fails and the presenter enters
+    // kUnconnectedRetryAtStateChange + paint_mode kNone — a permanent freeze
+    // because the guest will no longer request paints once mode is kNone.
     //
-    // On Android, surface change events only come from the Java side
-    // (SurfaceHolder.Callback.surfaceChanged), which is NOT called when the
-    // surface becomes outdated organically (e.g., due to power management,
-    // driver issues, or SurfaceFlinger recycling the surface buffer queue).
-    //
-    // To recover, we detect paint requests from the guest output thread
-    // (by checking the caller's thread ID against the UI thread ID) and
-    // force a full surface recreation via UpdateSurface() before painting.
-    // This destroys the old VkSurface and creates a new one from the current
-    // ANativeWindow, breaking the stuck state.
-    //
-    // A cooldown of 500ms prevents excessive surface recreation if the
-    // recovery itself fails (e.g., if the ANativeWindow is truly gone).
+    // We detect guest-thread paint requests and force a carefully ordered
+    // recovery on the UI thread. If recovery fails, we keep retrying on a
+    // timer instead of giving up permanently.
     std::atomic<bool> paint_from_guest_thread_{false};
     std::atomic<int64_t> last_surface_recovery_ns_{0};
-    static constexpr int64_t SURFACE_RECOVERY_COOLDOWN_NS = 500'000'000LL; // 500ms
+    std::atomic<int> surface_recovery_attempts_{0};
+    std::atomic<bool> surface_recovery_retry_scheduled_{false};
+    // Soft recovery first (reconnect / recreate swapchain only). After a few
+    // soft failures, escalate to full VkSurface + ANativeWindow rebind.
+    static constexpr int64_t SURFACE_RECOVERY_COOLDOWN_NS = 250'000'000LL; // 250ms
+    static constexpr int64_t SURFACE_RECOVERY_RETRY_NS = 500'000'000LL;    // 500ms
+    static constexpr int SURFACE_RECOVERY_SOFT_ATTEMPTS = 2;
+    static constexpr int SURFACE_RECOVERY_MAX_ATTEMPTS = 12;
 
     void NotifyUILoopOfPendingFunctions() override;
 
@@ -62,6 +62,8 @@ public:
     void request_paint();
 
     void request_surface_changed();
+
+    void schedule_surface_recovery_retry();
 
     void main_loop();
 
@@ -83,8 +85,13 @@ protected:
     void RequestPaintImpl() override;
 
 public:
-    void UpdateSurface();
-    void Paint();
+    // Soft: size update + OnSurfaceResize (swapchain recreate, same VkSurface).
+    // Hard: full OnSurfaceChanged (destroy VkSurface, new AndroidNativeWindowSurface).
+    void UpdateSurface(bool hard_recreate = true);
+    void Paint(bool force_paint = false);
+
+    // Returns true if the presenter currently has a surface object attached.
+    bool HasPresenterSurface() const { return HasSurface(); }
 };
 
 class android_menu_item final : public xe::ui::MenuItem {

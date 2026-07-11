@@ -387,7 +387,7 @@ widescreen = true                                 	# Toggles between 16:9 and 4:
 [Vulkan]
 adrenotools_force_max_clocks = false              	# Custom Driver Force Max Clocks
 vulkan_allow_present_mode_fifo_relaxed = true     	# When available, allow the relaxed first-in-first-out presentation mode (3rd priority), which causes waiting for host display vertical sync, but may present with tearing if frames don't meet the host display refresh rate.
-vulkan_allow_present_mode_immediate = true        	# When available, allow the immediate presentation mode (1st priority), offering the lowest latency with the possibility of tearing in certain cases, and, depending on the configuration, variable refresh rate.
+vulkan_allow_present_mode_immediate = false        	# When available, allow the immediate presentation mode (1st priority), offering the lowest latency with the possibility of tearing in certain cases, and, depending on the configuration, variable refresh rate.
 vulkan_allow_present_mode_mailbox = true          	# When available, allow the mailbox presentation mode (2nd priority), offering low latency without the possibility of tearing.
 vulkan_device = -1                                	# Index of the preferred Vulkan physical device, or -1 to use any compatible device.
 vulkan_lib_path = ""                              	# Custom Driver Library Path

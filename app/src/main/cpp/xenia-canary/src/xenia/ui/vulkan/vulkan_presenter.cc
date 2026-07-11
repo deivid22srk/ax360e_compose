@@ -1221,6 +1221,29 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
   // interfering with GPU command processing, and also to allow tearing so
   // variable refresh rate may be used where it's available.
   // Note: If the priorities here are changes, update the cvar descriptions.
+  //
+  // [ANDROID] Prefer MAILBOX then FIFO over IMMEDIATE. IMMEDIATE on Adreno +
+  // SurfaceFlinger frequently returns OUT_OF_DATE / SUBOPTIMAL as soon as the
+  // buffer queue is recycled, which is what freezes Forza Horizon mid-load on
+  // ax360e. MAILBOX still gives low latency without the same WSI thrashing.
+#if XE_PLATFORM_ANDROID || XE_PLATFORM_AX360E
+  if (cvars::vulkan_allow_present_mode_mailbox &&
+      std::find(present_modes.cbegin(), present_modes.cend(),
+                VK_PRESENT_MODE_MAILBOX_KHR) != present_modes.cend()) {
+    swapchain_create_info.presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+  } else if (cvars::vulkan_allow_present_mode_fifo_relaxed &&
+             std::find(present_modes.cbegin(), present_modes.cend(),
+                       VK_PRESENT_MODE_FIFO_RELAXED_KHR) !=
+                 present_modes.cend()) {
+    swapchain_create_info.presentMode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+  } else if (cvars::vulkan_allow_present_mode_immediate &&
+             std::find(present_modes.cbegin(), present_modes.cend(),
+                       VK_PRESENT_MODE_IMMEDIATE_KHR) != present_modes.cend()) {
+    swapchain_create_info.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+  } else {
+    swapchain_create_info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+  }
+#else
   if (cvars::vulkan_allow_present_mode_immediate &&
       std::find(present_modes.cbegin(), present_modes.cend(),
                 VK_PRESENT_MODE_IMMEDIATE_KHR) != present_modes.cend()) {
@@ -1244,6 +1267,7 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
     // Highest latency (but always guaranteed to be available).
     swapchain_create_info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
   }
+#endif
   swapchain_create_info.clipped = VK_TRUE;
   swapchain_create_info.oldSwapchain = old_swapchain;
   VkSwapchainKHR swapchain;
@@ -1273,6 +1297,15 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
 VkSwapchainKHR VulkanPresenter::PaintContext::PrepareForSwapchainRetirement() {
   if (swapchain != VK_NULL_HANDLE) {
     submission_tracker.AwaitAllSubmissionsCompletion();
+#if XE_PLATFORM_ANDROID || XE_PLATFORM_AX360E
+    // Adreno: after OUT_OF_DATE / SURFACE_LOST, pending presents may leave the
+    // WSI layer in a state where destroy+recreate of VkSurface hangs. A full
+    // device idle is the most reliable way to drain the present queue before
+    // tearing down the swapchain / surface.
+    if (vulkan_device) {
+      vulkan_device->functions().vkDeviceWaitIdle(vulkan_device->device());
+    }
+#endif
   }
   const VulkanDevice::Functions& dfn = vulkan_device->functions();
   const VkDevice device = vulkan_device->device();
@@ -1420,8 +1453,17 @@ Presenter::PaintResult VulkanPresenter::PaintAndPresentImpl(
 
   VkSemaphore acquire_semaphore = paint_submission.acquire_semaphore();
   uint32_t swapchain_image_index;
+  // [ANDROID] Never use UINT64_MAX on Android/Adreno: if SurfaceFlinger has
+  // recycled the buffer queue, an infinite wait freezes the GPU Commands
+  // thread forever (game stuck on last frame). Use a 1s timeout and treat
+  // TIMEOUT as outdated so the UI thread can recover the surface.
+#if XE_PLATFORM_ANDROID || XE_PLATFORM_AX360E
+  constexpr uint64_t kAcquireTimeoutNs = 1'000'000'000ull;  // 1 second
+#else
+  constexpr uint64_t kAcquireTimeoutNs = UINT64_MAX;
+#endif
   VkResult acquire_result = dfn.vkAcquireNextImageKHR(
-      device, paint_context_.swapchain, UINT64_MAX, acquire_semaphore,
+      device, paint_context_.swapchain, kAcquireTimeoutNs, acquire_semaphore,
       VK_NULL_HANDLE, &swapchain_image_index);
   switch (acquire_result) {
     case VK_SUCCESS:
@@ -1432,6 +1474,13 @@ Presenter::PaintResult VulkanPresenter::PaintAndPresentImpl(
           "VulkanPresenter: Failed to acquire the swapchain image as the "
           "device has been lost");
       return PaintResult::kGpuLostResponsible;
+    case VK_TIMEOUT:
+      // Timed out waiting for a free swapchain image — treat as outdated so
+      // recovery can recreate the swapchain/surface rather than hanging.
+      XELOGW(
+          "VulkanPresenter: Timed out acquiring swapchain image — treating as "
+          "outdated surface for recovery");
+      return PaintResult::kNotPresentedConnectionOutdated;
     case VK_ERROR_OUT_OF_DATE_KHR:
     case VK_ERROR_SURFACE_LOST_KHR:
     case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT:
