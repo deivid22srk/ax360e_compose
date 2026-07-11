@@ -107,6 +107,7 @@ class Exception {
     kInvalidException = 0,
     kAccessViolation,
     kIllegalInstruction,
+    kBreakpoint,  // [SIGTRAP fix] BRK #imm in JIT-generated code
   };
 
   enum class AccessViolationOperation {
@@ -127,6 +128,19 @@ class Exception {
     code_ = Code::kIllegalInstruction;
     thread_context_ = thread_context;
   }
+  // [SIGTRAP fix] Initialize as a breakpoint exception (BRK #imm in JIT code).
+  // The trap_type is the immediate value of the BRK instruction, which
+  // identifies the kind of trap (e.g., 0xF000 = DebugBreak/UnimplementedInstr,
+  // user-defined trap types from PPC tw/twi instructions).
+  void InitializeBreakpoint(HostThreadContext* thread_context,
+                            uint16_t trap_type) {
+    code_ = Code::kBreakpoint;
+    thread_context_ = thread_context;
+    trap_type_ = trap_type;
+  }
+
+  // [SIGTRAP fix] Returns the BRK immediate (trap type) for kBreakpoint.
+  uint16_t trap_type() const { return trap_type_; }
 
   Code code() const { return code_; }
 
@@ -214,6 +228,7 @@ class Exception {
   uint64_t fault_address_ = 0;
   AccessViolationOperation access_violation_operation_ =
       AccessViolationOperation::kUnknown;
+  uint16_t trap_type_ = 0;  // [SIGTRAP fix] BRK immediate for kBreakpoint
 };
 
 class ExceptionHandler {

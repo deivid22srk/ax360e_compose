@@ -23,6 +23,7 @@ namespace xe {
 bool signal_handlers_installed_ = false;
 struct sigaction original_sigill_handler_;
 struct sigaction original_sigsegv_handler_;
+struct sigaction original_sigtrap_handler_;  // [SIGTRAP fix]
 
 // This can be as large as needed, but isn't often needed.
 // As we will be sometimes firing many exceptions we want to avoid having to
@@ -105,7 +106,6 @@ static void ExceptionHandlerCallback(int signal_number, siginfo_t* signal_info,
       break;
     case SIGSEGV: {
       Exception::AccessViolationOperation access_violation_operation;
-#if XE_ARCH_AMD64
       // x86_pf_error_code::X86_PF_WRITE
       constexpr uint64_t kX86PageFaultErrorCodeWrite = UINT64_C(1) << 1;
       access_violation_operation =
@@ -154,6 +154,22 @@ static void ExceptionHandlerCallback(int signal_number, siginfo_t* signal_info,
       ex.InitializeAccessViolation(
           &thread_context, reinterpret_cast<uint64_t>(signal_info->si_addr),
           access_violation_operation);
+    } break;
+    case SIGTRAP: {
+      // [SIGTRAP fix] BRK #imm in JIT-generated code generates SIGTRAP with
+      // TRAP_BRKPT. Extract the BRK immediate (trap type) from the faulting
+      // instruction. ARM64 BRK #imm16 encoding: 0xD4200000 | (imm16 << 5).
+      uint16_t trap_type = 0;
+      uint32_t instruction = 0;
+      // On ARM64, the PC in the signal context points to the BRK instruction.
+      // Reading it is safe because it's in our JIT code cache.
+#if XE_ARCH_ARM64
+      instruction = xe::load<uint32_t>(reinterpret_cast<void*>(mcontext.pc));
+      if ((instruction & 0xFFE0001F) == 0xD4200000) {
+        trap_type = static_cast<uint16_t>((instruction >> 5) & 0xFFFF);
+      }
+#endif  // XE_ARCH
+      ex.InitializeBreakpoint(&thread_context, trap_type);
     } break;
     default:
       assert_unhandled_case(signal_number);
@@ -237,6 +253,14 @@ void ExceptionHandler::Install(Handler fn, void* data) {
     if (sigaction(SIGSEGV, &signal_handler, &original_sigsegv_handler_) != 0) {
       assert_always("Failed to install new SIGSEGV handler");
     }
+    // [SIGTRAP fix] Install SIGTRAP handler so BRK #imm instructions emitted
+    // by the JIT (for unimplemented instructions, trap instructions, and
+    // debug breaks) are caught by our exception handler instead of crashing
+    // the process. Without this, any BRK in JIT code kills the app with
+    // SIGTRAP/TRAP_BRKPT — see Forza Horizon 2 crash at ~111s.
+    if (sigaction(SIGTRAP, &signal_handler, &original_sigtrap_handler_) != 0) {
+      assert_always("Failed to install new SIGTRAP handler");
+    }
     signal_handlers_installed_ = true;
   }
 
@@ -276,6 +300,10 @@ void ExceptionHandler::Uninstall(Handler fn, void* data) {
       }
       if (sigaction(SIGSEGV, &original_sigsegv_handler_, NULL) != 0) {
         assert_always("Failed to restore original SIGSEGV handler");
+      }
+      // [SIGTRAP fix] Restore original SIGTRAP handler too.
+      if (sigaction(SIGTRAP, &original_sigtrap_handler_, NULL) != 0) {
+        assert_always("Failed to restore original SIGTRAP handler");
       }
       signal_handlers_installed_ = false;
     }

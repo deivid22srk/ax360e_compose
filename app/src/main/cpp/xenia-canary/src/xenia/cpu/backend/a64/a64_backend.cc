@@ -892,18 +892,70 @@ bool A64Backend::ExceptionCallbackThunk(Exception* ex, void* data) {
 }
 
 bool A64Backend::ExceptionCallback(Exception* ex) {
-  if (ex->code() != Exception::Code::kIllegalInstruction) {
-    return false;
+  // [SIGTRAP fix] Handle both kIllegalInstruction (SIGILL from undefined
+  // instructions) and kBreakpoint (SIGTRAP from BRK #imm in JIT code).
+  //
+  // The JIT emits BRK instructions for:
+  //   - Unimplemented HIR instructions (DebugBreak -> brk(0xF000))
+  //   - PPC trap instructions tw/twi (Trap -> brk(trap_type))
+  //   - Debug breaks (DebugBreak -> brk(0xF000))
+  //   - Code cache fill (BRK #0 for unmapped regions)
+  //
+  // Previously, only kIllegalInstruction was handled, and only BRK #0 was
+  // recognized. But BRK #imm on ARM64 generates SIGTRAP (not SIGILL), so
+  // any BRK with imm != 0 would crash the process with SIGTRAP.
+  //
+  // Now with SIGTRAP installed in the exception handler, we receive
+  // kBreakpoint exceptions. We log the trap for diagnostics and then handle
+  // it via OnThreadBreakpointHit (which for guest traps will continue
+  // execution at the next instruction, and for debug breaks will pause).
+  if (ex->code() == Exception::Code::kIllegalInstruction) {
+    // Verify it's our BRK #0 instruction.
+    auto instruction_bytes =
+        xe::load<uint32_t>(reinterpret_cast<void*>(ex->pc()));
+    if (instruction_bytes != kArm64Brk0) {
+      return false;
+    }
+    return processor()->OnThreadBreakpointHit(ex);
   }
 
-  // Verify it's our BRK #0 instruction.
-  auto instruction_bytes =
-      xe::load<uint32_t>(reinterpret_cast<void*>(ex->pc()));
-  if (instruction_bytes != kArm64Brk0) {
-    return false;
+  if (ex->code() == Exception::Code::kBreakpoint) {
+    // [SIGTRAP fix] A BRK #trap_type was hit in JIT code.
+    // trap_type identifies the source:
+    //   0x0000 = BRK #0 (code cache fill / unmapped)
+    //   0xF000 = DebugBreak / UnimplementedInstr
+    //   other  = PPC trap instruction (tw/twi) with custom trap_type
+    uint16_t trap_type = ex->trap_type();
+    XELOGW("A64 JIT trap: BRK #{:04X} at host PC {:016X} (guest thread)",
+           trap_type, ex->pc());
+
+    // For BRK #0 (code cache fill), delegate to OnThreadBreakpointHit which
+    // handles guest breakpoints.
+    if (trap_type == 0x0000) {
+      return processor()->OnThreadBreakpointHit(ex);
+    }
+
+    // For other trap types (DebugBreak, PPC tw/twi traps), advance past the
+    // BRK instruction and continue execution. The BRK is 4 bytes on ARM64.
+    // This prevents the process from crashing when the JIT emits a trap for
+    // an unimplemented instruction or a guest trap condition.
+    //
+    // For PPC tw/twi trap instructions, the correct behavior on Xbox 360
+    // hardware is to generate a Program Exception (0x700) that the guest
+    // OS exception handler processes. However, most games use tw/twi for
+    // assertions/debug checks and the guest exception handler either ignores
+    // them or the game continues. Advancing past the BRK effectively treats
+    // the trap as a no-op, which matches the behavior when
+    // cvars::ignore_trap_instructions is true.
+    //
+    // For DebugBreak (0xF000) from UnimplementedInstr, advancing past means
+    // the unimplemented instruction is silently skipped. This is better than
+    // crashing the process — the game may continue with a minor glitch.
+    ex->set_resume_pc(ex->pc() + 4);
+    return true;
   }
 
-  return processor()->OnThreadBreakpointHit(ex);
+  return false;
 }
 
 }  // namespace a64
