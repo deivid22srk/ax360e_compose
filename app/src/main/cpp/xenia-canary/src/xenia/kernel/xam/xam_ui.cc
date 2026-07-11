@@ -1060,6 +1060,89 @@ dword_result_t XamShowEditProfileUI_entry(dword_t user_index) {
 }
 DECLARE_XAM_EXPORT1(XamShowEditProfileUI, kUserProfiles, kImplemented);
 
+// [XAM UI STUBS] These UI functions show social/system dialogs on Xbox 360.
+// Without a full Xbox UI implementation, we return success or show a simple
+// ImGui message box. The game continues normally.
+
+// XamShowFriendsUI (ordinal 0x413)
+dword_result_t XamShowFriendsUI_entry(dword_t user_index,
+                                       pointer_t<XAM_OVERLAPPED> overlapped) {
+  if (cvars::headless) return X_ERROR_SUCCESS;
+  const Emulator* emulator = kernel_state()->emulator();
+  ui::ImGuiDrawer* imgui_drawer = emulator->imgui_drawer();
+  if (imgui_drawer) {
+    xe::threading::Fence fence;
+    if (emulator->display_window()->app_context().CallInUIThreadSynchronous(
+            [&]() {
+              xe::ui::ImGuiDialog::ShowMessageBox(
+                  imgui_drawer, "Friends",
+                  "Friends list is not available in the emulator.")
+                  ->Then(&fence);
+            })) {
+      kernel_state()->xam_state()->xam_dialogs_shown_++;
+      fence.Wait();
+      kernel_state()->xam_state()->xam_dialogs_shown_--;
+    }
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamShowFriendsUI, kUI, kStub);
+
+// XamShowGameInviteUI (ordinal 0x414)
+dword_result_t XamShowGameInviteUI_entry(
+    dword_t user_index, lpvoid_t invite_data, dword_t invite_data_size,
+    pointer_t<XAM_OVERLAPPED> overlapped) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamShowGameInviteUI, kUI, kStub);
+
+// XamShowGamerCardUIForXUID (ordinal 0x415)
+dword_result_t XamShowGamerCardUIForXUID_entry(
+    dword_t user_index, qword_t xuid,
+    pointer_t<XAM_OVERLAPPED> overlapped) {
+  if (cvars::headless) return X_ERROR_SUCCESS;
+  const Emulator* emulator = kernel_state()->emulator();
+  ui::ImGuiDrawer* imgui_drawer = emulator->imgui_drawer();
+  if (imgui_drawer) {
+    xe::threading::Fence fence;
+    if (emulator->display_window()->app_context().CallInUIThreadSynchronous(
+            [&]() {
+              xe::ui::ImGuiDialog::ShowMessageBox(
+                  imgui_drawer, "Gamer Card",
+                  "Gamer card is not available in the emulator.")
+                  ->Then(&fence);
+            })) {
+      kernel_state()->xam_state()->xam_dialogs_shown_++;
+      fence.Wait();
+      kernel_state()->xam_state()->xam_dialogs_shown_--;
+    }
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamShowGamerCardUIForXUID, kUI, kStub);
+
+// XamShowPlayersUI (ordinal 0x416)
+dword_result_t XamShowPlayersUI_entry(dword_t user_index,
+                                       pointer_t<XAM_OVERLAPPED> overlapped) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamShowPlayersUI, kUI, kStub);
+
+// XamShowNuiMessageBoxUI (ordinal 0x477)
+dword_result_t XamShowNuiMessageBoxUI_entry(
+    dword_t user_index, lpu16string_t title, lpu16string_t text,
+    dword_t flags, pointer_t<XAM_OVERLAPPED> overlapped) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamShowNuiMessageBoxUI, kUI, kStub);
+
+// XamShowNuiDeviceSelectorUI (ordinal 0x470)
+dword_result_t XamShowNuiDeviceSelectorUI_entry(
+    dword_t user_index, pointer_t<XAM_OVERLAPPED> overlapped) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamShowNuiDeviceSelectorUI, kUI, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

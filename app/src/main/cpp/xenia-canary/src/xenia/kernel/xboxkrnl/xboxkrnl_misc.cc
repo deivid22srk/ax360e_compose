@@ -7,6 +7,8 @@
  ******************************************************************************
  */
 
+#include <cstring>
+
 #include "xenia/kernel/util/shim_utils.h"
 #include "xenia/kernel/xboxkrnl/xboxkrnl_private.h"
 #include "xenia/kernel/xthread.h"
@@ -162,6 +164,108 @@ dword_result_t EtxConsumerFlushBuffers_entry(unknown_t unk1) {
   return X_STATUS_SUCCESS;
 }
 DECLARE_XBOXKRNL_EXPORT1(EtxConsumerFlushBuffers, kNone, kStub);
+
+// __C_specific_handler (ordinal 0x147)
+// C exception handler used by SEH (Structured Exception Handling) on Xbox 360.
+// This is called when a C exception occurs in a function with a try/except
+// block. The handler walks the scope table and calls the appropriate filter
+// or handler.
+//
+// Full implementation requires walking the guest's scope table and executing
+// PPC filter/handler functions, which is complex. For now, return
+// ExceptionContinueSearch (0) to let other handlers process the exception.
+dword_result_t __C_specific_handler_entry(
+    pointer_t<uint8_t> exception_pointers,
+    pointer_t<uint8_t> frame_pointer,
+    pointer_t<uint8_t> context,
+    lpvoid_t dispatcher) {
+  return 0;  // ExceptionContinueSearch
+}
+DECLARE_XBOXKRNL_EXPORT1(__C_specific_handler, kNone, kStub);
+
+// RtlCaptureContext (ordinal 0x119)
+// Captures the current thread's context (registers) into a CONTEXT structure.
+// On Xbox 360, this captures the PPC register file.
+//
+// We capture the PPC context that Xenia already maintains.
+void RtlCaptureContext_entry(pointer_t<uint8_t> context_ptr,
+                             const ppc_context_t& ctx) {
+  if (!context_ptr) return;
+  // Zero the context structure first
+  std::memset(context_ptr, 0, 0x300);  // X_CONTEXT is ~768 bytes
+  // Copy GPRs (r0-r31 = 32 * 4 = 128 bytes)
+  uint8_t* ptr = context_ptr;
+  // Offset 0x80 = GPRs in X_CONTEXT (Windows layout approximation)
+  for (int i = 0; i < 32; ++i) {
+    xe::store_and_swap<uint32_t>(ptr + 0x80 + i * 4, uint32_t(ctx->r[i]));
+  }
+  // Offset 0x100 = CR
+  xe::store_and_swap<uint32_t>(ptr + 0x100, uint32_t(ctx->cr));
+  // Offset 0x108 = LR
+  xe::store_and_swap<uint32_t>(ptr + 0x108, ctx->lr);
+  // Offset 0x110 = CTR
+  xe::store_and_swap<uint32_t>(ptr + 0x110, ctx->ctr);
+  // Offset 0x118 = XER
+  xe::store_and_swap<uint32_t>(ptr + 0x118, ctx->xer);
+  // NIP (PC) at offset 0x120
+  xe::store_and_swap<uint32_t>(ptr + 0x120, ctx->pc);
+}
+DECLARE_XBOXKRNL_EXPORT1(RtlCaptureContext, kNone, kImplemented);
+
+// RtlUnwind (ordinal 0x136)
+// Unwinds the stack to a target frame, calling exception handlers along the
+// way. Full implementation requires walking the PPC stack and executing
+// guest handler functions. For now, this is a no-op stub.
+void RtlUnwind_entry(pointer_t<uint8_t> target_frame,
+                     lpvoid_t target_ip,
+                     pointer_t<uint8_t> exception_record,
+                     dword_t return_value,
+                     const ppc_context_t& ctx) {
+  // No-op: stack unwinding is handled by the JIT's exception mechanism
+}
+DECLARE_XBOXKRNL_EXPORT1(RtlUnwind, kNone, kStub);
+
+// ObIsTitleObject (ordinal 0x69)
+// Checks whether a handle refers to a title (user) object rather than a
+// system object. Return true (1) to allow the guest to proceed.
+dword_result_t ObIsTitleObject_entry(dword_t handle) {
+  return 1;
+}
+DECLARE_XBOXKRNL_EXPORT1(ObIsTitleObject, kNone, kStub);
+
+// PsCamDeviceRequest (ordinal 0x30D)
+// Sends a request to the PlayStation Camera device (used by Kinect games).
+// Without camera hardware, return error.
+dword_result_t PsCamDeviceRequest_entry(pointer_t<uint8_t> request) {
+  return X_E_DEVICE_NOT_CONNECTED;
+}
+DECLARE_XBOXKRNL_EXPORT1(PsCamDeviceRequest, kNone, kStub);
+
+// LDI (Lempel-Dependent-Integer) decompression — used by some games for
+// texture/data decompression. These are compressed data decompression APIs.
+// Without a full LDI implementation, return error.
+
+// LDICreateDecompression (ordinal 0xB6)
+dword_result_t LDICreateDecompression_entry(
+    lpdword_t context, dword_t flags, lpvoid_t callback) {
+  return X_STATUS_NOT_IMPLEMENTED;
+}
+DECLARE_XBOXKRNL_EXPORT1(LDICreateDecompression, kNone, kStub);
+
+// LDIDecompress (ordinal 0xB7)
+dword_result_t LDIDecompress_entry(
+    dword_t context, pointer_t<uint8_t> dst, dword_t dst_size,
+    pointer_t<uint8_t> src, dword_t src_size, lpdword_t dst_used,
+    lpdword_t src_used) {
+  return X_STATUS_NOT_IMPLEMENTED;
+}
+DECLARE_XBOXKRNL_EXPORT1(LDIDecompress, kNone, kStub);
+
+// LDIDestroyDecompression (ordinal 0xB8)
+dword_result_t LDIDestroyDecompression_entry(dword_t context) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(LDIDestroyDecompression, kNone, kStub);
 
 }  // namespace xboxkrnl
 }  // namespace kernel

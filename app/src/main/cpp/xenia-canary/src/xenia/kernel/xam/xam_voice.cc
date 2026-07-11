@@ -60,6 +60,28 @@ dword_result_t XamVoiceSetMicArrayIdleUsers_entry(dword_t idle_mask) {
 }
 DECLARE_XAM_EXPORT1(XamVoiceSetMicArrayIdleUsers, kNone, kStub);
 
+// XamVoiceGetMicArrayAudioEx (ordinal 0x4xx)
+// Gets mic array audio data. Without voice hardware, return no data.
+dword_result_t XamVoiceGetMicArrayAudioEx_entry(
+    dword_t voice_handle, pointer_t<uint8_t> buffer, dword_t buffer_size,
+    lpdword_t bytes_returned) {
+  if (bytes_returned) {
+    *bytes_returned = 0;
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamVoiceGetMicArrayAudioEx, kNone, kStub);
+
+// XamVoiceGetMicArrayUnderrunStatus (ordinal 0x4xx)
+dword_result_t XamVoiceGetMicArrayUnderrunStatus_entry(dword_t voice_handle,
+                                                         lpdword_t status_out) {
+  if (status_out) {
+    *status_out = 0;  // no underrun
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamVoiceGetMicArrayUnderrunStatus, kNone, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

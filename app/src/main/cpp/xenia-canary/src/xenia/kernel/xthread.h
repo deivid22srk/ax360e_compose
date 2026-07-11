@@ -257,6 +257,16 @@ struct X_KTIMER {
 };
 static_assert_size(X_KTIMER, 0x28);
 
+// KMUTANT (kernel mutant / mutex) — used by KeInitializeMutant/KeReleaseMutant.
+// Layout based on Windows KMUTANT structure.
+struct X_KMUTANT {
+  X_DISPATCH_HEADER header;            // 0x0
+  xe::be<uint32_t> owner_thread;       // 0x10
+  xe::be<uint16_t> abandoned;          // 0x14
+  xe::be<uint16_t> acquisition_count;  // 0x16
+};
+static_assert_size(X_KMUTANT, 0x18);
+
 struct X_KTHREAD {
   X_DISPATCH_HEADER header;          // 0x0
   xe::be<uint32_t> unk_10;           // 0x10

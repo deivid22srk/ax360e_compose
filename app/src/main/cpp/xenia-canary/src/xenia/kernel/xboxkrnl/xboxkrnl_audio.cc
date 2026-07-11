@@ -7,6 +7,8 @@
  ******************************************************************************
  */
 
+#include <cstring>
+
 #include "xenia/apu/audio_system.h"
 #include "xenia/emulator.h"
 #include "xenia/kernel/kernel_state.h"
@@ -105,6 +107,76 @@ dword_result_t XAudioSubmitRenderDriverFrame_entry(lpunknown_t driver_ptr,
 }
 DECLARE_XBOXKRNL_EXPORT2(XAudioSubmitRenderDriverFrame, kAudio, kImplemented,
                          kHighFrequency);
+
+// [AUDIO RENDER DRIVER + DUCKER STUBS]
+//
+// These functions are part of the XAudio render driver API, used for
+// low-level audio processing (MEC = Multi-Effect Client, ducker = automatic
+// volume reduction during voice chat). Without a full render driver
+// implementation, return success or sensible defaults.
+
+// XAudioGetDuckerLevel (ordinal 0x350)
+// Returns the current ducker level (0-100). Return 0 (no ducking).
+dword_result_t XAudioGetDuckerLevel_entry(dword_t user_index) {
+  return 0;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioGetDuckerLevel, kAudio, kStub);
+
+// XAudioGetDuckerReleaseTime (ordinal 0x355)
+dword_result_t XAudioGetDuckerReleaseTime_entry(dword_t user_index) {
+  return 0;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioGetDuckerReleaseTime, kAudio, kStub);
+
+// XAudioGetDuckerAttackTime (ordinal 0x353)
+dword_result_t XAudioGetDuckerAttackTime_entry(dword_t user_index) {
+  return 0;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioGetDuckerAttackTime, kAudio, kStub);
+
+// XAudioGetDuckerHoldTime (ordinal 0x357)
+dword_result_t XAudioGetDuckerHoldTime_entry(dword_t user_index) {
+  return 0;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioGetDuckerHoldTime, kAudio, kStub);
+
+// XAudioGetDuckerThreshold (ordinal 0x351)
+dword_result_t XAudioGetDuckerThreshold_entry(dword_t user_index) {
+  return 0;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioGetDuckerThreshold, kAudio, kStub);
+
+// XAudioRegisterRenderDriverMECClient (ordinal 0x358)
+// Registers a Multi-Effect Client with the render driver.
+dword_result_t XAudioRegisterRenderDriverMECClient_entry(
+    dword_t unk1, dword_t unk2, dword_t unk3) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioRegisterRenderDriverMECClient, kAudio, kStub);
+
+// XAudioUnregisterRenderDriverMECClient (ordinal 0x359)
+dword_result_t XAudioUnregisterRenderDriverMECClient_entry(dword_t unk1) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioUnregisterRenderDriverMECClient, kAudio, kStub);
+
+// XAudioGetRenderDriverTic (ordinal 0x35A)
+// Returns the render driver's tick count (audio clock).
+qword_result_t XAudioGetRenderDriverTic_entry() {
+  return 0;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioGetRenderDriverTic, kAudio, kStub);
+
+// XAudioCaptureRenderDriverFrame (ordinal 0x35B)
+// Captures a frame from the render driver. Return success with no data.
+dword_result_t XAudioCaptureRenderDriverFrame_entry(
+    dword_t unk1, pointer_t<uint8_t> buffer, dword_t buffer_size) {
+  if (buffer) {
+    std::memset(buffer, 0, buffer_size);
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(XAudioCaptureRenderDriverFrame, kAudio, kStub);
 
 }  // namespace xboxkrnl
 }  // namespace kernel

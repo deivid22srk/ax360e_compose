@@ -1918,6 +1918,88 @@ void KeInitializeTimerEx_entry(pointer_t<X_KTIMER> timer, dword_t type,
 }
 DECLARE_XBOXKRNL_EXPORT1(KeInitializeTimerEx, kThreading, kImplemented);
 
+// KeInitializeMutant (ordinal 0x72)
+// Initializes a kernel mutant (mutex) object. This is the kernel-level
+// initialization (NtCreateMutant is the higher-level wrapper). We create
+// an XMutant and store its handle in the mutant struct's header.
+dword_result_t KeInitializeMutant_entry(pointer_t<X_KMUTANT> mutant_ptr,
+                                        dword_t initial_owner,
+                                        const ppc_context_t& context) {
+  mutant_ptr.Zero();
+  // Dispatcher header: type = Mutant (2)
+  mutant_ptr->header.type = 2;
+  mutant_ptr->header.signal_state = initial_owner ? 0 : 1;
+  mutant_ptr->header.inserted = 1;
+  util::XeInitializeListHead(&mutant_ptr->header.wait_list, context);
+  mutant_ptr->abandoned = 0;
+  mutant_ptr->owner_thread = 0;
+  if (initial_owner) {
+    mutant_ptr->acquisition_count = 1;
+  } else {
+    mutant_ptr->acquisition_count = 0;
+  }
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(KeInitializeMutant, kThreading, kImplemented);
+
+// KeReleaseMutant (ordinal 0x87)
+// Releases a kernel mutant. Similar to NtReleaseMutant but operates on the
+// kernel object directly.
+dword_result_t KeReleaseMutant_entry(pointer_t<X_KMUTANT> mutant_ptr,
+                                     dword_t increment, dword_t abandon,
+                                     dword_t wait) {
+  if (!mutant_ptr) {
+    return X_STATUS_INVALID_PARAMETER_1;
+  }
+  // If the mutant is signaled (signal_state > 0), releasing it is a no-op
+  // (it's already available). Otherwise, increment the signal state.
+  if (mutant_ptr->header.signal_state < 0) {
+    mutant_ptr->header.signal_state++;
+  } else {
+    mutant_ptr->header.signal_state = 1;
+  }
+  // Clear owner thread
+  mutant_ptr->owner_thread = 0;
+  mutant_ptr->acquisition_count = 0;
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(KeReleaseMutant, kThreading, kImplemented);
+
+// KeSetTimer (ordinal 0xA6)
+// Sets a kernel timer to expire at the specified due time. This is the simple
+// version (no DPC). KeSetTimerEx (ordinal 0xA7) is already implemented and
+// includes a period. KeSetTimer is equivalent to KeSetTimerEx with period=0.
+dword_result_t KeSetTimer_entry(pointer_t<X_KTIMER> timer,
+                                qword_t due_time, lpvoid_t dpc,
+                                const ppc_context_t& context) {
+  if (!timer) {
+    return X_STATUS_INVALID_PARAMETER_1;
+  }
+  timer->header.inserted = 1;
+  timer->due_time = due_time;
+  timer->period = 0;  // KeSetTimer = KeSetTimerEx with no period
+  // Signal the timer immediately (we don't have a real timer queue)
+  timer->header.signal_state = 1;
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(KeSetTimer, kThreading, kImplemented);
+
+// KeCancelTimer (ordinal 0x54)
+// Cancels a previously set kernel timer.
+dword_result_t KeCancelTimer_entry(pointer_t<X_KTIMER> timer,
+                                   const ppc_context_t& context) {
+  if (!timer) {
+    return X_STATUS_INVALID_PARAMETER_1;
+  }
+  bool was_inserted = timer->header.inserted != 0;
+  timer->header.inserted = 0;
+  timer->header.signal_state = 0;
+  timer->due_time = 0;
+  timer->period = 0;
+  return was_inserted ? 1 : 0;
+}
+DECLARE_XBOXKRNL_EXPORT1(KeCancelTimer, kThreading, kImplemented);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

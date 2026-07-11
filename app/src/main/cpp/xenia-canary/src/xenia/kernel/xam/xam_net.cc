@@ -1096,6 +1096,120 @@ dword_result_t NetDll_XNetUnregisterKey_entry(dword_t caller,
 }
 DECLARE_XAM_EXPORT1(NetDll_XNetUnregisterKey, kNetworking, kStub);
 
+// [NETWORKING STUBS] These NetDll_* and XNet* functions require a full
+// Xbox LIVE networking stack. Without it, return appropriate error codes.
+
+// NetDll_XNetServerToInAddr (ordinal 0x3A)
+dword_result_t NetDll_XNetServerToInAddr_entry(
+    dword_t user_index, qword_t xuid, dword_t service_id,
+    lpdword_t in_addr_out) {
+  return 0x80151802;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetServerToInAddr, kNetworking, kStub);
+
+// NetDll_XNetUnregisterInAddr (ordinal 0x3F)
+dword_result_t NetDll_XNetUnregisterInAddr_entry(dword_t in_addr) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetUnregisterInAddr, kNetworking, kStub);
+
+// NetDll_XNetConnect (ordinal 0x41)
+dword_result_t NetDll_XNetConnect_entry(dword_t in_addr) {
+  return 0x80151802;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetConnect, kNetworking, kStub);
+
+// NetDll_XNetGetConnectStatus (ordinal 0x42)
+dword_result_t NetDll_XNetGetConnectStatus_entry(dword_t in_addr) {
+  return 0;  // XNET_CONNECT_STATUS_IDLE
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetGetConnectStatus, kNetworking, kStub);
+
+// NetDll_XNetQosLookup (ordinal 0x46)
+dword_result_t NetDll_XNetQosLookup_entry(
+    dword_t user_index, lpvoid_t in_addrs, dword_t in_addr_count,
+    lpvoid_t out_buf, dword_t out_buf_size) {
+  return 0x80151802;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetQosLookup, kNetworking, kStub);
+
+// NetDll_XnpGetConfigStatus (ordinal 0x4xx)
+dword_result_t NetDll_XnpGetConfigStatus_entry(lpdword_t status_out) {
+  if (status_out) {
+    *status_out = 0;
+  }
+  return 0x80151802;
+}
+DECLARE_XAM_EXPORT1(NetDll_XnpGetConfigStatus, kNetworking, kStub);
+
+// NetDll_getpeername (ordinal 0x0A)
+dword_result_t NetDll_getpeername_entry(dword_t socket,
+                                         pointer_t<uint8_t> name,
+                                         lpdword_t namelen) {
+  return 0x80151802;
+}
+DECLARE_XAM_EXPORT1(NetDll_getpeername, kNetworking, kStub);
+
+// NetDll_WSAGetOverlappedResult (ordinal 0x10)
+dword_result_t NetDll_WSAGetOverlappedResult_entry(
+    dword_t socket, pointer_t<uint8_t> overlapped,
+    lpdword_t bytes_transferred, dword_t wait, lpdword_t flags) {
+  if (bytes_transferred) {
+    *bytes_transferred = 0;
+  }
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_WSAGetOverlappedResult, kNetworking, kStub);
+
+// NetDll_WSAEventSelect (ordinal 0x4xx)
+dword_result_t NetDll_WSAEventSelect_entry(dword_t socket, dword_t event,
+                                            dword_t network_events) {
+  return 0;  // success
+}
+DECLARE_XAM_EXPORT1(NetDll_WSAEventSelect, kNetworking, kStub);
+
+// NetDll_WSACancelOverlappedIO (ordinal 0x4xx)
+dword_result_t NetDll_WSACancelOverlappedIO_entry(dword_t socket) {
+  return 0;  // success
+}
+DECLARE_XAM_EXPORT1(NetDll_WSACancelOverlappedIO, kNetworking, kStub);
+
+// NetDll_WSARecv (ordinal 0x4xx)
+dword_result_t NetDll_WSARecv_entry(
+    dword_t socket, pointer_t<uint8_t> buffers, dword_t buffer_count,
+    lpdword_t bytes_received, lpdword_t flags,
+    pointer_t<uint8_t> overlapped, lpvoid_t completion_routine) {
+  return 0x80151802;
+}
+DECLARE_XAM_EXPORT1(NetDll_WSARecv, kNetworking, kStub);
+
+// NetDll_WSASend (ordinal 0x4xx)
+dword_result_t NetDll_WSASend_entry(
+    dword_t socket, pointer_t<uint8_t> buffers, dword_t buffer_count,
+    lpdword_t bytes_sent, dword_t flags,
+    pointer_t<uint8_t> overlapped, lpvoid_t completion_routine) {
+  return 0x80151802;
+}
+DECLARE_XAM_EXPORT1(NetDll_WSASend, kNetworking, kStub);
+
+// XNetLogonGetMachineID (ordinal 0x135)
+dword_result_t XNetLogonGetMachineID_entry(pointer_t<uint8_t> machine_id_out) {
+  if (machine_id_out) {
+    machine_id_out.Zero(0x14);  // XNET_MACHINE_ID is ~20 bytes
+  }
+  return 0x80151802;
+}
+DECLARE_XAM_EXPORT1(XNetLogonGetMachineID, kNetworking, kStub);
+
+// XNetLogonGetTitleID (ordinal 0x136)
+dword_result_t XNetLogonGetTitleID_entry(lpdword_t title_id_out) {
+  if (title_id_out) {
+    *title_id_out = kernel_state()->title_id();
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XNetLogonGetTitleID, kNetworking, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

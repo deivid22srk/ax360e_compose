@@ -474,6 +474,42 @@ dword_result_t XamNuiCameraTiltSetCallback_entry(unknown_t unk1,
 }
 DECLARE_XAM_EXPORT1(XamNuiCameraTiltSetCallback, kNone, kStub);
 
+// XamNuiCameraElevationSetAngle (ordinal 0x880)
+dword_result_t XamNuiCameraElevationSetAngle_entry(dword_t user_index,
+                                                    dword_t angle) {
+  return X_E_DEVICE_NOT_CONNECTED;
+}
+DECLARE_XAM_EXPORT1(XamNuiCameraElevationSetAngle, kNone, kStub);
+
+// XamNuiCameraElevationStopMovement (ordinal 0x883)
+dword_result_t XamNuiCameraElevationStopMovement_entry(dword_t user_index) {
+  return X_E_DEVICE_NOT_CONNECTED;
+}
+DECLARE_XAM_EXPORT1(XamNuiCameraElevationStopMovement, kNone, kStub);
+
+// XamNuiCameraRememberFloor (ordinal 0x865)
+dword_result_t XamNuiCameraRememberFloor_entry(dword_t user_index) {
+  return X_E_DEVICE_NOT_CONNECTED;
+}
+DECLARE_XAM_EXPORT1(XamNuiCameraRememberFloor, kNone, kStub);
+
+// XamNuiCameraTiltReportStatus (ordinal 0x895)
+dword_result_t XamNuiCameraTiltReportStatus_entry(dword_t user_index,
+                                                   lpvoid_t status_out) {
+  return X_E_DEVICE_NOT_CONNECTED;
+}
+DECLARE_XAM_EXPORT1(XamNuiCameraTiltReportStatus, kNone, kStub);
+
+// XamUserNuiGetEnrollmentIndex (ordinal 0x86A)
+dword_result_t XamUserNuiGetEnrollmentIndex_entry(dword_t user_index,
+                                                   lpdword_t index_out) {
+  if (index_out) {
+    *index_out = 0;
+  }
+  return X_E_NO_SUCH_USER;
+}
+DECLARE_XAM_EXPORT1(XamUserNuiGetEnrollmentIndex, kNone, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

@@ -795,6 +795,94 @@ dword_result_t IoDismountVolumeByFileHandle_entry(dword_t file_handle) {
 }
 DECLARE_XBOXKRNL_EXPORT1(IoDismountVolumeByFileHandle, kFileSystem, kStub);
 
+// IoCheckShareAccess (ordinal 0x22)
+// Checks whether a file can be opened with the requested share access.
+// Return success to allow all share accesses.
+dword_result_t IoCheckShareAccess_entry(
+    dword_t desired_access, dword_t desired_share_access,
+    pointer_t<uint8_t> file_object, pointer_t<uint8_t> share_access,
+    dword_t update) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(IoCheckShareAccess, kFileSystem, kStub);
+
+// IoSetShareAccess (ordinal 0x2F)
+// Sets share access on a file object.
+void IoSetShareAccess_entry(dword_t desired_access,
+                            dword_t desired_share_access,
+                            pointer_t<uint8_t> file_object,
+                            pointer_t<uint8_t> share_access) {
+}
+DECLARE_XBOXKRNL_EXPORT1(IoSetShareAccess, kFileSystem, kStub);
+
+// IoRemoveShareAccess (ordinal 0x2D)
+// Removes share access tracking on a file object.
+void IoRemoveShareAccess_entry(pointer_t<uint8_t> file_object,
+                               pointer_t<uint8_t> share_access) {
+}
+DECLARE_XBOXKRNL_EXPORT1(IoRemoveShareAccess, kFileSystem, kStub);
+
+// IoCompleteRequest (ordinal 0x23)
+// Completes an IRP (I/O Request Packet). In the emulator, I/O is synchronous,
+// so this is a no-op — the IRP is already completed by the time the guest
+// calls this.
+void IoCompleteRequest_entry(pointer_t<uint8_t> irp, dword_t priority_boost) {
+}
+DECLARE_XBOXKRNL_EXPORT1(IoCompleteRequest, kFileSystem, kStub);
+
+// IoInvalidDeviceRequest (ordinal 0x29)
+// Default handler for invalid device requests. Returns invalid device request
+// status.
+dword_result_t IoInvalidDeviceRequest_entry(pointer_t<uint8_t> device_object,
+                                            pointer_t<uint8_t> irp) {
+  return X_STATUS_INVALID_DEVICE_REQUEST;
+}
+DECLARE_XBOXKRNL_EXPORT1(IoInvalidDeviceRequest, kFileSystem, kStub);
+
+// IoDismountVolume (ordinal 0x3A)
+// Dismounts a volume. Stubbed — return success.
+dword_result_t IoDismountVolume_entry(dword_t volume_handle) {
+  XELOGI("IoDismountVolume(handle={:08X}) - stubbed", volume_handle.value());
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(IoDismountVolume, kFileSystem, kStub);
+
+// NtWriteFileGather (ordinal 0x9E)
+// Writes scattered data to a file. Similar to NtWriteFile but with a gather
+// array. Stubbed — return success (the game typically ignores the result).
+dword_result_t NtWriteFileGather_entry(
+    dword_t file_handle, dword_t event, pointer_t<uint8_t> apc_routine,
+    pointer_t<uint8_t> apc_context, pointer_t<uint8_t> io_status_block,
+    pointer_t<uint32_t> segment_array, dword_t length,
+    lpdword_t byte_offset) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(NtWriteFileGather, kFileSystem, kStub);
+
+// StfsCreateDevice (ordinal 0x259)
+// Creates an STFS (Secure Transacted File System) device. Used by the
+// dashboard for package management. Without STFS subsystem, return error.
+dword_result_t StfsCreateDevice_entry(
+    lpstring_t mount_path, dword_t device_type,
+    pointer_t<uint8_t> device_out) {
+  return X_STATUS_NOT_IMPLEMENTED;
+}
+DECLARE_XBOXKRNL_EXPORT1(StfsCreateDevice, kFileSystem, kStub);
+
+// StfsControlDevice (ordinal 0x25A)
+// Sends a control code to an STFS device.
+dword_result_t StfsControlDevice_entry(
+    pointer_t<uint8_t> device, dword_t control_code,
+    pointer_t<uint8_t> in_buf, dword_t in_buf_size,
+    pointer_t<uint8_t> out_buf, dword_t out_buf_size,
+    lpdword_t bytes_returned) {
+  if (bytes_returned) {
+    *bytes_returned = 0;
+  }
+  return X_STATUS_NOT_IMPLEMENTED;
+}
+DECLARE_XBOXKRNL_EXPORT1(StfsControlDevice, kFileSystem, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

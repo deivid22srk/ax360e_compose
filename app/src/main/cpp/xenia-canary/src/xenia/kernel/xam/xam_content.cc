@@ -830,6 +830,39 @@ dword_result_t XamContentGetDeviceVolumePath_entry(dword_t device_id,
   return X_ERROR_SUCCESS;
 }
 DECLARE_XAM_EXPORT1(XamContentGetDeviceVolumePath, kContent, kStub);
+// [XLFS UPLOAD QUEUE STUBS] XamXlfs* functions manage Xbox LIVE File System
+// upload queues for background uploads. Without LIVE, these are no-ops.
+
+// XamXlfsInitializeUploadQueue (ordinal 0x482)
+dword_result_t XamXlfsInitializeUploadQueue_entry(
+    lpdword_t queue_handle_out) {
+  if (queue_handle_out) {
+    *queue_handle_out = 0;
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamXlfsInitializeUploadQueue, kNone, kStub);
+
+// XamXlfsUninitializeUploadQueue (ordinal 0x483)
+dword_result_t XamXlfsUninitializeUploadQueue_entry(dword_t queue_handle) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamXlfsUninitializeUploadQueue, kNone, kStub);
+
+// XamXlfsMountUploadQueueInstance (ordinal 0x484)
+dword_result_t XamXlfsMountUploadQueueInstance_entry(
+    dword_t queue_handle, lpstring_t instance_name) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamXlfsMountUploadQueueInstance, kNone, kStub);
+
+// XamXlfsUnmountUploadQueueInstance (ordinal 0x485)
+dword_result_t XamXlfsUnmountUploadQueueInstance_entry(
+    dword_t queue_handle, lpstring_t instance_name) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamXlfsUnmountUploadQueueInstance, kNone, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

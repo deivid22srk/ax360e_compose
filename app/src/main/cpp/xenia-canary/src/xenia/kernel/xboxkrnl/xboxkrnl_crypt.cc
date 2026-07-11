@@ -626,6 +626,84 @@ void XeCryptSha512Final_entry(pointer_t<XECRYPT_SHA256_STATE> sha_state,
 }
 DECLARE_XBOXKRNL_EXPORT1(XeCryptSha512Final, kNone, kImplemented);
 
+// [SHA-384 IMPLEMENTATION] SHA-384 is structurally identical to SHA-512, using
+// the same algorithm but with different initial hash values and truncating
+// the output to 48 bytes (384 bits). The FFmpeg AVSHA512 API supports this
+// via av_sha512_init(sha, 384).
+//
+// Without these, the guest would hit "undefined extern" when calling
+// XeCryptSha384Init/Update/Final. Forza Horizon 2 imports these for
+// session/token hashing.
+//
+// We reuse XECRYPT_SHA512_STATE since the state layout is the same.
+
+void XeCryptSha384Init_entry(pointer_t<XECRYPT_SHA512_STATE> sha_state) {
+  sha_state.Zero();
+  // SHA-384 initial hash values (FIPS 180-4)
+  sha_state->state[0] = 0xcbbb9d5dc1059ed8;
+  sha_state->state[1] = 0x629a292a367cd507;
+  sha_state->state[2] = 0x9159015a3070dd17;
+  sha_state->state[3] = 0x152fecd8f70e5939;
+  sha_state->state[4] = 0x67332667ffc00b31;
+  sha_state->state[5] = 0x8eb44a8768581511;
+  sha_state->state[6] = 0xdb0c2e0d64f98fa7;
+  sha_state->state[7] = 0x47b5481dbefa4fa4;
+}
+DECLARE_XBOXKRNL_EXPORT1(XeCryptSha384Init, kNone, kImplemented);
+
+void XeCryptSha384Update_entry(pointer_t<XECRYPT_SHA512_STATE> sha_state,
+                               lpvoid_t input, dword_t input_size) {
+  AVSHA512* sha = av_sha512_alloc();
+  av_sha512_init(sha, 384);  // 384-bit mode
+
+  SHA512_STATE* sha2 = reinterpret_cast<SHA512_STATE*>(sha);
+  std::copy(std::begin(sha_state->state), std::end(sha_state->state),
+            sha2->state);
+  std::copy(std::begin(sha_state->buffer), std::end(sha_state->buffer),
+            sha2->buffer);
+  sha2->count = sha_state->count;
+
+  av_sha512_update(sha, input, input_size);
+
+  std::copy_n(sha2->state, xe::countof(sha_state->state), sha_state->state);
+  std::copy_n(sha2->buffer, xe::countof(sha_state->buffer), sha_state->buffer);
+  sha_state->count = sha2->count;
+}
+DECLARE_XBOXKRNL_EXPORT1(XeCryptSha384Update, kNone, kImplemented);
+
+void XeCryptSha384Final_entry(pointer_t<XECRYPT_SHA512_STATE> sha_state,
+                              pointer_t<uint8_t> out, dword_t out_size) {
+  AVSHA512* sha = av_sha512_alloc();
+  av_sha512_init(sha, 384);
+
+  SHA512_STATE* sha2 = reinterpret_cast<SHA512_STATE*>(sha);
+  std::copy(std::begin(sha_state->state), std::end(sha_state->state),
+            sha2->state);
+  std::copy(std::begin(sha_state->buffer), std::end(sha_state->buffer),
+            sha2->buffer);
+  sha2->count = sha_state->count;
+
+  uint8_t hash[64];  // SHA-384 produces 48 bytes, but AVSHA512 writes 64
+  av_sha512_final(sha, hash);
+
+  // Copy only 48 bytes (384 bits) for SHA-384
+  size_t copy_size = std::min<size_t>(48, out_size);
+  std::copy_n(hash, copy_size, static_cast<uint8_t*>(out));
+  // Store full 64-byte hash in buffer for state continuity
+  std::copy(std::begin(hash), std::end(hash), sha_state->buffer);
+}
+DECLARE_XBOXKRNL_EXPORT1(XeCryptSha384Final, kNone, kImplemented);
+
+// XeKeysConsoleSignatureVerification (ordinal 0x257)
+// Verifies a console signature using the console's private key. Without the
+// actual console key, we cannot verify — return success so the game continues.
+// This matches the behavior of other XeKeys stubs in xenia.
+dword_result_t XeKeysConsoleSignatureVerification_entry(
+    unknown_t unk1, unknown_t unk2, unknown_t unk3, unknown_t unk4) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(XeKeysConsoleSignatureVerification, kNone, kStub);
+
 void XeCryptMd5Init_entry(pointer_t<XECRYPT_MD5_STATE> md5_state) {
   md5_state.Zero();
 

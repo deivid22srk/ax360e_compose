@@ -593,6 +593,119 @@ dword_result_t XamXStudioRequest_entry(dword_t request_type,
 }
 DECLARE_XAM_EXPORT2(XamXStudioRequest, kNone, kStub, kHighFrequency);
 
+// [XAM INFO STUBS] Remaining unimplemented info functions.
+
+// XamInputRawState (ordinal 0x195)
+// Returns the raw input state for a controller. Return success with zeroed
+// state (no input).
+dword_result_t XamInputRawState_entry(dword_t user_index, dword_t flags,
+                                      pointer_t<uint8_t> state_out) {
+  if (state_out) {
+    state_out.Zero(0x20);  // X_INPUT_STATE is ~32 bytes
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamInputRawState, kInput, kStub);
+
+// XamUserGetAgeGroup (ordinal 0x4A5)
+// Returns the age group for a user. Return adult (1).
+dword_result_t XamUserGetAgeGroup_entry(dword_t user_index,
+                                        lpdword_t age_group_out) {
+  if (age_group_out) {
+    *age_group_out = 1;  // XAGE_GROUP_ADULT
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamUserGetAgeGroup, kNone, kStub);
+
+// XamCacheOpenFile (ordinal 0x2B4)
+// Opens a file in the cache partition. Return file not found.
+dword_result_t XamCacheOpenFile_entry(lpstring_t file_name, dword_t flags,
+                                      lpdword_t handle_out) {
+  return X_ERROR_FILE_NOT_FOUND;
+}
+DECLARE_XAM_EXPORT1(XamCacheOpenFile, kFileSystem, kStub);
+
+// XamCacheCloseFile (ordinal 0x2B5)
+void XamCacheCloseFile_entry(dword_t handle) {
+}
+DECLARE_XAM_EXPORT1(XamCacheCloseFile, kFileSystem, kStub);
+
+// XamCacheReset (ordinal 0x2B7)
+dword_result_t XamCacheReset_entry(dword_t unk) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamCacheReset, kFileSystem, kStub);
+
+// XamReadBiometricData (ordinal 0x849)
+// Reads biometric data (fingerprint/facial). Not available, return error.
+dword_result_t XamReadBiometricData_entry(dword_t user_index,
+                                          pointer_t<uint8_t> data_out,
+                                          lpdword_t size_out) {
+  return X_E_FAIL;
+}
+DECLARE_XAM_EXPORT1(XamReadBiometricData, kNone, kStub);
+
+// XamWriteBiometricData (ordinal 0x84A)
+dword_result_t XamWriteBiometricData_entry(dword_t user_index,
+                                           pointer_t<uint8_t> data,
+                                           dword_t size) {
+  return X_E_FAIL;
+}
+DECLARE_XAM_EXPORT1(XamWriteBiometricData, kNone, kStub);
+
+// XamNuiGetDeviceSerialNumber (ordinal 0x858)
+// Returns the NUI device serial number. Return empty string.
+dword_result_t XamNuiGetDeviceSerialNumber_entry(pointer_t<uint8_t> serial_out,
+                                                 dword_t serial_size) {
+  if (serial_out && serial_size > 0) {
+    serial_out.Zero(serial_size);
+  }
+  return X_E_DEVICE_NOT_CONNECTED;
+}
+DECLARE_XAM_EXPORT1(XamNuiGetDeviceSerialNumber, kNone, kStub);
+
+// XampXAuthIsLocalSocketAllowed (ordinal 0x5A0)
+// Checks if a local socket is allowed for XAuth. Return success (allowed).
+dword_result_t XampXAuthIsLocalSocketAllowed_entry(unknown_t unk1,
+                                                    unknown_t unk2) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XampXAuthIsLocalSocketAllowed, kNone, kStub);
+
+// XCustomSetDynamicActions (ordinal 0x1DA)
+dword_result_t XCustomSetDynamicActions_entry(
+    dword_t user_index, pointer_t<uint8_t> actions, dword_t action_count) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XCustomSetDynamicActions, kNone, kStub);
+
+// XCustomUnregisterDynamicActions (ordinal 0x1DE)
+dword_result_t XCustomUnregisterDynamicActions_entry(dword_t user_index,
+                                                      dword_t unk) {
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XCustomUnregisterDynamicActions, kNone, kStub);
+
+// XCustomGetLastActionPressEx (ordinal 0x1DC)
+dword_result_t XCustomGetLastActionPressEx_entry(
+    dword_t user_index, lpdword_t action_out) {
+  if (action_out) {
+    *action_out = 0;
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XCustomGetLastActionPressEx, kNone, kStub);
+
+// XCustomGetCurrentGamercard (ordinal 0x1DF)
+dword_result_t XCustomGetCurrentGamercard_entry(lpdword_t gamercard_out) {
+  if (gamercard_out) {
+    *gamercard_out = 0;
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XCustomGetCurrentGamercard, kNone, kStub);
+
 // http://www.noxa.org/blog/2011/02/28/building-an-xbox-360-emulator-part-3-feasibilityos/
 // http://www.noxa.org/blog/2011/08/13/building-an-xbox-360-emulator-part-5-xex-files/
 dword_result_t RtlSleep_entry(dword_t dwMilliseconds, dword_t bAlertable) {
