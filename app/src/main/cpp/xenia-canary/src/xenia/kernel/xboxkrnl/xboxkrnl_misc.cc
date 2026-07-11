@@ -85,6 +85,84 @@ static qword_result_t KeQueryInterruptTime_entry(const ppc_context_t& ctx) {
   return xe::load_and_swap<uint64_t>(&bundle->interrupt_time);
 }
 DECLARE_XBOXKRNL_EXPORT1(KeQueryInterruptTime, kNone, kImplemented);
+
+// [ETX STUBS] Event Tracing for Xbox (ETX) — producer/consumer API.
+//
+// ETX is Xbox 360's ETW (Event Tracing for Windows) equivalent. Games can
+// register as producers to log telemetry events, and as consumers to receive
+// events. Without a real ETX subsystem, these are no-ops.
+//
+// Without these stubs, the guest would crash with
+// "undefined extern call to EtxProducerRegister" (Forza Horizon 2 log line
+// 3539, 3541). Returning X_STATUS_SUCCESS (0) lets the game continue.
+//
+// Reference: xboxkrnl_table.inc ordinals 0x032D-0x0336.
+
+// EtxConsumerDisableEventType (0x032D)
+dword_result_t EtxConsumerDisableEventType_entry(unknown_t unk1,
+                                                 unknown_t unk2) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxConsumerDisableEventType, kNone, kStub);
+
+// EtxConsumerEnableEventType (0x032E)
+dword_result_t EtxConsumerEnableEventType_entry(unknown_t unk1,
+                                                unknown_t unk2) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxConsumerEnableEventType, kNone, kStub);
+
+// EtxConsumerProcessLogs (0x032F)
+dword_result_t EtxConsumerProcessLogs_entry(unknown_t unk1) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxConsumerProcessLogs, kNone, kStub);
+
+// EtxConsumerRegister (0x0330)
+dword_result_t EtxConsumerRegister_entry(unknown_t unk1, unknown_t unk2,
+                                         unknown_t unk3, unknown_t unk4) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxConsumerRegister, kNone, kStub);
+
+// EtxConsumerUnregister (0x0331)
+dword_result_t EtxConsumerUnregister_entry(unknown_t unk1) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxConsumerUnregister, kNone, kStub);
+
+// EtxProducerLog (0x0332)
+dword_result_t EtxProducerLog_entry(unknown_t unk1, unknown_t unk2) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxProducerLog, kNone, kStub);
+
+// EtxProducerLogV (0x0333)
+dword_result_t EtxProducerLogV_entry(unknown_t unk1, unknown_t unk2,
+                                     unknown_t unk3) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxProducerLogV, kNone, kStub);
+
+// EtxProducerRegister (0x0334)
+dword_result_t EtxProducerRegister_entry(unknown_t unk1, unknown_t unk2,
+                                         unknown_t unk3, unknown_t unk4) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxProducerRegister, kNone, kStub);
+
+// EtxProducerUnregister (0x0335)
+dword_result_t EtxProducerUnregister_entry(unknown_t unk1) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxProducerUnregister, kNone, kStub);
+
+// EtxConsumerFlushBuffers (0x0336)
+dword_result_t EtxConsumerFlushBuffers_entry(unknown_t unk1) {
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(EtxConsumerFlushBuffers, kNone, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

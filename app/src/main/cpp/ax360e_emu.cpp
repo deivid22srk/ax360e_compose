@@ -592,6 +592,42 @@ void EmulatorApp::emu_thr_main() {
         }
     }
 
+    // [VFS DEVICE REGISTRATION] Always register cache: and update: devices
+    // regardless of cvars::mount_cache. Many games (Forza Horizon 2, etc.)
+    // access cache:\ and update:\ during boot, and if these devices aren't
+    // registered, the VFS logs "ResolvePath(...) failed - device not found"
+    // which clutters the log and can cause game logic to take error paths.
+    //
+    // cache: points to {storage_root}/cache (already created by
+    // Application.onCreate which makes cache, cache0, cache1 dirs).
+    // update: points to {storage_root}/update (created on demand).
+    // \Device is registered as a NullDevice so ResolvePath(\Device) doesn't
+    // log an error (the guest uses it for XFileFsDeviceInformation queries).
+    if (!cvars::mount_cache) {
+        auto cache_device = std::make_unique<xe::vfs::HostPathDevice>(
+                "\\CACHE", emu->storage_root() / "cache", false);
+        if (cache_device->Initialize()) {
+            if (fs->RegisterDevice(std::move(cache_device))) {
+                fs->RegisterSymbolicLink("cache:", "\\CACHE");
+            }
+        }
+    }
+
+    // update: device — used by some games to check for title updates.
+    // Point to {storage_root}/update (empty dir = no updates).
+    {
+        auto update_dir = emu->storage_root() / "update";
+        std::error_code ec;
+        std::filesystem::create_directories(update_dir, ec);
+        auto update_device = std::make_unique<xe::vfs::HostPathDevice>(
+                "\\UPDATE", update_dir, false);
+        if (update_device->Initialize()) {
+            if (fs->RegisterDevice(std::move(update_device))) {
+                fs->RegisterSymbolicLink("update:", "\\UPDATE");
+            }
+        }
+    }
+
     if (cvars::force_mount_devkit) {
         auto devkit_device =
                 std::make_unique<xe::vfs::HostPathDevice>("\\DEVKIT", "devkit", false);

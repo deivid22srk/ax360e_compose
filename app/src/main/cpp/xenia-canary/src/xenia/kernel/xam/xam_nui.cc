@@ -464,6 +464,16 @@ void XamNuiPlayerEngagementUpdate_entry(qword_t unk1, unknown_t unk2,
 }
 DECLARE_XAM_EXPORT1(XamNuiPlayerEngagementUpdate, kNone, kStub);
 
+// XamNuiCameraTiltSetCallback (ordinal 0x086D)
+// Registers a callback for camera tilt events. Without NUI hardware, this is
+// a no-op. Without this stub, the guest would crash with
+// "undefined extern call to XamNuiCameraTiltSetCallback" (Forza Horizon 2 log).
+dword_result_t XamNuiCameraTiltSetCallback_entry(unknown_t unk1,
+                                                 unknown_t unk2) {
+  return X_E_FAIL;
+}
+DECLARE_XAM_EXPORT1(XamNuiCameraTiltSetCallback, kNone, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

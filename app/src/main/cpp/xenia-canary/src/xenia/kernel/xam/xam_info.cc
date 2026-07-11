@@ -497,6 +497,102 @@ dword_result_t XamQueryLiveHiveW_entry(lpu16string_t name, lpvoid_t out_buf,
 }
 DECLARE_XAM_EXPORT1(XamQueryLiveHiveW, kNone, kStub);
 
+// XamQueryLiveHiveA (ordinal 0x070C)
+// ANSI variant of XamQueryLiveHiveW. Live Hive is Xbox LIVE's cloud key-value
+// store. No LIVE transport, return invalid parameter.
+dword_result_t XamQueryLiveHiveA_entry(lpstring_t name, lpvoid_t out_buf,
+                                       dword_t out_size, dword_t type) {
+  return X_STATUS_INVALID_PARAMETER_1;
+}
+DECLARE_XAM_EXPORT1(XamQueryLiveHiveA, kNone, kStub);
+
+// XamGetLiveHiveValueA (ordinal 0x0708)
+// XamGetLiveHiveValueW (ordinal 0x0709)
+//
+// Reads a value from Xbox LIVE's Live Hive (cloud key-value store).
+// Without LIVE connectivity, return X_ONLINE_E_LOGON_NOT_LOGGED_ON (0x80151802)
+// so the title falls back to local/default behavior. This matches the behavior
+// of XLiveBaseLogonGetHR (message 0x00058003) which returns the same code.
+//
+// Without this stub, the guest would call GetProcAddressByOrdinal(0x708) which
+// returns 0 (null), and calling through null crashes the process. Forza Horizon
+// 2 hits this path during boot (log line 2763).
+//
+// Parameters (best guess from xliveless + xam_nui.cc notes):
+//   - user_index: DWORD
+//   - name: ANSI/WIDE string pointer
+//   - out_buf: output buffer
+//   - out_size: buffer size
+//   - type: value type
+dword_result_t XamGetLiveHiveValueA_entry(dword_t user_index,
+                                          lpstring_t name, lpvoid_t out_buf,
+                                          dword_t out_size, dword_t type) {
+  XELOGD("XamGetLiveHiveValueA(user={}) - no LIVE, returning not logged on",
+         user_index.value());
+  return 0x80151802;  // X_ONLINE_E_LOGON_NOT_LOGGED_ON
+}
+DECLARE_XAM_EXPORT1(XamGetLiveHiveValueA, kNone, kStub);
+
+dword_result_t XamGetLiveHiveValueW_entry(dword_t user_index,
+                                          lpu16string_t name, lpvoid_t out_buf,
+                                          dword_t out_size, dword_t type) {
+  XELOGD("XamGetLiveHiveValueW(user={}) - no LIVE, returning not logged on",
+         user_index.value());
+  return 0x80151802;  // X_ONLINE_E_LOGON_NOT_LOGGED_ON
+}
+DECLARE_XAM_EXPORT1(XamGetLiveHiveValueW, kNone, kStub);
+
+// XamGetLiveHiveValueDuringLogonAttemptA (ordinal 0x070A)
+// Same as XamGetLiveHiveValueA but called during logon attempt. Return not
+// logged on.
+dword_result_t XamGetLiveHiveValueDuringLogonAttemptA_entry(
+    dword_t user_index, lpstring_t name, lpvoid_t out_buf, dword_t out_size,
+    dword_t type) {
+  return 0x80151802;  // X_ONLINE_E_LOGON_NOT_LOGGED_ON
+}
+DECLARE_XAM_EXPORT1(XamGetLiveHiveValueDuringLogonAttemptA, kNone, kStub);
+
+// XamGetLiveHiveValueDuringLogonAttemptExA (ordinal 0x070E)
+dword_result_t XamGetLiveHiveValueDuringLogonAttemptExA_entry(
+    dword_t user_index, lpstring_t name, lpvoid_t out_buf, dword_t out_size,
+    dword_t type, dword_t flags) {
+  return 0x80151802;  // X_ONLINE_E_LOGON_NOT_LOGGED_ON
+}
+DECLARE_XAM_EXPORT1(XamGetLiveHiveValueDuringLogonAttemptExA, kNone, kStub);
+
+// XamNetworkStorageIsEnabledInLiveHive (ordinal 0x062D)
+// Returns whether network storage is enabled in Live Hive. No LIVE, return
+// false (0).
+dword_result_t XamNetworkStorageIsEnabledInLiveHive_entry() {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamNetworkStorageIsEnabledInLiveHive, kNone, kStub);
+
+// XamXStudioRequest (ordinal 0x0686)
+//
+// Sends a request to XStudio (Xbox Studio services). Referenced by
+// XamNuiGetDeviceStatus which calls XamXStudioRequest(6, &var).
+// Without LIVE/Studio services, return a success code so the caller's
+// var stays 0 (which XamNuiGetDeviceStatus checks: if return >= 0 && var &
+// 0x80000000, sets Kinect error). Returning 0 = X_ERROR_SUCCESS with var=0
+// means "Studio not available" which is the correct emulator behavior.
+//
+// Without this stub, the guest would crash with
+// "undefined extern call to XamXStudioRequest" (Forza Horizon 2 log line 3524,
+// 1233 occurrences). This was the most frequent error in the FH2 log.
+//
+// Parameters (from xam_nui.cc notes):
+//   - request_type: DWORD (e.g., 6)
+//   - out_result: pointer to DWORD that receives the result
+dword_result_t XamXStudioRequest_entry(dword_t request_type,
+                                       lpdword_t out_result) {
+  if (out_result) {
+    *out_result = 0;
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT2(XamXStudioRequest, kNone, kStub, kHighFrequency);
+
 // http://www.noxa.org/blog/2011/02/28/building-an-xbox-360-emulator-part-3-feasibilityos/
 // http://www.noxa.org/blog/2011/08/13/building-an-xbox-360-emulator-part-5-xex-files/
 dword_result_t RtlSleep_entry(dword_t dwMilliseconds, dword_t bAlertable) {

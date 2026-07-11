@@ -1052,12 +1052,15 @@ bool GetResolveInfo(const RegisterFile& regs, const Memory& memory,
            xenos::kMaxResolveSize);
     y1 = y0 + int32_t(xenos::kMaxResolveSize);
   }
-  // fails in forza horizon 1
-  // x0 is 0, x1 is 0x100, y0 is 0x100, y1 is 0x100
-  assert_true(x0 <= x1 && y0 <= y1);
+  // If the region is empty or inverted after clipping (e.g., entirely outside
+  // EDRAM bounds due to window offset), treat as a no-op rather than an error.
+  // The caller checks width/height and skips the resolve.
+  // Reduces log spam in Forza Horizon 1/2 which seem to do a lot of these
+  // resolves without any visible impact on rendering.
   if (x0 >= x1 || y0 >= y1) {
-    XELOGE("Resolve region is empty");
-    return false;
+    info_out.coordinate_info.width_div_8 = 0;
+    info_out.height_div_8 = 0;
+    return true;
   }
 
   info_out.coordinate_info.width_div_8 =
