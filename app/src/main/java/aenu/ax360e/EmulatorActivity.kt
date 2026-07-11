@@ -64,6 +64,12 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
     private var started = false
     private var delayDialog: Dialog? = null
 
+    // [LOG CRASH RECOVERY] Session info for periodic log capture + crash recovery
+    private var sessionGameName: String = "unknown"
+    private var sessionStartTimestamp: Long = 0L
+    private var logCaptureThread: Thread? = null
+    @Volatile private var logCaptureRunning = false
+
     private val delayOnCreate = Handler(Handler.Callback { msg ->
         if (msg.what != DELAY_ON_CREATE) return@Callback false
         delayDialog?.dismiss()
@@ -104,6 +110,27 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
 
     private fun on_create() {
         val uri = intent.getStringExtra(EXTRA_GAME_URI) ?: return
+
+        // [LOG CRASH RECOVERY] Before booting the new game, check if there's
+        // a leftover xe.log from a PREVIOUS session that crashed or was
+        // force-killed. If so, capture it as a crash log so the user can
+        // review what happened.
+        try {
+            aenu.ax360e.ui.model.EmulatorLogRepository.captureCrashLogIfPending(this)
+        } catch (_: Exception) {
+            // Don't let crash recovery block game boot
+        }
+
+        // [LOG CRASH RECOVERY] Extract game name and save session start info
+        // so that if THIS session crashes, the next launch can capture the log.
+        sessionGameName = if (uri.isNotEmpty()) {
+            val decoded = android.net.Uri.decode(uri)
+            val lastSegment = decoded.substringAfterLast('/').substringBeforeLast('.')
+            lastSegment.ifEmpty { "unknown" }
+        } else "unknown"
+        sessionStartTimestamp = System.currentTimeMillis()
+        aenu.ax360e.ui.model.EmulatorLogRepository.saveSessionStart(this, sessionGameName)
+
         val path = aenu.emulator.Emulator.Path.from(uri, -1)
         Emulator.get.setup_context(this)
         Emulator.get.setup_document_file_tree(
@@ -161,12 +188,12 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
     override fun onDestroy() {
         // [LOG CAPTURE] Before the process exits, save the current xe.log
         // as a per-game log file so the user can review it later in the
-        // LogViewerActivity. The game name is extracted from the intent URI
-        // (the file name without extension) — the actual title name from
-        // the STFS header is only known after the emulator boots, but the
-        // URI is available immediately.
+        // LogViewerActivity.
         //
-        // STEP 1: Flush the xenia-canary log file to disk. The FileLogSink
+        // STEP 1: Stop the periodic log capture thread.
+        stopLogCaptureThread()
+
+        // STEP 2: Flush the xenia-canary log file to disk. The FileLogSink
         // uses stdio FILE* buffering, and System.exit(0) below may not run
         // C++ static destructors. Without this flush, the last few KB of
         // log data is lost and captureGameLog would copy an incomplete file.
@@ -176,21 +203,89 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
             // Don't let flush crash the exit path
         }
 
-        // STEP 2: Copy the flushed xe.log to a per-game log file.
+        // STEP 3: Copy the flushed xe.log to a per-game log file. Use the
+        // session start timestamp so this overwrites the periodic captures
+        // with the complete final log.
         try {
-            val gameUri = intent.getStringExtra(EXTRA_GAME_URI) ?: ""
-            val gameName = if (gameUri.isNotEmpty()) {
-                // Extract a human-readable name from the URI
-                val decoded = android.net.Uri.decode(gameUri)
-                val lastSegment = decoded.substringAfterLast('/').substringBeforeLast('.')
-                lastSegment.ifEmpty { "unknown" }
-            } else "unknown"
-            aenu.ax360e.ui.model.EmulatorLogRepository.captureGameLog(this, gameName)
+            aenu.ax360e.ui.model.EmulatorLogRepository.captureGameLog(
+                this, sessionGameName, sessionStartTimestamp
+            )
+            // Clear the crash recovery state — the session ended normally.
+            aenu.ax360e.ui.model.EmulatorLogRepository.clearSession(this)
         } catch (_: Exception) {
             // Don't let log capture crash the exit path
         }
         super.onDestroy()
         System.exit(0)
+    }
+
+    // [LOG CRASH RECOVERY] Called when the activity goes to the background
+    // (user pressed Home, opened another app, etc.). This is more reliable
+    // than onDestroy — if the system kills the process while it's in the
+    // background, onDestroy may never be called, but onPause always is.
+    // Capture the log here so we have a recent snapshot even if the process
+    // is killed while backgrounded. Also stop the periodic thread to save CPU.
+    override fun onPause() {
+        super.onPause()
+        stopLogCaptureThread()
+        try {
+            aenu.ax360e.ui.model.EmulatorLogRepository.captureGameLog(
+                this, sessionGameName, sessionStartTimestamp
+            )
+        } catch (_: Exception) {
+            // Don't let log capture crash onPause
+        }
+    }
+
+    // [LOG CRASH RECOVERY] Called when the activity returns to the foreground.
+    // Restart the periodic log capture thread.
+    override fun onResume() {
+        super.onResume()
+        startLogCaptureThread()
+    }
+
+    // [LOG CRASH RECOVERY] Periodic log capture thread.
+    //
+    // Every 30 seconds, copies xe.log to the per-game log file (using the
+    // stable session timestamp so it overwrites the same file). This ensures
+    // that even if the process is abruptly killed (native crash SIGSEGV,
+    // OOM kill, force-stop from Settings), there's a recent log file saved
+    // in game_logs/ that the user can review.
+    //
+    // The thread is started in onResume and stopped in onDestroy/onPause.
+    // It's a low-priority daemon thread so it doesn't interfere with the
+    // emulator's performance.
+    private fun startLogCaptureThread() {
+        if (logCaptureRunning) return
+        logCaptureRunning = true
+        logCaptureThread = Thread {
+            while (logCaptureRunning) {
+                try {
+                    Thread.sleep(30_000)  // 30 seconds
+                } catch (_: InterruptedException) {
+                    break
+                }
+                if (!logCaptureRunning) break
+                try {
+                    aenu.ax360e.ui.model.EmulatorLogRepository.captureGameLog(
+                        this, sessionGameName, sessionStartTimestamp
+                    )
+                } catch (_: Exception) {
+                    // Don't let log capture crash the thread
+                }
+            }
+        }.apply {
+            name = "LogCaptureThread"
+            isDaemon = true
+            priority = Thread.MIN_PRIORITY
+            start()
+        }
+    }
+
+    private fun stopLogCaptureThread() {
+        logCaptureRunning = false
+        logCaptureThread?.interrupt()
+        logCaptureThread = null
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
