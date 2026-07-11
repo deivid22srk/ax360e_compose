@@ -137,6 +137,15 @@ void AndroidWindowedAppContext::request_paint() {
         std::this_thread::get_id() != WindowedAppContext::ui_thread_id_) {
         paint_from_guest_thread_.store(true, std::memory_order_relaxed);
     }
+    
+    // [ANDROID SURFACE RECOVERY] Also set a timestamp for the last paint
+    // request. This is used to detect if the presenter is stuck (not making
+    // progress) and force recovery after a timeout.
+    last_paint_request_time_ns_.store(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count(),
+        std::memory_order_relaxed);
+    
     std::lock_guard<std::mutex> lock(mutex);
     events.push({EVENT_PAINT, nullptr});
     cv.notify_one();
@@ -202,6 +211,13 @@ void AndroidWindowedAppContext::main_loop(){
             //
             // Cooldown: 500ms to avoid excessive surface recreation if the
             // recovery itself fails (e.g., ANativeWindow is truly gone).
+            //
+            // [FIX] Also check if the presenter is in a stuck state BEFORE
+            // attempting to paint. If the presenter is stuck in
+            // kUnconnectedRetryAtStateChange, we must force recovery even if
+            // paint_from_guest_thread_ is false (the flag may have been
+            // cleared by a previous failed recovery attempt).
+            bool force_recovery = false;
             bool from_guest = paint_from_guest_thread_.exchange(false,
                                                                 std::memory_order_relaxed);
             if (from_guest) {
@@ -209,11 +225,47 @@ void AndroidWindowedAppContext::main_loop(){
                     std::chrono::steady_clock::now().time_since_epoch()).count();
                 int64_t last_ns = last_surface_recovery_ns_.load(std::memory_order_relaxed);
                 if (now_ns - last_ns > SURFACE_RECOVERY_COOLDOWN_NS) {
+                    force_recovery = true;
                     last_surface_recovery_ns_.store(now_ns, std::memory_order_relaxed);
-                    XELOGI("[SURFACE RECOVERY] Guest output thread reported outdated "
-                           "surface — forcing UpdateSurface() before paint");
-                    win->UpdateSurface();
                 }
+            }
+            
+            // [FIX] Proactively check if the presenter is stuck and force recovery
+            // even without the guest thread flag. This handles the case where
+            // the surface becomes outdated but the guest thread didn't (or couldn't)
+            // request a paint before the stuck state was entered.
+            if (!force_recovery && app->emu_window) {
+                xe::ui::Presenter* presenter = app->emu_window->window()->presenter();
+                if (presenter) {
+                    auto connection_state = presenter->GetSurfacePaintConnectionState();
+                    if (connection_state == xe::ui::Presenter::SurfacePaintConnectionState::kUnconnectedRetryAtStateChange) {
+                        XELOGW("[SURFACE RECOVERY] Presenter is in stuck state "
+                               "(kUnconnectedRetryAtStateChange) — forcing recovery");
+                        force_recovery = true;
+                    }
+                }
+            }
+            
+            // [FIX] Check for timeout — if we haven't successfully painted for
+            // more than SURFACE_RECOVERY_STUCK_TIMEOUT_NS (5 seconds) and there
+            // are paint requests coming in (meaning the guest is running), force
+            // a recovery to break out of any stuck state.
+            if (!force_recovery) {
+                auto now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    std::chrono::steady_clock::now().time_since_epoch()).count();
+                int64_t last_paint_ns = last_paint_request_time_ns_.load(std::memory_order_relaxed);
+                if (last_paint_ns > 0 && (now_ns - last_paint_ns) > SURFACE_RECOVERY_STUCK_TIMEOUT_NS) {
+                    XELOGW("[SURFACE RECOVERY] Timeout detected — no successful paint "
+                           "after %ld ms, forcing recovery",
+                           (now_ns - last_paint_ns) / 1000000LL);
+                    force_recovery = true;
+                    last_surface_recovery_ns_.store(now_ns, std::memory_order_relaxed);
+                }
+            }
+            
+            if (force_recovery) {
+                XELOGI("[SURFACE RECOVERY] Forcing UpdateSurface() to recover Vulkan surface");
+                win->UpdateSurface();
             }
 
             win->Paint();

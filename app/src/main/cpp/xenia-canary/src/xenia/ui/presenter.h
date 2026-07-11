@@ -305,6 +305,13 @@ class Presenter {
   // them too.
   void PaintFromUIThread(bool force_paint = false);
 
+  // [ANDROID SURFACE RECOVERY] Returns the current surface paint connection
+  // state. Useful for detecting if the presenter is in a stuck state
+  // (kUnconnectedRetryAtStateChange) and needs recovery.
+  SurfacePaintConnectionState GetSurfacePaintConnectionState() const {
+    return surface_paint_connection_state_;
+  }
+
   // Pass 0 as width or height to disable guest output until the next refresh
   // with an actual size. The display aspect ratio may be specified like 16:9 or
   // like 1280:720, both are accepted, for simplicity, the guest display size

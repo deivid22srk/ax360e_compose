@@ -1437,9 +1437,22 @@ Presenter::PaintResult VulkanPresenter::PaintAndPresentImpl(
     case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT:
       // Not an error, reporting just as info (may normally occur while resizing
       // on some platforms).
+      // [ANDROID SURFACE RECOVERY] Added more diagnostic info for Android
       XELOGI(
           "VulkanPresenter: Presentation to the swapchain image has been "
-          "dropped as the swapchain or the surface has become outdated");
+          "dropped as the swapchain or the surface has become outdated "
+          "(VkResult: %d)",
+          acquire_result);
+      // [ANDROID SURFACE RECOVERY] On Android, explicitly log the surface
+      // and swapchain state for debugging
+#ifdef XE_PLATFORM_ANDROID
+      XELOGI(
+          "[ANDROID] Vulkan surface: %p, Swapchain: %p, Extent: %dx%d",
+          paint_context_.vulkan_surface,
+          paint_context_.swapchain,
+          paint_context_.swapchain_extent.width,
+          paint_context_.swapchain_extent.height);
+#endif
       return PaintResult::kNotPresentedConnectionOutdated;
     default:
       XELOGE("VulkanPresenter: Failed to acquire the swapchain image");

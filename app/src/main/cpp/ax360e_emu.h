@@ -49,9 +49,15 @@ public:
     //
     // A cooldown of 500ms prevents excessive surface recreation if the
     // recovery itself fails (e.g., if the ANativeWindow is truly gone).
+    // 
+    // [FIX] Also track the last paint request time to detect if the
+    // presenter is stuck (not making progress) and force recovery after a
+    // timeout (5 seconds).
     std::atomic<bool> paint_from_guest_thread_{false};
     std::atomic<int64_t> last_surface_recovery_ns_{0};
+    std::atomic<int64_t> last_paint_request_time_ns_{0};
     static constexpr int64_t SURFACE_RECOVERY_COOLDOWN_NS = 500'000'000LL; // 500ms
+    static constexpr int64_t SURFACE_RECOVERY_STUCK_TIMEOUT_NS = 5'000'000'000LL; // 5 seconds
 
     void NotifyUILoopOfPendingFunctions() override;
 
