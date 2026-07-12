@@ -32,6 +32,8 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
+import type { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
 // ---------------------------------------------------------------------------
@@ -413,7 +415,74 @@ app.get("/", (req, res) => {
   res.type("html").send(html);
 });
 
+// ---------------------------------------------------------------------------
+// Inline JSON-RPC-over-HTTP transport.
+//
+// Implements the MCP Transport interface for a single request/response
+// cycle. The server connects to it, we inject the client's JSON-RPC
+// message via handleMessage(), the server processes it and calls send()
+// with the response, which we write directly to the HTTP response.
+// ---------------------------------------------------------------------------
+class InlineHttpServerTransport implements Transport {
+  private res: express.Response;
+  private settled = false;
+  private responsePromise: Promise<void>;
+  private resolveResponse!: () => void;
+
+  onclose?: () => void;
+  onerror?: (e: Error) => void;
+  onmessage?: (msg: JSONRPCMessage) => void;
+
+  constructor(_req: express.Request, res: express.Response) {
+    this.res = res;
+    this.responsePromise = new Promise((resolve) => {
+      this.resolveResponse = resolve;
+    });
+  }
+
+  async start(): Promise<void> {
+    // No-op — the HTTP request is already in flight.
+  }
+
+  async send(message: JSONRPCMessage): Promise<void> {
+    if (this.settled) return;
+    this.settled = true;
+    const msg = message as Record<string, unknown>;
+    // Only send responses (with id/result/error) back over HTTP.
+    // Notifications (no id) have no response to send.
+    if ("id" in msg || "result" in msg || "error" in msg) {
+      this.res.status(200).json(message);
+    } else {
+      // It's a notification — respond with 202 Accepted.
+      if (!this.res.headersSent) {
+        this.res.status(202).end();
+      }
+    }
+    this.resolveResponse();
+  }
+
+  async close(): Promise<void> {
+    if (!this.settled) {
+      this.settled = true;
+      if (!this.res.headersSent) {
+        this.res.status(204).end();
+      }
+      this.resolveResponse();
+    }
+    this.onclose?.();
+  }
+
+  /** Inject a JSON-RPC message and wait for the server to respond via send(). */
+  async handleMessage(message: JSONRPCMessage): Promise<void> {
+    this.onmessage?.(message);
+    // Wait until send() or close() is called by the server.
+    await this.responsePromise;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // MCP over SSE transport
+// ---------------------------------------------------------------------------
 const transports = new Map<string, SSEServerTransport>();
 
 app.get("/sse", async (req, res) => {
@@ -431,6 +500,58 @@ app.get("/sse", async (req, res) => {
   });
 
   await server.connect(transport);
+});
+
+// ---------------------------------------------------------------------------
+// Simple JSON-RPC over HTTP endpoint (no SSE required).
+//
+// Some reverse proxies (Render's free tier included) close idle SSE
+// connections before the client can POST back, which breaks the standard
+// MCP SSE transport. This endpoint accepts a single JSON-RPC request per
+// HTTP POST and returns the response in the same HTTP response — no
+// streaming, no sessions, no timeouts.
+//
+// The request body is a standard JSON-RPC 2.0 message:
+//   { "jsonrpc": "2.0", "id": 1, "method": "tools/call",
+//     "params": { "name": "list_devices", "arguments": {} } }
+//
+// The response is a standard JSON-RPC 2.0 response:
+//   { "jsonrpc": "2.0", "id": 1, "result": { "content": [...] } }
+//
+// Notifications (no `id`) get a 202 with empty body.
+// ---------------------------------------------------------------------------
+app.post("/rpc", async (req, res) => {
+  if (!checkApiKey(req)) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  const rpcReq = req.body;
+  if (!rpcReq || typeof rpcReq !== "object" || typeof rpcReq.method !== "string") {
+    res.status(400).json({
+      jsonrpc: "2.0",
+      error: { code: -32600, message: "Invalid Request" },
+      id: null,
+    });
+    return;
+  }
+
+  // Create a fresh MCP server for each request (cheap — no state between calls).
+  const server = createMcpServer();
+  const transport = new InlineHttpServerTransport(req, res);
+  try {
+    await server.connect(transport);
+    await transport.handleMessage(rpcReq);
+  } catch (e) {
+    if (!res.headersSent) {
+      res.status(500).json({
+        jsonrpc: "2.0",
+        error: { code: -32603, message: e instanceof Error ? e.message : "Internal error" },
+        id: rpcReq.id ?? null,
+      });
+    }
+  } finally {
+    await server.close().catch(() => {});
+  }
 });
 
 app.post("/messages", async (req, res) => {
