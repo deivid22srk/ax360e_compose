@@ -836,11 +836,28 @@ struct MEMSET_I64
 
     // Use `dc zva` if it writes more bytes at a time than STP
     if (zva_enable && len >= zva_length && zva_length > 16) {
+      // [RANGE FIX] The ADD-immediate encoding only accepts a 12-bit
+      // unsigned immediate (0..4095). zva_length = 4 << BS where BS is
+      // DCZID_EL0[3:0]; for BS >= 10 the ZVA block size is >= 4 KiB and
+      // the post-increment would trigger ERR_ILLEGAL_IMM_RANGE in Xbyak.
+      // Real ARM64 hardware uses BS = 4 (64-byte blocks) so this path is
+      // rarely taken, but we still need to guard it so the JIT never
+      // throws on hardware with larger ZVA blocks. When zva_length exceeds
+      // the 12-bit immediate range we materialise it in a scratch
+      // register (x17) and use the register-form of ADD.
+      const bool zva_length_fits_imm = zva_length <= 4095;
+      if (!zva_length_fits_imm) {
+        e.mov(e.x17, zva_length);
+      }
       for (; off + zva_length <= len; off += zva_length) {
         // dc zva, x0
         e.sys(0b011, 0b0111, 0b0100, 0b001, e.x0);
         if (off + zva_length < len) {
-          e.add(e.x0, e.x0, zva_length);
+          if (zva_length_fits_imm) {
+            e.add(e.x0, e.x0, static_cast<uint32_t>(zva_length));
+          } else {
+            e.add(e.x0, e.x0, e.x17);
+          }
         }
       }
     }

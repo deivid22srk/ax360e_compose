@@ -329,8 +329,71 @@ uint32_t CodeGenerator::PCrelAddrEnc(uint32_t op, const XReg &rd, int64_t labelO
 void CodeGenerator::PCrelAddr(uint32_t op, const XReg &rd, const Label &label) {
   auto encFunc = [&, op, rd](int64_t labelOffset) { return PCrelAddrEnc(op, rd, labelOffset); };
   JmpLabel jmpL = JmpLabel(encFunc, size_);
-  uint32_t code = PCrelAddrEnc(op, rd, genLabelOffset(label, jmpL));
-  dd(code);
+  int64_t offset = genLabelOffset(label, jmpL);
+
+  if (op == 0) {
+    // ADR — has a ±1 MiB range. For JIT-generated code in large guest
+    // functions (e.g. Forza Horizon 2 generates 2-3 MiB of A64 code per
+    // function after HIR inlining), the ADR target can easily exceed this
+    // range. The canonical example is `EnsureSynchronizedGuestAndHostStack`
+    // in xenia's A64Emitter, which emits `adr x8, return_from_sync` in tail
+    // code that needs to reach a label bound in the function body.
+    //
+    // When the label is already bound (backward reference — the common case
+    // for the above scenario), `offset` is the real byte distance and we can
+    // fall back to a 2-instruction ADRP+ADD sequence with a ±4 GiB range:
+    //
+    //   adrp rd, label   ; rd = label & ~0xFFF  (page base, ±4 GiB range)
+    //   add  rd, rd, #(label & 0xFFF)           ; low 12 bits, always fits
+    //
+    // This matches the architectural pattern already used by the existing
+    // veneers for CondBrImm / CompareBr / TestBr in this file: try the
+    // short-range encoding first, and on ERR_ILLEGAL_IMM_RANGE emit a
+    // long-range veneer. For forward (unbound) references the JmpLabel
+    // callback registered above still uses the plain ADR encoding and will
+    // throw at backpatch time if the distance is too large — same
+    // limitation as the existing branch veneers.
+    try {
+      uint32_t code = PCrelAddrEnc(op, rd, offset);
+      dd(code);
+    } catch (const Error& e) {
+      if ((int)e != ERR_ILLEGAL_IMM_RANGE) throw;
+      // Veneer: ADRP + ADD. Only valid for bound labels (offset != 0 or
+      // offset == 0 but label resolved). For unbound labels, offset is 0
+      // and we wouldn't be here (the fast path above succeeded).
+      //
+      // At this point `size_` is the position where ADRP will be emitted
+      // (no instructions have been written yet for this PCrelAddr call).
+      // The label's absolute byte address is:
+      //   label_addr_bytes = size_ * CSIZE + offset
+      // and the low 12 bits we need for the ADD immediate are:
+      //   page_offset = label_addr_bytes & 0xFFF
+      //
+      // ADRP rd, label computes (label & ~0xFFF) — verified by the ARM ARM
+      // ADRP semantics: result = (PC & ~0xFFF) + sign_extend(imm21) << 12,
+      // where imm21 = (labelOffset >> 12) which equals (label_page - PC_page)
+      // for the bound-label case. After ADRP, ADD rd, rd, #page_offset
+      // reconstructs the exact label address.
+      uint64_t label_addr_bytes =
+          static_cast<uint64_t>(size_) * CSIZE + offset;
+      uint32_t page_offset =
+          static_cast<uint32_t>(label_addr_bytes & 0xFFF);
+
+      // Emit ADRP rd, label (op = 1). PCrelAddrEnc with op=1 shifts the
+      // offset by 12 and the range check becomes ±4 GiB, so this never
+      // throws for any realistic JIT function size.
+      uint32_t adrp_code = PCrelAddrEnc(1, rd, offset);
+      dd(adrp_code);
+
+      // Emit ADD rd, rd, #page_offset (op=0, S=0, shift=0). page_offset is
+      // at most 0xFFF so the 12-bit immediate range check always passes.
+      AddSubImm(0, 0, rd, rd, page_offset, 0);
+    }
+  } else {
+    // ADRP — already has ±4 GiB range, no veneer needed.
+    uint32_t code = PCrelAddrEnc(op, rd, offset);
+    dd(code);
+  }
 }
 
 void CodeGenerator::PCrelAddr(uint32_t op, const XReg &rd, int64_t label) {
