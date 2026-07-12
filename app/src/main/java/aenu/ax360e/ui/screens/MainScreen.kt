@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Gamepad
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -63,6 +64,7 @@ fun MainScreen() {
     )
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var menuExpanded by remember { mutableStateOf(false) }
+    var showCoverArtSettings by remember { mutableStateOf(false) }
 
     val openDirLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -146,6 +148,18 @@ fun MainScreen() {
                                     openFileManager()
                                 },
                                 leadingIcon = { Icon(Icons.Default.FolderOpen, contentDescription = null) }
+                            )
+                            // Cover art settings — lets the user paste their
+                            // TheGamesDB API key. ISO/ZAR games don't carry
+                            // any art metadata, so without this integration
+                            // every ISO row shows a generic placeholder icon.
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.cover_art_settings)) },
+                                onClick = {
+                                    menuExpanded = false
+                                    showCoverArtSettings = true
+                                },
+                                leadingIcon = { Icon(Icons.Default.Image, contentDescription = null) }
                             )
                             // Emulator Logs - shows per-game log files captured
                             // when the user exits a game. Each log contains the
@@ -232,5 +246,9 @@ fun MainScreen() {
                 )
             }
         }
+    }
+
+    if (showCoverArtSettings) {
+        CoverArtSettingsDialog(onDismiss = { showCoverArtSettings = false })
     }
 }

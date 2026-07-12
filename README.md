@@ -9,6 +9,7 @@ Fork do projeto [ax360e](https://github.com/deivid22srk/ax360e) (emulador de Xbo
 - **Settings reescrito do zero** — o framework `androidx.preference` (XML) foi substituído por um `SettingsTree` em Kotlin gerado a partir do `emulator_settings.xml` original; agora é renderizado inteiramente por componentes Compose (`Switch`, `Slider`, `AlertDialog`, etc.).
 - **KeyMap, About, VirtualControlEdit, EmulatorActivity** — todas reescritas em Compose. O `VirtualControl` continua como `SurfaceView` Java (desenho customizado) e é hospedado via `AndroidView`.
 - **Native C++ inalterado** — toda a integração com o xenia-canary permanece idêntica.
+- **Capas de jogos (ISO/ZAR) via TheGamesDB** — jogos ISO e ZAR não contêm metadados de capa (ao contrário dos GOD/STFS). A UI agora busca automaticamente a capa em https://api.thegamesdb.net (plataforma Xbox 360, id 15) usando o nome do arquivo como query. Resultados são cacheados em disco (`filesDir/covers/`) com sentinela `.miss` para evitar re-fetch de jogos sem capa. O usuário precisa cadastrar uma API key gratuita em https://thegamesdb.net/key.php e colá-la em **⋮ → Cover Art Settings**. Sem a chave, o ícone placeholder é exibido.
 
 ## Estrutura
 
@@ -31,9 +32,13 @@ app/src/main/java/aenu/ax360e/
 └── ui/
     ├── theme/                   # Theme.kt, Type.kt, Shape.kt (Material 3 Expressive)
     ├── components/              # GameCard.kt, EmptyState.kt
-    ├── model/                   # GameItem.kt, GameListLoader.kt
+    ├── model/                   # GameItem.kt, GameListLoader.kt,
+    │                            # CoverArtRepository.kt (TheGamesDB API),
+    │                            # CoverArtCache.kt (disk + sentinel),
+    │                            # CoverArtLoader.kt (memory → disk → network)
     └── screens/                 # MainScreen.kt, AboutScreen.kt, KeyMapScreen.kt,
-                                 # EmulatorSettingsScreen.kt, SettingsTree.kt
+                                 # EmulatorSettingsScreen.kt, SettingsTree.kt,
+                                 # CoverArtSettingsDialog.kt
 ```
 
 ## Build

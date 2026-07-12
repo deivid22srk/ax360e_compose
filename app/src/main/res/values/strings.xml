@@ -100,13 +100,13 @@
 
 
     <string name="gratitude_content">Thanks Ruban for all the ICONS\n\n
-		Thanks to SRC267 (Sting) for managing reddit/discord\n\n
-		Thanks to 妖妖 for test\n\n
-		Thanks to 再见某人 \n\n
+                Thanks to SRC267 (Sting) for managing reddit/discord\n\n
+                Thanks to 妖妖 for test\n\n
+                Thanks to 再见某人 \n\n
         Thanks to 再见某人 \n\n
         Thanks to 再见某人 \n\n
         \n\n
-        		Based on the Xenia transplantation optimization, thanks to all the participants of the Xenia project\n\n
+                        Based on the Xenia transplantation optimization, thanks to all the participants of the Xenia project\n\n
     </string>
 
     <string name="es_apu">APU</string>
@@ -528,5 +528,15 @@ This Config requires you to pair an analog and digitial flag together while digi
 1 = LSE
 2 = F16C
 -1 = Detect and utilize all possible processor features</string>
+
+    <!-- Cover art (TheGamesDB integration) -->
+    <string name="cover_art_settings">Cover Art Settings</string>
+    <string name="cover_art_settings_title">Cover Art</string>
+    <string name="cover_art_settings_help">Cover art for ISO/ZAR games is fetched from TheGamesDB (api.thegamesdb.net). Register a free account at thegamesdb.net and paste your API key here to enable cover downloads. Without a key, the placeholder icon is used.</string>
+    <string name="cover_art_api_key_label">TheGamesDB API Key</string>
+    <string name="cover_art_clear_cache">Clear cache</string>
+    <string name="cover_art_clear_cache_hint">Re-downloads covers on next refresh</string>
+    <string name="cover_art_save">Save</string>
+    <string name="cancel">Cancel</string>
 
 </resources>
