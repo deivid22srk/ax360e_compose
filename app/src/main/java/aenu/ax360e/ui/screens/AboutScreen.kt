@@ -1,18 +1,30 @@
 package aenu.ax360e.ui.screens
 
 import android.webkit.WebView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,9 +38,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import aenu.ax360e.Emulator
@@ -36,67 +50,121 @@ import aenu.ax360e.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen() {
+fun AboutScreen(onBack: (() -> Unit)? = null) {
     val context = LocalContext.current
     var showLicenses by remember { mutableStateOf(false) }
-    var aboutText by remember { mutableStateOf("") }
-
-    // Lazy-load device info on first composition
-    if (aboutText.isEmpty()) {
-        aboutText = runCatching {
-            Emulator.get?.simple_device_info() ?: ""
-        }.getOrDefault("")
+    var aboutText by remember {
+        mutableStateOf(
+            runCatching { Emulator.get?.simple_device_info() ?: "" }.getOrDefault("")
+        )
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.about)) },
+                navigationIcon = {
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 )
             )
-        },
-        bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                TextButton(onClick = {
-                    aboutText = context.getString(R.string.gratitude_content)
-                }) {
-                    Text(stringResource(R.string.gratitude))
-                }
-                TextButton(onClick = {
-                    aboutText = getUpdateLog()
-                }) {
-                    Text(stringResource(R.string.update_log))
-                }
-                TextButton(onClick = { showLicenses = true }) {
-                    Text(stringResource(R.string.open_source_licenses))
-                }
-            }
         }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                shape = MaterialTheme.shapes.extraLarge
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.SportsEsports,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = "0.15-compose · Material You",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilledTonalButton(
+                    onClick = { aboutText = context.getString(R.string.gratitude_content) },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.gratitude))
+                }
+                FilledTonalButton(
+                    onClick = { aboutText = getUpdateLog() },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.update_log))
+                }
+                FilledTonalButton(
+                    onClick = { showLicenses = true },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.open_source_licenses), maxLines = 1)
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                ),
+                shape = MaterialTheme.shapes.large
             ) {
                 Text(
-                    text = aboutText,
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = aboutText.ifEmpty { stringResource(R.string.device_info) },
+                    style = MaterialTheme.typography.bodySmall,
                     fontFamily = FontFamily.Monospace,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 )
             }
         }
@@ -176,5 +244,11 @@ private fun getUpdateLog(): String {
          * Complete UI port to Jetpack Compose
          * Material 3 Expressive design system
          * No more XML layouts
+
+        0.16-compose (2026-07)
+         * Material You redesign inspired by RPCSX UI
+         * Navigation drawer + game grid library
+         * Preference-style settings components
+         * Pull-to-refresh game list
     """.trimIndent()
 }

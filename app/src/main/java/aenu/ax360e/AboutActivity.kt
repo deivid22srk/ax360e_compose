@@ -13,7 +13,7 @@ class AboutActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Ax360eTheme {
-                AboutScreen()
+                AboutScreen(onBack = { finish() })
             }
         }
     }

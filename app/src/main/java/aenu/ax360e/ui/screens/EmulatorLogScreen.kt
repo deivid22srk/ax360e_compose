@@ -7,20 +7,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
@@ -28,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -50,31 +47,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import aenu.ax360e.ui.components.EmptyState
 import aenu.ax360e.ui.model.EmulatorLogRepository
 import aenu.ax360e.ui.model.GameLogEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
-/**
- * Screen for browsing and viewing per-game emulator logs.
- *
- * Xenia-canary writes all XELOG* output to a file (configured via the
- * `--log_file` launch argument in src/xenia/base/logging.cc:449). When
- * a game session ends, EmulatorActivity calls
- * EmulatorLogRepository.captureGameLog() to copy the active `xe.log`
- * to `{app_data_dir}/ax360e/game_logs/{game_name}_{timestamp}.log`.
- *
- * This screen lists all captured logs, allows viewing the full content,
- * copying to clipboard, sharing via Intent, and deleting.
- *
- * Log line format (from logging.cc:317):
- *   `{prefix_char}> {thread_id_hex} {message}`
- * prefix_char values:
- *   '!' = Error, 'w' = Warning, 'i' = Info, 'd' = Debug,
- *   'C' = CPU, 'A' = APU, 'G' = GPU, 'K' = Kernel, 'F' = FileSystem
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmulatorLogScreen(
@@ -89,14 +68,8 @@ fun EmulatorLogScreen(
     var logContent by remember { mutableStateOf("") }
     var showClearDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf<GameLogEntry?>(null) }
-
-    // Pending export: the log entry the user wants to export. When set,
-    // the exportLauncher is launched to pick a destination URI via SAF.
     var pendingExport by remember { mutableStateOf<GameLogEntry?>(null) }
 
-    // SAF launcher for exporting a log file to a user-chosen location
-    // (Downloads, external SD, cloud drive, etc.). The contract
-    // CreateDocument() opens the system file picker in "save as" mode.
     val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("text/plain")
     ) { uri ->
@@ -104,14 +77,11 @@ fun EmulatorLogScreen(
         pendingExport = null
         if (uri != null && entry != null) {
             scope.launch(Dispatchers.IO) {
-                val success = EmulatorLogRepository.exportLogToUri(
-                    context, entry.file, uri
-                )
+                val success = EmulatorLogRepository.exportLogToUri(context, entry.file, uri)
                 withContext(Dispatchers.Main) {
                     scope.launch {
                         snackbarHostState.showSnackbar(
-                            if (success) "Log exported successfully"
-                            else "Failed to export log"
+                            if (success) "Log exported successfully" else "Failed to export log"
                         )
                     }
                 }
@@ -119,11 +89,8 @@ fun EmulatorLogScreen(
         }
     }
 
-    // Load log list
     LaunchedEffect(Unit) {
-        logs = withContext(Dispatchers.IO) {
-            EmulatorLogRepository.listLogs(context)
-        }
+        logs = withContext(Dispatchers.IO) { EmulatorLogRepository.listLogs(context) }
     }
 
     fun refreshLogs() {
@@ -166,44 +133,42 @@ fun EmulatorLogScreen(
     }
 
     fun exportLog(entry: GameLogEntry) {
-        // Launch the SAF "Save As" picker. The result is handled by
-        // exportLauncher above, which writes the log content to the
-        // chosen URI via EmulatorLogRepository.exportLogToUri().
         pendingExport = entry
-        val fileName = "${entry.gameName}_${entry.formattedTimestamp.replace(":", "_").replace(" ", "_")}.log"
+        val fileName =
+            "${entry.gameName}_${entry.formattedTimestamp.replace(":", "_").replace(" ", "_")}.log"
         exportLauncher.launch(fileName)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Emulator Logs") },
+                title = {
+                    Text(
+                        if (selectedLog != null) selectedLog!!.gameName else "Emulator Logs"
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = {
                         if (selectedLog != null) {
                             selectedLog = null
                             logContent = ""
-                        } else {
-                            onBack()
-                        }
+                        } else onBack()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
                 actions = {
                     if (selectedLog != null) {
-                        // Viewing a single log - copy, export, share
                         IconButton(onClick = { copyToClipboard(logContent) }) {
-                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy to clipboard")
+                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy")
                         }
                         IconButton(onClick = { exportLog(selectedLog!!) }) {
-                            Icon(Icons.Default.FolderOpen, contentDescription = "Export to file")
+                            Icon(Icons.Default.FolderOpen, contentDescription = "Export")
                         }
                         IconButton(onClick = { shareLog(selectedLog!!) }) {
                             Icon(Icons.Default.Share, contentDescription = "Share")
                         }
                     } else if (logs.isNotEmpty()) {
-                        // List view
                         IconButton(onClick = { showClearDialog = true }) {
                             Icon(Icons.Default.Delete, contentDescription = "Clear all")
                         }
@@ -217,7 +182,6 @@ fun EmulatorLogScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         if (selectedLog != null) {
-            // Single log viewer
             LogContentView(
                 entry = selectedLog!!,
                 content = logContent,
@@ -225,50 +189,29 @@ fun EmulatorLogScreen(
                     .fillMaxSize()
                     .padding(padding)
             )
+        } else if (logs.isEmpty()) {
+            EmptyState(
+                icon = Icons.Default.Description,
+                title = "No logs yet",
+                subtitle = "Logs are captured automatically when you exit a game.",
+                modifier = Modifier.padding(padding)
+            )
         } else {
-            // Log list
-            if (logs.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "No logs yet",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "Logs are captured automatically when you exit a game.\nEach session saves the xenia-canary output (XELOGE/W/I/D) to a per-game file.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                    }
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    items(logs, key = { it.file.absolutePath }) { entry ->
-                        LogEntryRow(
-                            entry = entry,
-                            onClick = { openLog(entry) },
-                            onExport = { exportLog(entry) },
-                            onShare = { shareLog(entry) },
-                            onDelete = { showDeleteDialog = entry }
-                        )
-                    }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(logs, key = { it.file.absolutePath }) { entry ->
+                    LogEntryRow(
+                        entry = entry,
+                        onClick = { openLog(entry) },
+                        onExport = { exportLog(entry) },
+                        onShare = { shareLog(entry) },
+                        onDelete = { showDeleteDialog = entry }
+                    )
                 }
             }
         }
@@ -278,7 +221,7 @@ fun EmulatorLogScreen(
         AlertDialog(
             onDismissRequest = { showClearDialog = false },
             title = { Text("Clear all logs?") },
-            text = { Text("This will permanently delete all ${logs.size} saved log(s). This cannot be undone.") },
+            text = { Text("This will permanently delete all ${logs.size} saved log(s).") },
             confirmButton = {
                 TextButton(onClick = {
                     showClearDialog = false
@@ -289,9 +232,7 @@ fun EmulatorLogScreen(
                 }) { Text("Delete all") }
             },
             dismissButton = {
-                TextButton(onClick = { showClearDialog = false }) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = { showClearDialog = false }) { Text("Cancel") }
             }
         )
     }
@@ -311,15 +252,12 @@ fun EmulatorLogScreen(
                 }) { Text("Delete") }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = null }) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = { showDeleteDialog = null }) { Text("Cancel") }
             }
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LogEntryRow(
     entry: GameLogEntry,
@@ -330,7 +268,7 @@ private fun LogEntryRow(
 ) {
     Surface(
         onClick = onClick,
-        shape = MaterialTheme.shapes.medium,
+        shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -359,7 +297,7 @@ private fun LogEntryRow(
                 )
             }
             IconButton(onClick = onExport) {
-                Icon(Icons.Default.FolderOpen, contentDescription = "Export to file")
+                Icon(Icons.Default.FolderOpen, contentDescription = "Export")
             }
             IconButton(onClick = onShare) {
                 Icon(Icons.Default.Share, contentDescription = "Share")
@@ -382,7 +320,6 @@ private fun LogContentView(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        // Header with game info
         Surface(
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
             modifier = Modifier.fillMaxWidth()
@@ -393,10 +330,7 @@ private fun LogContentView(
                     .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                Text(
-                    text = entry.gameName,
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Text(text = entry.gameName, style = MaterialTheme.typography.titleMedium)
                 Text(
                     text = "${entry.formattedTimestamp} • ${entry.formattedSize}",
                     style = MaterialTheme.typography.bodySmall,
@@ -405,7 +339,6 @@ private fun LogContentView(
             }
         }
 
-        // Log content
         Box(
             modifier = Modifier
                 .fillMaxSize()
