@@ -62,6 +62,29 @@ public class Application extends android.app.Application{
         return global;
     }
 
+    /**
+     * Text-only rewrite of known-dangerous debug flags without loading native
+     * code. Used at Application.onCreate before any game can boot.
+     */
+    public static void sanitize_dangerous_logging_flags() {
+        try {
+            File global = ensure_global_config_file();
+            if (!global.exists()) return;
+            String text = Utils.load_string(global);
+            if (text == null || text.isEmpty()) return;
+            // Force dump_translated_hir_functions = false (crash vector on Android).
+            String patched = text.replaceAll(
+                    "(?m)^(\\s*dump_translated_hir_functions\\s*=\\s*)true(\\s*(?:#.*)?)?$",
+                    "$1false$2"
+            );
+            if (!patched.equals(text)) {
+                Utils.save_string(global, patched);
+            }
+        } catch (Throwable ignored) {
+            // Never block app start on config sanitize.
+        }
+    }
+
     public  static byte[] load_assets_file(Context ctx,String asset_file_path) {
         try {
             InputStream in = ctx.getAssets().open(asset_file_path);
@@ -119,6 +142,12 @@ public class Application extends android.app.Application{
 
         // Seed global settings so the Settings screen works before first game boot.
         ensure_global_config_file();
+
+        // Safety: dump_translated_hir_functions writes relative hirdump_* dirs
+        // and used to abort on Android when CWD is read-only. Force it off at
+        // process start so a previously-saved "true" cannot brick game launch
+        // until the user opens Emulator Logs / Settings.
+        sanitize_dangerous_logging_flags();
 
         if(!get_default_profile_file().exists()){
             File default_profile_dir=get_default_profile_file().getParentFile();

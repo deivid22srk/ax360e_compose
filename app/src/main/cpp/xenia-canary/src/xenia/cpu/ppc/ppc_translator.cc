@@ -9,9 +9,11 @@
 
 #include "xenia/cpu/ppc/ppc_translator.h"
 
+#include "third_party/fmt/include/fmt/format.h"
 #include "xenia/base/assert.h"
 #include "xenia/base/byte_order.h"
 #include "xenia/base/cvar.h"
+#include "xenia/base/logging.h"
 #include "xenia/base/memory.h"
 #include "xenia/base/profiling.h"
 #include "xenia/base/reset_scope.h"
@@ -27,6 +29,12 @@
 
 DEFINE_bool(dump_translated_hir_functions, false, "dumps translated hir",
             "CPU");
+
+// storage_root is defined in xenia_main.cc; on Android ax360e passes
+// --storage_root=<app external files>/ax360e which is writable. DumpHIR used
+// to create relative "hirdump_*" folders in CWD and abort with
+// filesystem_error on read-only Android process CWD.
+DECLARE_path(storage_root);
 
 DEFINE_bool(disable_context_promotion, false,
             "Disables Context Promotion optimizations, this may be needed for "
@@ -128,42 +136,56 @@ class HirBuilderScope {
   }
 };
 void PPCTranslator::DumpHIR(GuestFunction* function, PPCHIRBuilder* builder) {
-  if (cvars::dump_translated_hir_functions) {
-    StringBuffer buffer{};
-    builder_->Dump(&buffer);
+  if (!cvars::dump_translated_hir_functions) {
+    return;
+  }
 
-    XexModule* mod = dynamic_cast<XexModule*>(function->module());
+  StringBuffer buffer{};
+  builder_->Dump(&buffer);
 
-    std::wstring folder_name = L"hirdump";
+  XexModule* mod = dynamic_cast<XexModule*>(function->module());
 
-    if (mod) {
-      xex2_opt_execution_info* opt_exec_info = nullptr;
-      if (mod->GetOptHeader(XEX_HEADER_EXECUTION_INFO, &opt_exec_info)) {
-        folder_name =
-            L"hirdump_title_" + std::to_wstring(opt_exec_info->title_id);
-      }
+  std::string folder_name = "hirdump";
+  if (mod) {
+    xex2_opt_execution_info* opt_exec_info = nullptr;
+    if (mod->GetOptHeader(XEX_HEADER_EXECUTION_INFO, &opt_exec_info) &&
+        opt_exec_info) {
+      folder_name =
+          fmt::format("hirdump_title_{:08X}", opt_exec_info->title_id);
     }
-    std::filesystem::path folder_path{folder_name};
+  }
 
-    if (!std::filesystem::exists(folder_path)) {
-      std::filesystem::create_directory(folder_path);
+  // Prefer storage_root/cache (writable on Android). Fall back to relative
+  // path only when storage_root was not set (desktop portable mode).
+  std::filesystem::path folder_path;
+  if (!cvars::storage_root.empty()) {
+    folder_path = std::filesystem::path(cvars::storage_root) / "cache" /
+                  "hirdump" / folder_name;
+  } else {
+    folder_path = std::filesystem::path(folder_name);
+  }
+
+  try {
+    std::error_code ec;
+    std::filesystem::create_directories(folder_path, ec);
+    if (ec) {
+      XELOGE("DumpHIR: create_directories({}) failed: {}",
+             folder_path.string(), ec.message());
+      return;
     }
 
-    {
-      wchar_t tmpbuf[64];
-#ifdef XE_PLATFORM_WIN32
-      _snwprintf(tmpbuf, 64, L"%X", function->address());
-#else
-      swprintf(tmpbuf, 64, L"%X", function->address());
-#endif
-      folder_path.append(&tmpbuf[0]);
-    }
-
-    FILE* f = fopen(folder_path.string().c_str(), "w");
+    auto file_path =
+        folder_path / fmt::format("{:08X}.hir", function->address());
+    FILE* f = fopen(file_path.string().c_str(), "w");
     if (f) {
       fputs(buffer.buffer(), f);
       fclose(f);
+    } else {
+      XELOGE("DumpHIR: fopen({}) failed", file_path.string());
     }
+  } catch (const std::exception& e) {
+    // Never abort the emulator because of a debug dump.
+    XELOGE("DumpHIR: exception while writing HIR dump: {}", e.what());
   }
 }
 bool PPCTranslator::Translate(GuestFunction* function,

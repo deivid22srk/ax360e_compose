@@ -68,7 +68,7 @@ public class Utils {
         }
     }
 
-    static String load_string(File file){
+    public static String load_string(File file){
         try{
             FileInputStream fis=new FileInputStream(file);
             byte[] buf=new byte[fis.available()];

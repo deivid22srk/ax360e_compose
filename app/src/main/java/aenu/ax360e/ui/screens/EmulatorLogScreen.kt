@@ -101,8 +101,13 @@ fun EmulatorLogScreen(
     }
 
     LaunchedEffect(Unit) {
-        logs = withContext(Dispatchers.IO) { EmulatorLogRepository.listLogs(context) }
-        currentLogLevel = withContext(Dispatchers.IO) { LoggingConfigHelper.readLogLevel() }
+        // Auto-recover configs that enable HIR file dumps — those used to
+        // abort the emu process on Android (create_directory on read-only CWD).
+        withContext(Dispatchers.IO) {
+            LoggingConfigHelper.disableHirFileDumps()
+            logs = EmulatorLogRepository.listLogs(context)
+            currentLogLevel = LoggingConfigHelper.readLogLevel()
+        }
     }
 
     fun refreshLogs() {
