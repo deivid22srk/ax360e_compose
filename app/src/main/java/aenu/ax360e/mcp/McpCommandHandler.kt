@@ -30,11 +30,17 @@ class McpCommandHandler(private val appContext: Context) {
 
             "get_logs" -> getLogs(args)
 
+            "get_crash_logs" -> getCrashLogs(args)
+
+            "clear_logs" -> clearLogs()
+
             "list_games" -> listGames()
 
             "open_game" -> openGame(args)
 
             "close_game" -> closeGame()
+
+            "force_kill_emulator" -> forceKillEmulator()
 
             "get_emulator_status" -> getEmulatorStatus()
 
@@ -261,5 +267,151 @@ class McpCommandHandler(private val appContext: Context) {
             .put("path", configPath)
             .put("exists", true)
             .put("content", content)
+    }
+
+    /**
+     * List and read crash logs captured by EmulatorLogRepository.
+     *
+     * Crash logs are saved when a game session ends abnormally. The
+     * repository keeps up to 50 logs; this command can either list them
+     * (default) or read a specific file by name.
+     */
+    private fun getCrashLogs(args: JSONObject): JSONObject {
+        val action = args.optString("action", "list")  // "list" or "read"
+        val logs = EmulatorLogRepository.listLogs(appContext)
+
+        if (action == "list") {
+            val arr = JSONArray()
+            logs.forEach { entry ->
+                arr.put(JSONObject()
+                    .put("fileName", entry.file.name)
+                    .put("gameName", entry.gameName)
+                    .put("timestamp", entry.timestamp)
+                    .put("formattedTimestamp", entry.formattedTimestamp)
+                    .put("sizeBytes", entry.sizeBytes)
+                    .put("formattedSize", entry.formattedSize)
+                    .put("isCrash", entry.file.name.contains("_crash_"))
+                )
+            }
+            return JSONObject()
+                .put("action", "list")
+                .put("logs", arr)
+                .put("count", logs.size)
+                .put("logsDir", EmulatorLogRepository.getLogsDir(appContext).absolutePath)
+        }
+
+        if (action == "read") {
+            val fileName = args.optString("fileName")
+            if (fileName.isEmpty()) throw IllegalArgumentException("Missing 'fileName' for read action")
+            val logsDir = EmulatorLogRepository.getLogsDir(appContext)
+            val target = java.io.File(logsDir, fileName)
+            if (!target.exists()) {
+                return JSONObject().put("ok", false).put("error", "File not found: $fileName")
+            }
+            // Read up to 1 MB
+            val content = EmulatorLogRepository.readLog(target, maxBytes = 1L * 1024 * 1024)
+            // Return last N lines if too big
+            val maxLines = args.optInt("maxLines", 500)
+            val lines = content.lines()
+            val returned = if (lines.size > maxLines) lines.takeLast(maxLines) else lines
+            return JSONObject()
+                .put("ok", true)
+                .put("fileName", fileName)
+                .put("sizeBytes", target.length())
+                .put("totalLines", lines.size)
+                .put("returnedLines", returned.size)
+                .put("truncated", lines.size > maxLines)
+                .put("lines", JSONArray().apply { returned.forEach { put(it) } })
+        }
+
+        if (action == "read_active") {
+            // Read the current active xe.log (may contain incomplete data if
+            // the process crashed without flushing)
+            val active = EmulatorLogRepository.getActiveLogFile()
+            if (!active.exists() || active.length() == 0L) {
+                return JSONObject().put("ok", false).put("error", "No active log file")
+            }
+            val content = EmulatorLogRepository.readLog(active, maxBytes = 2L * 1024 * 1024)
+            val maxLines = args.optInt("maxLines", 1000)
+            val lines = content.lines()
+            val returned = if (lines.size > maxLines) lines.takeLast(maxLines) else lines
+            return JSONObject()
+                .put("ok", true)
+                .put("fileName", active.name)
+                .put("path", active.absolutePath)
+                .put("sizeBytes", active.length())
+                .put("lastModified", active.lastModified())
+                .put("totalLines", lines.size)
+                .put("returnedLines", returned.size)
+                .put("truncated", lines.size > maxLines)
+                .put("lines", JSONArray().apply { returned.forEach { put(it) } })
+        }
+
+        throw IllegalArgumentException("Unknown action: $action (expected: list, read, read_active)")
+    }
+
+    /**
+     * Clear all saved crash/game logs. Useful for starting fresh before
+     * a debugging session.
+     */
+    private fun clearLogs(): JSONObject {
+        val count = EmulatorLogRepository.clearAllLogs(appContext)
+        return JSONObject()
+            .put("ok", true)
+            .put("deletedCount", count)
+    }
+
+    /**
+     * Force-kill the :emu process. The emulator activity runs in a separate
+     * process (android:process=":emu" in the manifest). When a game hangs
+     * (e.g. stuck on a loading screen with a deadlocked guest thread),
+     * the only way to recover is to kill that process. We can't directly
+     * kill another process from the main process without permission, but
+     * we can launch the main activity with CLEAR_TOP which forces the
+     * emulator activity to be backgrounded; Android will kill the :emu
+     * process shortly after due to its foreground service being gone.
+     *
+     * For a more immediate kill, we use ActivityManager.killBackgroundProcesses
+     * which works for processes without a visible activity.
+     */
+    private fun forceKillEmulator(): JSONObject {
+        val results = JSONObject()
+
+        // Method 1: Bring main activity to front, clearing the back stack.
+        // This backgrounds the emulator activity, causing its process to be
+        // killed by the system.
+        try {
+            val mainIntent = Intent(appContext, aenu.ax360e.MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
+            appContext.startActivity(mainIntent)
+            results.put("broughtMainToForeground", true)
+        } catch (e: Exception) {
+            results.put("broughtMainToForeground", false)
+            results.put("bringToFrontError", e.message ?: "unknown")
+        }
+
+        // Method 2: Try to kill background processes (works if :emu is no
+        // longer the foreground activity).
+        try {
+            val am = appContext.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+            am.killBackgroundProcesses(appContext.packageName)
+            results.put("killBackgroundProcesses", true)
+        } catch (e: Exception) {
+            results.put("killBackgroundProcesses", false)
+            results.put("killError", e.message ?: "unknown")
+        }
+
+        // Clear the session info so the next open_game starts fresh
+        try {
+            EmulatorLogRepository.clearSession(appContext)
+            results.put("clearedSession", true)
+        } catch (_: Exception) {
+            results.put("clearedSession", false)
+        }
+
+        results.put("ok", true)
+        results.put("message", "Force-kill requested. The :emu process should die within a few seconds.")
+        return results
     }
 }

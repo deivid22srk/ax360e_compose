@@ -196,6 +196,64 @@ function createMcpServer(): Server {
         },
       },
       {
+        name: "get_crash_logs",
+        description:
+          "List or read crash logs captured by the device's EmulatorLogRepository. " +
+          "Crash logs are saved when a game session ends abnormally (process kill, " +
+          "crash, force-stop). Use action='list' to get all saved logs with metadata, " +
+          "action='read' with fileName to read a specific log, or action='read_active' " +
+          "to read the current xe.log (which may contain incomplete data if the process " +
+          "crashed without flushing).",
+        inputSchema: {
+          type: "object",
+          properties: {
+            deviceId: { type: "string" },
+            action: {
+              type: "string",
+              enum: ["list", "read", "read_active"],
+              default: "list",
+            },
+            fileName: {
+              type: "string",
+              description: "Required for action='read'. The log file name from the list.",
+            },
+            maxLines: {
+              type: "integer",
+              minimum: 10,
+              maximum: 5000,
+              default: 500,
+            },
+          },
+          required: ["deviceId"],
+        },
+      },
+      {
+        name: "clear_logs",
+        description:
+          "Delete ALL saved crash/game logs on the device. Useful for starting " +
+          "fresh before a debugging session. Returns the count of deleted files.",
+        inputSchema: {
+          type: "object",
+          properties: { deviceId: { type: "string" } },
+          required: ["deviceId"],
+        },
+      },
+      {
+        name: "force_kill_emulator",
+        description:
+          "Force-kill the :emu process on the device. Use this when a game hangs " +
+          "(stuck on a loading screen with a deadlocked guest thread) and the user " +
+          "can't reach the back button. Brings the main activity to the foreground " +
+          "(backgrounding the emulator activity, which Android will then kill) and " +
+          "calls ActivityManager.killBackgroundProcesses. Also clears the session " +
+          "info so the next open_game starts fresh.",
+        inputSchema: {
+          type: "object",
+          properties: { deviceId: { type: "string" } },
+          required: ["deviceId"],
+        },
+      },
+      {
         name: "list_games",
         description:
           "List all games available on the device's configured game directory. " +
@@ -314,6 +372,27 @@ function createMcpServer(): Server {
           );
           const filter = args?.filter as string | undefined;
           const result = await sendToDevice(deviceId, "get_logs", { level, limit, filter });
+          return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        }
+
+        case "get_crash_logs": {
+          const deviceId = z.string().parse(args?.deviceId);
+          const action = (args?.action as string) ?? "list";
+          const fileName = (args?.fileName as string) ?? "";
+          const maxLines = (args?.maxLines as number) ?? 500;
+          const result = await sendToDevice(deviceId, "get_crash_logs", { action, fileName, maxLines });
+          return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        }
+
+        case "clear_logs": {
+          const deviceId = z.string().parse(args?.deviceId);
+          const result = await sendToDevice(deviceId, "clear_logs", {});
+          return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        }
+
+        case "force_kill_emulator": {
+          const deviceId = z.string().parse(args?.deviceId);
+          const result = await sendToDevice(deviceId, "force_kill_emulator", {});
           return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
         }
 
