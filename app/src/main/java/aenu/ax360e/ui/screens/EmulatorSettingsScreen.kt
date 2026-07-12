@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import aenu.ax360e.Application
@@ -179,7 +180,9 @@ fun EmulatorSettingsScreen(
                     Text(
                         text = if (currentScreen.isEmpty())
                             stringResource(R.string.settings)
-                        else currentScreen.last()
+                        else currentScreen.last(),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
@@ -187,7 +190,11 @@ fun EmulatorSettingsScreen(
                         if (currentScreen.isEmpty()) leaveSettings()
                         else currentScreen = currentScreen.dropLast(1)
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -245,7 +252,13 @@ fun EmulatorSettingsScreen(
                 }
             }
 
-            items(entries, key = { it.key }) { entry ->
+            // [REFRESH FIX] Add refreshToken to the items() key so the LazyColumn
+            // recomposes every entry whenever a setting is changed. Previously
+            // only `it.key` was the key, which meant the per-item content lambdas
+            // were cached and never recomputed when refreshToken incremented —
+            // so the Switch/Slider/TextField visually stayed in the old state
+            // until the user left the screen and came back.
+            items(entries, key = { "${it.key}::$refreshToken" }) { entry ->
                 when (entry) {
                     is SettingsEntry.Section -> {
                         RegularPreference(

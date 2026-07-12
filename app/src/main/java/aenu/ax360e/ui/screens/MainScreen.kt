@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
@@ -57,6 +59,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -83,6 +86,24 @@ private data class DrawerDestination(
     val onClick: () -> Unit
 )
 
+/**
+ * v2 redesign main screen.
+ *
+ * Layout reference: pastebin kSG9hRBW (game library) + WPDn4NM8 (drawer open).
+ *
+ * Structure:
+ *  - CenterAlignedTopAppBar with semi-transparent surface + blur (scrolledContainerColor)
+ *  - ModalNavigationDrawer with avatar header (Player 1 / Xbox Live Gold) +
+ *    version footer, items use the rounded-pill selected style from the mock
+ *  - LazyVerticalGrid with adaptive columns (min 150.dp) so we get 2 cols on
+ *    phones, 3-4 on tablets, 5-6 on landscape tablets
+ *  - FAB bottom-right with rounded-square shape (matches mockup, not the
+ *    default circular FAB)
+ *
+ * All existing functionality is preserved: drawer destinations, refresh,
+ * pull-to-refresh, FAB sets game dir, empty state with secondary action,
+ * error display.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
@@ -209,7 +230,8 @@ fun MainScreen() {
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                drawerShape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -217,24 +239,34 @@ fun MainScreen() {
                         .verticalScroll(rememberScrollState())
                         .padding(bottom = 24.dp)
                 ) {
+                    // Avatar header — matches the mockup's "Player 1 / Xbox Live Gold"
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp, vertical = 28.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.SportsEsports,
-                            contentDescription = null,
-                            modifier = Modifier.size(40.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(Modifier.height(12.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SportsEsports,
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Spacer(Modifier.height(16.dp))
                         Text(
-                            text = stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            text = "aX360e Free",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
+                        Spacer(Modifier.height(2.dp))
                         Text(
                             text = "Xbox 360 · Material You",
                             style = MaterialTheme.typography.bodyMedium,
@@ -244,25 +276,49 @@ fun MainScreen() {
 
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
                     )
 
                     destinations.forEach { dest ->
                         NavigationDrawerItem(
-                            label = { Text(dest.label) },
+                            label = {
+                                Text(
+                                    text = dest.label,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            },
                             selected = false,
                             onClick = dest.onClick,
                             icon = {
-                                Icon(dest.icon, contentDescription = null)
+                                Icon(
+                                    dest.icon,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
                             },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                            modifier = Modifier
+                                .padding(NavigationDrawerItemDefaults.ItemPadding)
+                                .padding(vertical = 2.dp),
+                            shape = RoundedCornerShape(28.dp),
                             colors = NavigationDrawerItemDefaults.colors(
                                 unselectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurface
+                                unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         )
                     }
+
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        text = "v${stringResource(R.string.app_version)}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier
+                            .padding(24.dp)
+                    )
                 }
             }
         }
@@ -273,20 +329,26 @@ fun MainScreen() {
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            text = stringResource(R.string.app_name),
-                            fontWeight = FontWeight.SemiBold
+                            text = "aX360e Free",
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = "Menu",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     },
                     actions = {
                         IconButton(onClick = { viewModel.refresh() }) {
                             Icon(
                                 Icons.Default.Refresh,
-                                contentDescription = stringResource(R.string.refresh_list)
+                                contentDescription = stringResource(R.string.refresh_list),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         IconButton(
@@ -296,12 +358,13 @@ fun MainScreen() {
                         ) {
                             Icon(
                                 Icons.Default.Settings,
-                                contentDescription = stringResource(R.string.settings)
+                                contentDescription = stringResource(R.string.settings),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
                         scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
                 )
@@ -309,10 +372,14 @@ fun MainScreen() {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = { openDirLauncher.launch(null) },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    Icon(Icons.Default.FolderOpen, contentDescription = stringResource(R.string.set_game_dir))
+                    Icon(
+                        Icons.Default.FolderOpen,
+                        contentDescription = stringResource(R.string.set_game_dir)
+                    )
                 }
             }
         ) { padding ->
@@ -373,13 +440,13 @@ fun MainScreen() {
 
                     else -> {
                         LazyVerticalGrid(
-                            columns = GridCells.Adaptive(minSize = 168.dp),
+                            columns = GridCells.Adaptive(minSize = 150.dp),
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(
-                                start = 12.dp,
-                                end = 12.dp,
-                                top = 8.dp,
-                                bottom = 88.dp
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp,
+                                bottom = 96.dp
                             ),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)

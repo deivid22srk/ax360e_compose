@@ -16,81 +16,91 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
 
 /**
- * Material You palette aligned with RPCSX-ui-android surface containers,
- * tinted toward Xbox green accents for aX360e identity.
+ * Material 3 Expressive color palette aligned with the v2 redesign reference.
+ *
+ * The dark scheme uses a deep purple/violet primary (with the
+ * `#e9ddff / #d0bcff` family from the design mock) instead of the original
+ * Xbox green. The light scheme mirrors the same hue family with the
+ * corresponding M3 light tonal palette.
+ *
+ * Surface containers follow the M3 2024 spec (surfaceDim < surfaceContainerLow
+ * < surfaceContainer < surfaceContainerHigh < surfaceContainerHighest) so the
+ * card backgrounds in the new layouts render with the correct elevation tint.
  */
 object Ax360eColors {
-    val primaryLight = Color(0xFF006E1C)
+    // ---- Light scheme (purple family) ----
+    val primaryLight = Color(0xFF6B4EA2)
     val onPrimaryLight = Color(0xFFFFFFFF)
-    val primaryContainerLight = Color(0xFF94F990)
-    val onPrimaryContainerLight = Color(0xFF002204)
-    val secondaryLight = Color(0xFF52634F)
+    val primaryContainerLight = Color(0xFFEBDCFF)
+    val onPrimaryContainerLight = Color(0xFF22005C)
+    val secondaryLight = Color(0xFF984061)
     val onSecondaryLight = Color(0xFFFFFFFF)
-    val secondaryContainerLight = Color(0xFFD5E8CF)
-    val onSecondaryContainerLight = Color(0xFF101F0F)
-    val tertiaryLight = Color(0xFF38656A)
+    val secondaryContainerLight = Color(0xFFFFD9E2)
+    val onSecondaryContainerLight = Color(0xFF3E001E)
+    val tertiaryLight = Color(0xFF6B4EA2)
     val onTertiaryLight = Color(0xFFFFFFFF)
-    val tertiaryContainerLight = Color(0xFFBCEBF0)
-    val onTertiaryContainerLight = Color(0xFF002023)
+    val tertiaryContainerLight = Color(0xFFEBDCFF)
+    val onTertiaryContainerLight = Color(0xFF22005C)
     val errorLight = Color(0xFFBA1A1A)
     val onErrorLight = Color(0xFFFFFFFF)
     val errorContainerLight = Color(0xFFFFDAD6)
     val onErrorContainerLight = Color(0xFF410002)
-    val backgroundLight = Color(0xFFFCFDF6)
-    val onBackgroundLight = Color(0xFF1A1C19)
-    val surfaceLight = Color(0xFFFCFDF6)
-    val onSurfaceLight = Color(0xFF1A1C19)
-    val surfaceVariantLight = Color(0xFFDEE5D8)
-    val onSurfaceVariantLight = Color(0xFF424940)
-    val outlineLight = Color(0xFF72796F)
-    val outlineVariantLight = Color(0xFFC2C9BC)
+    val backgroundLight = Color(0xFFFFF7FB)
+    val onBackgroundLight = Color(0xFF1E1B22)
+    val surfaceLight = Color(0xFFFFF7FB)
+    val onSurfaceLight = Color(0xFF1E1B22)
+    val surfaceVariantLight = Color(0xFFE7E0EB)
+    val onSurfaceVariantLight = Color(0xFF49454F)
+    val outlineLight = Color(0xFF7A757F)
+    val outlineVariantLight = Color(0xFFCAC4CF)
     val scrimLight = Color(0xFF000000)
-    val inverseSurfaceLight = Color(0xFF2F312D)
-    val inverseOnSurfaceLight = Color(0xFFF0F1EB)
-    val inversePrimaryLight = Color(0xFF78DC77)
-    val surfaceDimLight = Color(0xFFDADAD4)
-    val surfaceBrightLight = Color(0xFFFCFDF6)
+    val inverseSurfaceLight = Color(0xFF332F38)
+    val inverseOnSurfaceLight = Color(0xFFF6EFF7)
+    val inversePrimaryLight = Color(0xFFD3BBFF)
+    val surfaceDimLight = Color(0xFFE0D7E6)
+    val surfaceBrightLight = Color(0xFFFFF7FB)
     val surfaceContainerLowestLight = Color(0xFFFFFFFF)
-    val surfaceContainerLowLight = Color(0xFFF6F7F0)
-    val surfaceContainerLight = Color(0xFFF0F1EA)
-    val surfaceContainerHighLight = Color(0xFFEAEBE4)
-    val surfaceContainerHighestLight = Color(0xFFE5E6DF)
+    val surfaceContainerLowLight = Color(0xFFFAF1FA)
+    val surfaceContainerLight = Color(0xFFF4EBF4)
+    val surfaceContainerHighLight = Color(0xFFEEE5EE)
+    val surfaceContainerHighestLight = Color(0xFFE9E0E9)
 
-    val primaryDark = Color(0xFF78DC77)
-    val onPrimaryDark = Color(0xFF00390A)
-    val primaryContainerDark = Color(0xFF005313)
-    val onPrimaryContainerDark = Color(0xFF94F990)
-    val secondaryDark = Color(0xFFB9CCB4)
-    val onSecondaryDark = Color(0xFF253423)
-    val secondaryContainerDark = Color(0xFF3B4B39)
-    val onSecondaryContainerDark = Color(0xFFD5E8CF)
-    val tertiaryDark = Color(0xFFA0CFD4)
-    val onTertiaryDark = Color(0xFF00363B)
-    val tertiaryContainerDark = Color(0xFF1F4D52)
-    val onTertiaryContainerDark = Color(0xFFBCEBF0)
+    // ---- Dark scheme (matches the redesign reference exactly) ----
+    val primaryDark = Color(0xFFE9DDFF)
+    val onPrimaryDark = Color(0xFF37265E)
+    val primaryContainerDark = Color(0xFF594983)
+    val onPrimaryContainerDark = Color(0xFFEBDCFF)
+    val secondaryDark = Color(0xFFFFB0C9)
+    val onSecondaryDark = Color(0xFF5C1333)
+    val secondaryContainerDark = Color(0xFF7C2D4C)
+    val onSecondaryContainerDark = Color(0xFFFF9ABC)
+    val tertiaryDark = Color(0xFFE9DDFF)
+    val onTertiaryDark = Color(0xFF381E72)
+    val tertiaryContainerDark = Color(0xFF5B4397)
+    val onTertiaryContainerDark = Color(0xFFEBDCFF)
     val errorDark = Color(0xFFFFB4AB)
     val onErrorDark = Color(0xFF690005)
     val errorContainerDark = Color(0xFF93000A)
     val onErrorContainerDark = Color(0xFFFFDAD6)
-    val backgroundDark = Color(0xFF121411)
-    val onBackgroundDark = Color(0xFFE2E3DC)
-    val surfaceDark = Color(0xFF121411)
-    val onSurfaceDark = Color(0xFFE2E3DC)
-    val surfaceVariantDark = Color(0xFF424940)
-    val onSurfaceVariantDark = Color(0xFFC2C9BC)
-    val outlineDark = Color(0xFF8C9388)
-    val outlineVariantDark = Color(0xFF424940)
+    val backgroundDark = Color(0xFF141317)
+    val onBackgroundDark = Color(0xFFE6E1E7)
+    val surfaceDark = Color(0xFF141317)
+    val onSurfaceDark = Color(0xFFE6E1E7)
+    val surfaceVariantDark = Color(0xFF363438)
+    val onSurfaceVariantDark = Color(0xFFCAC4D0)
+    val outlineDark = Color(0xFF948F9A)
+    val outlineVariantDark = Color(0xFF49454F)
     val scrimDark = Color(0xFF000000)
-    val inverseSurfaceDark = Color(0xFFE2E3DC)
-    val inverseOnSurfaceDark = Color(0xFF2F312D)
-    val inversePrimaryDark = Color(0xFF006E1C)
-    val surfaceDimDark = Color(0xFF121411)
-    val surfaceBrightDark = Color(0xFF383A36)
-    val surfaceContainerLowestDark = Color(0xFF0C0F0C)
-    val surfaceContainerLowDark = Color(0xFF1A1C19)
-    val surfaceContainerDark = Color(0xFF1E201C)
-    val surfaceContainerHighDark = Color(0xFF282B27)
-    val surfaceContainerHighestDark = Color(0xFF333531)
+    val inverseSurfaceDark = Color(0xFFE6E1E7)
+    val inverseOnSurfaceDark = Color(0xFF323034)
+    val inversePrimaryDark = Color(0xFF665590)
+    val surfaceDimDark = Color(0xFF141317)
+    val surfaceBrightDark = Color(0xFF3B383D)
+    val surfaceContainerLowestDark = Color(0xFF0F0E11)
+    val surfaceContainerLowDark = Color(0xFF1C1B1F)
+    val surfaceContainerDark = Color(0xFF211F23)
+    val surfaceContainerHighDark = Color(0xFF2B292D)
+    val surfaceContainerHighestDark = Color(0xFF363438)
 }
 
 private val LightColorScheme = lightColorScheme(
@@ -172,7 +182,10 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun Ax360eTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    // [REDESIGN] Force the custom purple palette (matches the v2 mockups).
+    // The previous default (true) made Android 12+ override the palette with
+    // the user's wallpaper, hiding the intended violet identity.
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
