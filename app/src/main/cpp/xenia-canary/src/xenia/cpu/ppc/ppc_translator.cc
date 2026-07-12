@@ -150,8 +150,9 @@ void PPCTranslator::DumpHIR(GuestFunction* function, PPCHIRBuilder* builder) {
     xex2_opt_execution_info* opt_exec_info = nullptr;
     if (mod->GetOptHeader(XEX_HEADER_EXECUTION_INFO, &opt_exec_info) &&
         opt_exec_info) {
-      folder_name =
-          fmt::format("hirdump_title_{:08X}", opt_exec_info->title_id);
+      // title_id is xe::be<uint32_t> (big-endian wrapper), not a plain int.
+      const uint32_t title_id = opt_exec_info->title_id;
+      folder_name = fmt::format("hirdump_title_{:08X}", title_id);
     }
   }
 
