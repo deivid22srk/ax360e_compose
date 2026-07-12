@@ -34,7 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.nativeKeyEvent
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
@@ -181,7 +182,7 @@ fun KeyMapScreen(
             },
             modifier = Modifier.onKeyEvent { ev ->
                 if (ev.type == KeyEventType.KeyDown) {
-                    val code = ev.nativeKeyEvent.keyCode
+                    val code = ev.key.nativeKeyCode
                     if (code != 0 && code != KeyEvent.KEYCODE_BACK) {
                         prefs.edit()
                             .putInt(KeyMapConfig.KEY_NAMEIDS[idx].toString(), code)
