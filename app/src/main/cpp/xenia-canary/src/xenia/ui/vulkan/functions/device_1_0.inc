@@ -39,6 +39,9 @@ XE_UI_VULKAN_FUNCTION(vkCreateFramebuffer)
 XE_UI_VULKAN_FUNCTION(vkCreateGraphicsPipelines)
 XE_UI_VULKAN_FUNCTION(vkCreateImage)
 XE_UI_VULKAN_FUNCTION(vkCreateImageView)
+// [PERF] Pipeline cache — used by VulkanPipelineCache to let the driver
+// reuse compiled pipeline artifacts across frames.
+XE_UI_VULKAN_FUNCTION(vkCreatePipelineCache)
 XE_UI_VULKAN_FUNCTION(vkCreatePipelineLayout)
 XE_UI_VULKAN_FUNCTION(vkCreateRenderPass)
 XE_UI_VULKAN_FUNCTION(vkCreateSampler)
@@ -54,6 +57,8 @@ XE_UI_VULKAN_FUNCTION(vkDestroyFramebuffer)
 XE_UI_VULKAN_FUNCTION(vkDestroyImage)
 XE_UI_VULKAN_FUNCTION(vkDestroyImageView)
 XE_UI_VULKAN_FUNCTION(vkDestroyPipeline)
+// [PERF] Pipeline cache destroy — paired with vkCreatePipelineCache above.
+XE_UI_VULKAN_FUNCTION(vkDestroyPipelineCache)
 XE_UI_VULKAN_FUNCTION(vkDestroyPipelineLayout)
 XE_UI_VULKAN_FUNCTION(vkDestroyRenderPass)
 XE_UI_VULKAN_FUNCTION(vkDestroySampler)
