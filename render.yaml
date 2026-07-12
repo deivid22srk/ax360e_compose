@@ -1,0 +1,22 @@
+# Render Blueprint for the ax360e MCP Bridge service.
+# Apply via the Render API or `render blueprint apply`.
+# After deploy, set BRIDGE_API_KEY in the Render env vars dashboard (do NOT
+# commit a real key here).
+services:
+  - type: web
+    name: ax360e-mcp-bridge
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: feature/mcp-bridge-render
+    rootDir: mcp-bridge
+    dockerfilePath: ./mcp-bridge/Dockerfile
+    dockerContext: ./mcp-bridge
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BRIDGE_API_KEY
+        sync: false   # set manually in the Render dashboard
+    numInstances: 1

@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
@@ -77,6 +80,10 @@
             android:exported="false"
             android:label="Emulator Logs" />
 
+        <activity android:name="aenu.ax360e.AiRemoteControlActivity"
+            android:exported="false"
+            android:label="AI Remote Control" />
+
         <provider
             android:name="aenu.ax360e.DocumentsProvider"
             android:authorities="${applicationId}.DocumentsProvider"
@@ -87,5 +94,10 @@
                 <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
             </intent-filter>
         </provider>
+
+        <service
+            android:name="aenu.ax360e.mcp.McpBridgeService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 </manifest>

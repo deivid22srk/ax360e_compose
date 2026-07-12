@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import aenu.ax360e.AboutActivity
+import aenu.ax360e.AiRemoteControlActivity
 import aenu.ax360e.EmulatorActivity
 import aenu.ax360e.EmulatorSettings
 import aenu.ax360e.KeyMapActivity
@@ -181,6 +182,15 @@ fun MainScreen() {
             onClick = {
                 closeDrawerThen {
                     context.startActivity(Intent(context, LogViewerActivity::class.java))
+                }
+            }
+        ),
+        DrawerDestination(
+            label = "AI Remote Control",
+            icon = Icons.Default.Psychology,
+            onClick = {
+                closeDrawerThen {
+                    context.startActivity(Intent(context, AiRemoteControlActivity::class.java))
                 }
             }
         ),

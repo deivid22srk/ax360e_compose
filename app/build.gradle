@@ -71,6 +71,7 @@ dependencies {
     implementation libs.material
     implementation libs.documentfile
     implementation libs.preference
+    implementation libs.okhttp
 
     // Compose
     implementation platform(libs.compose.bom)
