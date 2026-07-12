@@ -58,7 +58,7 @@ public class Utils {
         return fileName;
     }
 
-    static void save_string(File file, String str){
+    public static void save_string(File file, String str){
         try{
             FileOutputStream fos=new FileOutputStream(file);
             fos.write(str.getBytes());
