@@ -292,9 +292,10 @@ staging_mode = false                              	# Enables preview mode in das
 
 [Logging]
 flush_log = true                                  	# Flush log file after each log line batch.
-log_file = ""                                     	# Logs are written to the given file
-log_level = 2                                     	# Maximum level to be logged. (0=error, 1=warning, 2=info, 3=debug)
-log_mask = 0                                      	# Disables specific categorizes for more granular debug logging. Kernel = 1, Apu = 2, Cpu = 4, Gpu = 8.
+log_file = ""                                     	# Logs are written to the given file (ax360e also forces --log_file=.../xe.log at boot)
+log_level = 2                                     	# Maximum level to be logged. (0=error, 1=warning, 2=info, 3=debug, 4=trace)
+                                                  	# Raise to 3/4 for JIT/function-level detail (XELOGD, CPU tracers).
+log_mask = 0                                      	# Bitmask of categories to DISABLE (Kernel=1, Apu=2, Cpu=4, Gpu=8). 0 = log all.
 log_string_format_kernel_calls = false            	# Log kernel calls with the kHighFrequency tag.
 log_to_debugprint = false                         	# Dump the log to DebugPrint.
 log_to_stdout = true                              	# Write log output to stdout

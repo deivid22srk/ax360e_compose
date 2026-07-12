@@ -61,7 +61,8 @@ DEFINE_uint32(log_mask, 0,
 
 DEFINE_int32(
     log_level, 2,
-    "Maximum level to be logged. (0=error, 1=warning, 2=info, 3=debug)",
+    "Maximum level to be logged. (0=error, 1=warning, 2=info, 3=debug, "
+    "4=trace). Raise to 3/4 for verbose JIT/CPU function logging.",
     "Logging");
 
 namespace dp = disruptorplus;

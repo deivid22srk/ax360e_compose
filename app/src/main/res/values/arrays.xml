@@ -219,6 +219,7 @@
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
     </string-array>
 
     <string-array name="es_arr_v_kernel_kernel_display_gamma_type">
@@ -407,6 +408,7 @@
         <item>warning</item>
         <item>info</item>
         <item>debug</item>
+        <item>trace</item>
     </string-array>
 
     <string-array name="es_arr_kernel_kernel_display_gamma_type">

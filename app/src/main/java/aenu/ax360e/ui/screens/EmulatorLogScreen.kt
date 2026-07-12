@@ -2,13 +2,16 @@ package aenu.ax360e.ui.screens
 
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,11 +24,14 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -37,6 +43,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,12 +51,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import aenu.ax360e.ui.components.EmptyState
+import aenu.ax360e.R
 import aenu.ax360e.ui.model.EmulatorLogRepository
 import aenu.ax360e.ui.model.GameLogEntry
+import aenu.ax360e.ui.model.LoggingConfigHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -69,6 +78,8 @@ fun EmulatorLogScreen(
     var showClearDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf<GameLogEntry?>(null) }
     var pendingExport by remember { mutableStateOf<GameLogEntry?>(null) }
+    var currentLogLevel by remember { mutableIntStateOf(2) }
+    var showVerbosityHelp by remember { mutableStateOf(false) }
 
     val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("text/plain")
@@ -91,12 +102,45 @@ fun EmulatorLogScreen(
 
     LaunchedEffect(Unit) {
         logs = withContext(Dispatchers.IO) { EmulatorLogRepository.listLogs(context) }
+        currentLogLevel = withContext(Dispatchers.IO) { LoggingConfigHelper.readLogLevel() }
     }
 
     fun refreshLogs() {
         scope.launch(Dispatchers.IO) {
             val newLogs = EmulatorLogRepository.listLogs(context)
             withContext(Dispatchers.Main) { logs = newLogs }
+        }
+    }
+
+    fun applyLogLevel(level: Int) {
+        scope.launch(Dispatchers.IO) {
+            val ok = LoggingConfigHelper.setLogLevel(level)
+            val newLevel = LoggingConfigHelper.readLogLevel()
+            withContext(Dispatchers.Main) {
+                currentLogLevel = newLevel
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        if (ok) context.getString(R.string.log_level_saved)
+                        else "Failed to update log_level"
+                    )
+                }
+            }
+        }
+    }
+
+    fun applyJitDetail() {
+        scope.launch(Dispatchers.IO) {
+            val ok = LoggingConfigHelper.enableJitFunctionDetail(true)
+            val newLevel = LoggingConfigHelper.readLogLevel()
+            withContext(Dispatchers.Main) {
+                currentLogLevel = newLevel
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        if (ok) context.getString(R.string.log_level_saved)
+                        else "Failed to enable JIT detail flags"
+                    )
+                }
+            }
         }
     }
 
@@ -189,13 +233,6 @@ fun EmulatorLogScreen(
                     .fillMaxSize()
                     .padding(padding)
             )
-        } else if (logs.isEmpty()) {
-            EmptyState(
-                icon = Icons.Default.Description,
-                title = "No logs yet",
-                subtitle = "Logs are captured automatically when you exit a game.",
-                modifier = Modifier.padding(padding)
-            )
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -204,17 +241,74 @@ fun EmulatorLogScreen(
                 contentPadding = PaddingValues(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(logs, key = { it.file.absolutePath }) { entry ->
-                    LogEntryRow(
-                        entry = entry,
-                        onClick = { openLog(entry) },
-                        onExport = { exportLog(entry) },
-                        onShare = { shareLog(entry) },
-                        onDelete = { showDeleteDialog = entry }
+                item {
+                    LogVerbosityCard(
+                        currentLevel = currentLogLevel,
+                        onSelectLevel = { applyLogLevel(it) },
+                        onEnableJitDetail = { applyJitDetail() },
+                        onHelp = { showVerbosityHelp = true }
                     )
+                }
+
+                if (logs.isEmpty()) {
+                    item {
+                        Surface(
+                            shape = MaterialTheme.shapes.large,
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(20.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "No logs yet",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = "Logs are captured automatically when you exit a game. Raise log_level above, then relaunch a game for more detail.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    items(logs, key = { it.file.absolutePath }) { entry ->
+                        LogEntryRow(
+                            entry = entry,
+                            onClick = { openLog(entry) },
+                            onExport = { exportLog(entry) },
+                            onShare = { shareLog(entry) },
+                            onDelete = { showDeleteDialog = entry }
+                        )
+                    }
                 }
             }
         }
+    }
+
+    if (showVerbosityHelp) {
+        AlertDialog(
+            onDismissRequest = { showVerbosityHelp = false },
+            title = { Text(stringResource(R.string.log_level_preset_title)) },
+            text = {
+                Text(
+                    "Official Xenia cvar Logging|log_level (xenia-canary):\n" +
+                        "0 error · 1 warning · 2 info (default) · 3 debug · 4 trace\n\n" +
+                        "Debug/trace unlock XELOGD and CPU tracer lines. " +
+                        "\"Enable JIT function detail\" also sets CPU|disassemble_functions, " +
+                        "CPU|dump_translated_hir_functions and CPU|trace_functions.\n\n" +
+                        "Changes apply on the next game launch. Review results in this screen " +
+                        "after exiting the game (xe.log is copied per session)."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showVerbosityHelp = false }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            }
+        )
     }
 
     if (showClearDialog) {
@@ -255,6 +349,85 @@ fun EmulatorLogScreen(
                 TextButton(onClick = { showDeleteDialog = null }) { Text("Cancel") }
             }
         )
+    }
+}
+
+@Composable
+private fun LogVerbosityCard(
+    currentLevel: Int,
+    onSelectLevel: (Int) -> Unit,
+    onEnableJitDetail: () -> Unit,
+    onHelp: () -> Unit
+) {
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.Tune,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = stringResource(R.string.log_level_preset_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp)
+                )
+                TextButton(onClick = onHelp) {
+                    Text("?")
+                }
+            }
+            Text(
+                text = stringResource(
+                    R.string.log_level_current,
+                    LoggingConfigHelper.levelName(currentLevel)
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(
+                    2 to stringResource(R.string.log_level_set_info),
+                    3 to stringResource(R.string.log_level_set_debug),
+                    4 to stringResource(R.string.log_level_set_trace)
+                ).forEach { (level, label) ->
+                    FilterChip(
+                        selected = currentLevel == level,
+                        onClick = { onSelectLevel(level) },
+                        label = { Text(label) }
+                    )
+                }
+            }
+            OutlinedButton(
+                onClick = onEnableJitDetail,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.log_level_enable_jit_detail))
+            }
+            Text(
+                text = stringResource(R.string.log_level_preset_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 

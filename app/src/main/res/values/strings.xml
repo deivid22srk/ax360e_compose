@@ -440,8 +440,16 @@ For scaling by factors of more than 2x2, multiple FSR passes are done.</string>
 
     <string name="es_hint_logging_flush_log">Flush log file after each log line batch.</string>
     <string name="es_hint_logging_log_file">Logs are written to the given file</string>
-    <string name="es_hint_logging_log_level">Maximum level to be logged. (0=error, 1=warning, 2=info, 3=debug)</string>
-    <string name="es_hint_logging_log_mask">Disables specific categorizes for more granular debug logging. Kernel = 1, Apu = 2, Cpu = 4.</string>
+    <string name="es_hint_logging_log_level">Maximum level to be logged. (0=error, 1=warning, 2=info, 3=debug, 4=trace). Use debug/trace for JIT function-level detail.</string>
+    <string name="es_hint_logging_log_mask">Bitmask of categories to DISABLE. Kernel=1, Apu=2, Cpu=4, Gpu=8. 0 logs all categories.</string>
+    <string name="log_level_preset_title">Log verbosity</string>
+    <string name="log_level_preset_hint">Controls Logging|log_level in xenia-canary.config.toml. Debug/trace make Emulator Logs much more detailed (incl. JIT/CPU). Applies on next game launch.</string>
+    <string name="log_level_set_info">Set info (default)</string>
+    <string name="log_level_set_debug">Set debug (verbose)</string>
+    <string name="log_level_set_trace">Set trace (max)</string>
+    <string name="log_level_enable_jit_detail">Enable JIT function detail flags</string>
+    <string name="log_level_current">Current log_level: %1$s</string>
+    <string name="log_level_saved">Saved. Relaunch a game to apply.</string>
     <string name="es_hint_logging_log_string_format_kernel_calls">Log kernel calls with the kHighFrequency tag.</string>
     <string name="es_hint_logging_log_to_debugprint">Dump the log to DebugPrint.</string>
     <string name="es_hint_logging_log_to_stdout">Write log output to stdout</string>

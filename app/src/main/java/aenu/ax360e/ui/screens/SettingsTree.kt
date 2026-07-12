@@ -195,7 +195,21 @@ object SettingsTree {
                 title = context.getString(R.string.es_logging),
                 children = listOf(
                     SettingsEntry.Bool(key = "Logging|flush_log", title = context.getString(R.string.es_logging_flush_log)),
-                    SettingsEntry.StrArr(key = "Logging|log_level", title = context.getString(R.string.es_logging_log_level), entries = listOf("error", "warning", "info", "debug"), values = listOf("0", "1", "2", "3")),
+                    // Matches xe::LogLevel: Error=0, Warning=1, Info=2, Debug=3, Trace=4.
+                    // Official cvar docs stop at debug; trace is valid in ShouldLog and
+                    // surfaces the most verbose XELOG*/CPU tracer output in xe.log.
+                    SettingsEntry.StrArr(
+                        key = "Logging|log_level",
+                        title = context.getString(R.string.es_logging_log_level),
+                        entries = listOf("error", "warning", "info", "debug", "trace"),
+                        values = listOf("0", "1", "2", "3", "4")
+                    ),
+                    SettingsEntry.Int(
+                        key = "Logging|log_mask",
+                        title = context.getString(R.string.es_logging_log_mask),
+                        min = 0,
+                        max = 15
+                    ),
                     SettingsEntry.Bool(key = "Logging|log_string_format_kernel_calls", title = context.getString(R.string.es_logging_log_string_format_kernel_calls)),
                     SettingsEntry.Bool(key = "Logging|log_to_debugprint", title = context.getString(R.string.es_logging_log_to_debugprint)),
                     SettingsEntry.Bool(key = "Logging|log_to_stdout", title = context.getString(R.string.es_logging_log_to_stdout)),
