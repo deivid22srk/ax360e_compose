@@ -187,7 +187,7 @@ fun MainScreen() {
         ),
         DrawerDestination(
             label = "AI Remote Control",
-            icon = Icons.Default.Psychology,
+            icon = Icons.Default.Build,
             onClick = {
                 closeDrawerThen {
                     context.startActivity(Intent(context, AiRemoteControlActivity::class.java))

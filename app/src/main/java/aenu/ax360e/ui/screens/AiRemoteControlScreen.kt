@@ -70,7 +70,6 @@ fun AiRemoteControlScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
     var enabled by remember {
         mutableStateOf(McpBridgeClient.isEnabled(context))
