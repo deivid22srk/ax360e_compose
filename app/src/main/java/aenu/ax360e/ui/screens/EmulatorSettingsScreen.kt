@@ -1,5 +1,11 @@
 package aenu.ax360e.ui.screens
 
+import android.app.Activity
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.SystemUpdateAlt
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,8 +49,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import aenu.ax360e.Application
+import aenu.ax360e.Emulator
 import aenu.ax360e.R
 import aenu.ax360e.Utils
 import aenu.ax360e.ui.components.preference.PreferenceHeader
@@ -52,6 +62,8 @@ import aenu.ax360e.ui.components.preference.ValuePreference
 import aenu.emulator.Emulator as NativeEmulator
 import java.io.File
 
+private const val VULKAN_LIB_PATH_KEY = "Vulkan|vulkan_lib_path"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmulatorSettingsScreen(
@@ -59,21 +71,31 @@ fun EmulatorSettingsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val activity = context as? Activity
     LaunchedEffect(Unit) { SettingsTree.init(context) }
+
+    val libraryReady = remember {
+        Emulator.ensure_library_loaded()
+    }
+
     val effectivePath = remember(configPath) {
-        configPath ?: Application.get_global_config_file().absolutePath
+        if (configPath != null) {
+            configPath
+        } else {
+            Application.ensure_global_config_file().absolutePath
+        }
     }
     val isGlobal = configPath == null
 
-    val config = remember(effectivePath) {
-        runCatching {
-            if (File(effectivePath).exists())
-                NativeEmulator.Config.open_config_file(effectivePath)
-            else null
-        }.getOrNull()
+    // Holder keeps the latest native handle for dispose even if composition
+    // snapshots are stale (DisposableEffect(Unit) only captures once).
+    val session = remember(effectivePath) {
+        SettingsSession(openConfigOrNull(effectivePath, libraryReady))
     }
-    val originalConfig = remember {
-        runCatching {
+    var config by remember(effectivePath) { mutableStateOf(session.config) }
+    val originalConfig = remember(libraryReady) {
+        if (!libraryReady) null
+        else runCatching {
             NativeEmulator.Config.open_config_from_string(
                 Application.load_default_config_str(context)
             )
@@ -82,6 +104,73 @@ fun EmulatorSettingsScreen(
 
     var currentScreen by remember { mutableStateOf<List<String>>(emptyList()) }
     var refreshToken by remember { mutableStateOf(0) }
+    var loadError by remember {
+        mutableStateOf(
+            if (!libraryReady) "Native library not loaded"
+            else if (session.config == null) "Config file not available: $effectivePath"
+            else null
+        )
+    }
+
+    fun flushAndRelease() {
+        val c = session.config ?: return
+        runCatching { c.close_config_file() }
+            .onFailure {
+                loadError = it.message ?: "Failed to save settings"
+            }
+        session.config = null
+        session.dirty = false
+        config = null
+    }
+
+    fun markDirtyAndRefresh(block: (NativeEmulator.Config) -> Unit) {
+        val c = session.config ?: return
+        block(c)
+        session.dirty = true
+        refreshToken++
+    }
+
+    fun leaveSettings() {
+        flushAndRelease()
+        onBack()
+    }
+
+    DisposableEffect(session) {
+        onDispose {
+            session.config?.let { c ->
+                runCatching { c.close_config_file() }
+                session.config = null
+                session.dirty = false
+            }
+        }
+    }
+
+    BackHandler {
+        if (currentScreen.isNotEmpty()) {
+            currentScreen = currentScreen.dropLast(1)
+        } else {
+            leaveSettings()
+        }
+    }
+
+    val importDriverLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri == null || activity == null) return@rememberLauncherForActivityResult
+        val ok = Utils.install_custom_driver_from_zip(activity, uri) { installedPath ->
+            markDirtyAndRefresh { c ->
+                c.save_config_entry(VULKAN_LIB_PATH_KEY, installedPath)
+            }
+            Toast.makeText(
+                context,
+                context.getString(R.string.driver_library_path_dialog_add_hint) + "\n$installedPath",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        if (!ok) {
+            Toast.makeText(context, "Failed to import driver", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -95,7 +184,7 @@ fun EmulatorSettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (currentScreen.isEmpty()) onBack()
+                        if (currentScreen.isEmpty()) leaveSettings()
                         else currentScreen = currentScreen.dropLast(1)
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -115,10 +204,26 @@ fun EmulatorSettingsScreen(
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Config file not available: $effectivePath",
-                    color = MaterialTheme.colorScheme.error
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = loadError ?: "Config file not available: $effectivePath",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    OutlinedButton(onClick = {
+                        // Retry seed + open after a failed first attempt.
+                        Emulator.ensure_library_loaded()
+                        if (isGlobal) Application.ensure_global_config_file()
+                        val reopened = openConfigOrNull(effectivePath, true)
+                        session.config = reopened
+                        config = reopened
+                        loadError = if (reopened == null) {
+                            "Config file not available: $effectivePath"
+                        } else null
+                    }) {
+                        Text("Retry")
+                    }
+                }
             }
             return@Scaffold
         }
@@ -158,7 +263,7 @@ fun EmulatorSettingsScreen(
                         )
                     }
                     is SettingsEntry.Bool -> {
-                        val stored = config.load_config_entry(entry.key)
+                        val stored = config?.load_config_entry(entry.key)
                         val value = stored?.toBooleanStrictOrNull()
                         val defaultVal = originalConfig?.load_config_entry(entry.key)
                         val modified = defaultVal != value?.toString()
@@ -166,16 +271,17 @@ fun EmulatorSettingsScreen(
                             title = entry.title,
                             checked = value == true,
                             onCheckedChange = { newVal ->
-                                config.save_config_entry(entry.key, newVal.toString())
-                                refreshToken++
+                                markDirtyAndRefresh {
+                                    it.save_config_entry(entry.key, newVal.toString())
+                                }
                             },
                             subtitle = if (modified) "Modified" else null,
                             icon = Icons.Default.Tune,
-                            enabled = value != null
+                            enabled = value != null || stored == null
                         )
                     }
                     is SettingsEntry.Int -> {
-                        val value = config.load_config_entry(entry.key)?.toIntOrNull()
+                        val value = config?.load_config_entry(entry.key)?.toIntOrNull()
                         val defaultVal = originalConfig?.load_config_entry(entry.key)
                         val modified = defaultVal != value?.toString()
                         IntPreferenceRow(
@@ -185,13 +291,14 @@ fun EmulatorSettingsScreen(
                             max = entry.max,
                             modified = modified,
                             onValueChange = { newVal ->
-                                config.save_config_entry(entry.key, newVal.toString())
-                                refreshToken++
+                                markDirtyAndRefresh {
+                                    it.save_config_entry(entry.key, newVal.toString())
+                                }
                             }
                         )
                     }
                     is SettingsEntry.StrArr -> {
-                        val value = config.load_config_entry(entry.key)
+                        val value = config?.load_config_entry(entry.key)
                         val defaultVal = originalConfig?.load_config_entry(entry.key)
                         val modified = defaultVal != value
                         StrArrPreferenceRow(
@@ -201,21 +308,43 @@ fun EmulatorSettingsScreen(
                             values = entry.values,
                             modified = modified,
                             onValueChange = { newVal ->
-                                config.save_config_entry(entry.key, newVal)
-                                refreshToken++
+                                markDirtyAndRefresh {
+                                    it.save_config_entry(entry.key, newVal)
+                                }
                             }
                         )
                     }
                     is SettingsEntry.StrLeaf -> {
-                        val value = config.load_config_entry(entry.key)
-                        StrLeafPreferenceRow(
-                            title = entry.title,
-                            value = value,
-                            onValueChange = { newVal ->
-                                config.save_config_entry(entry.key, newVal)
-                                refreshToken++
-                            }
-                        )
+                        val value = config?.load_config_entry(entry.key)
+                        if (entry.key == VULKAN_LIB_PATH_KEY) {
+                            DriverPathPreferenceRow(
+                                title = entry.title,
+                                value = value,
+                                onImportClick = {
+                                    importDriverLauncher.launch("application/zip")
+                                },
+                                onValueChange = { newVal ->
+                                    markDirtyAndRefresh {
+                                        it.save_config_entry(entry.key, newVal)
+                                    }
+                                },
+                                onClear = {
+                                    markDirtyAndRefresh {
+                                        it.save_config_entry(entry.key, "")
+                                    }
+                                }
+                            )
+                        } else {
+                            StrLeafPreferenceRow(
+                                title = entry.title,
+                                value = value,
+                                onValueChange = { newVal ->
+                                    markDirtyAndRefresh {
+                                        it.save_config_entry(entry.key, newVal)
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -226,12 +355,22 @@ fun EmulatorSettingsScreen(
                 Spacer(Modifier.height(12.dp))
                 OutlinedButton(
                     onClick = {
-                        config.close_config_file()
+                        runCatching { session.config?.close_config_file() }
+                        session.config = null
                         Utils.copy_file(
                             Application.get_default_config_file(),
                             File(effectivePath)
                         )
-                        onBack()
+                        val reopened = openConfigOrNull(effectivePath, libraryReady)
+                        session.config = reopened
+                        session.dirty = false
+                        config = reopened
+                        refreshToken++
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.reset_as_default),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -247,9 +386,11 @@ fun EmulatorSettingsScreen(
                 if (!isGlobal) {
                     OutlinedButton(
                         onClick = {
-                            config.close_config_file()
+                            runCatching { session.config?.close_config_file() }
+                            session.config = null
+                            session.dirty = false
                             File(effectivePath).delete()
-                            onBack()
+                            leaveSettings()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -261,6 +402,114 @@ fun EmulatorSettingsScreen(
                 Spacer(Modifier.height(16.dp))
             }
         }
+    }
+}
+
+private class SettingsSession(var config: NativeEmulator.Config?) {
+    var dirty: Boolean = false
+}
+
+private fun openConfigOrNull(path: String, libraryReady: Boolean): NativeEmulator.Config? {
+    if (!libraryReady) return null
+    return runCatching {
+        val file = File(path)
+        if (!file.exists()) {
+            // For per-game configs the path may not exist yet; seed from defaults.
+            val parent = file.parentFile
+            if (parent != null && !parent.exists()) parent.mkdirs()
+            Utils.copy_file(Application.get_default_config_file(), file)
+            if (!file.exists()) {
+                Utils.save_string(file, Application.load_default_config_str(Application.ctx))
+            }
+        }
+        if (file.exists()) NativeEmulator.Config.open_config_file(path) else null
+    }.getOrNull()
+}
+
+@Composable
+private fun DriverPathPreferenceRow(
+    title: String,
+    value: String?,
+    onImportClick: () -> Unit,
+    onValueChange: (String) -> Unit,
+    onClear: () -> Unit
+) {
+    var showManualDialog by remember { mutableStateOf(false) }
+    val display = when {
+        value.isNullOrBlank() -> "System default"
+        else -> value.substringAfterLast('/').ifEmpty { value }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ValuePreference(
+            title = title,
+            value = display,
+            onClick = { showManualDialog = true },
+            subtitle = if (value.isNullOrBlank()) {
+                stringResource(R.string.driver_library_path_dialog_add_hint)
+            } else {
+                value
+            },
+            icon = Icons.Default.SystemUpdateAlt
+        )
+        OutlinedButton(
+            onClick = onImportClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+        ) {
+            Icon(
+                Icons.Default.SystemUpdateAlt,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Text(stringResource(R.string.driver_library_path_dialog_add_hint))
+        }
+        if (!value.isNullOrBlank()) {
+            TextButton(
+                onClick = onClear,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(stringResource(R.string.clear))
+            }
+        }
+    }
+
+    if (showManualDialog) {
+        var textValue by remember { mutableStateOf(value.orEmpty()) }
+        AlertDialog(
+            onDismissRequest = { showManualDialog = false },
+            title = { Text(title) },
+            text = {
+                Column {
+                    Text(
+                        text = stringResource(R.string.driver_library_path_dialog_add_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = textValue,
+                        onValueChange = { textValue = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onValueChange(textValue)
+                    showManualDialog = false
+                }) { Text(stringResource(android.R.string.ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showManualDialog = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
     }
 }
 
@@ -365,7 +614,9 @@ private fun StrArrPreferenceRow(
                                 text = label,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }

@@ -27,7 +27,12 @@ class MainActivity : ComponentActivity() {
             return
         }
 
+        // Always ensure the native library is ready before the UI is shown so
+        // Settings can open the TOML config without requiring a prior game boot.
+        // On Adreno 5xx/6xx we still delay slightly (driver quirk), but we never
+        // leave Emulator.get null for the rest of the session.
         if (!Application.should_delay_load()) {
+            Emulator.ensure_library_loaded()
             startUi()
             return
         }
@@ -38,14 +43,19 @@ class MainActivity : ComponentActivity() {
         Thread {
             try {
                 Thread.sleep(500)
-                Emulator.load_library()
+                Emulator.ensure_library_loaded()
                 Thread.sleep(100)
                 Handler(mainLooper).post {
                     dialog.dismiss()
                     startUi()
                 }
             } catch (_: InterruptedException) {
-                runOnUiThread { dialog.dismiss() }
+                runOnUiThread {
+                    dialog.dismiss()
+                    // Still try to show UI; Settings will retry load if needed.
+                    Emulator.ensure_library_loaded()
+                    startUi()
+                }
             }
         }.start()
     }

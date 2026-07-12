@@ -17,9 +17,22 @@ public class Emulator extends aenu.emulator.Emulator{
     public static Emulator get=null;
     public static void load_library(){
         if(get!=null)
-            throw new RuntimeException("Emulator already loaded");
+            return;
         get=new Emulator();
         System.loadLibrary("e");
+    }
+
+    /** Idempotent: safe to call from Settings before touching Config JNI. */
+    public static boolean ensure_library_loaded() {
+        try {
+            if (get == null) {
+                load_library();
+            }
+            return get != null;
+        } catch (Throwable t) {
+            android.util.Log.e("ax360e", "Failed to load native library", t);
+            return false;
+        }
     }
 
     /*public void key_event(int keycode,boolean pressed){

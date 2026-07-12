@@ -100,7 +100,7 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
         Thread {
             try {
                 Thread.sleep(500)
-                Emulator.load_library()
+                Emulator.ensure_library_loaded()
                 Thread.sleep(100)
                 delayOnCreate.sendEmptyMessage(DELAY_ON_CREATE)
             } catch (_: InterruptedException) {

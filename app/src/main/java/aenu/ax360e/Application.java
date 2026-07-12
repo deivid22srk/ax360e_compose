@@ -36,6 +36,32 @@ public class Application extends android.app.Application{
         return new File(Application.get_app_data_dir(),"xenia-canary.config.toml");
     }
 
+    /**
+     * Ensures the global settings file exists before the Settings screen opens.
+     * Xenia only creates {@code xenia-canary.config.toml} on first boot; without
+     * this seed the Compose settings UI shows an empty "config not available"
+     * state until the user launches a game once.
+     */
+    public static File ensure_global_config_file() {
+        File global = get_global_config_file();
+        if (global.exists()) {
+            return global;
+        }
+        File parent = global.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+        File defaults = get_default_config_file();
+        if (!defaults.exists()) {
+            Utils.save_string(defaults, load_default_config_str(ctx));
+        }
+        Utils.copy_file(defaults, global);
+        if (!global.exists()) {
+            Utils.save_string(global, load_default_config_str(ctx));
+        }
+        return global;
+    }
+
     public  static byte[] load_assets_file(Context ctx,String asset_file_path) {
         try {
             InputStream in = ctx.getAssets().open(asset_file_path);
@@ -90,6 +116,9 @@ public class Application extends android.app.Application{
         File default_config_file=get_default_config_file();
         if(!default_config_file.exists())
             Utils.save_string(default_config_file,load_default_config_str(this));
+
+        // Seed global settings so the Settings screen works before first game boot.
+        ensure_global_config_file();
 
         if(!get_default_profile_file().exists()){
             File default_profile_dir=get_default_profile_file().getParentFile();

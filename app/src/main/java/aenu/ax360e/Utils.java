@@ -147,7 +147,7 @@ public class Utils {
     public static interface InstallCallback {
         void onInstallComplete(String path);
     }
-    static boolean install_custom_driver_from_zip(Activity ctx, Uri uri, InstallCallback cb) {
+    public static boolean install_custom_driver_from_zip(Activity ctx, Uri uri, InstallCallback cb) {
         try {
             ParcelFileDescriptor pfd = ctx.getContentResolver().openFileDescriptor(uri, "r");
             FileInputStream fis = new FileInputStream(pfd.getFileDescriptor());
