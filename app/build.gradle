@@ -7,6 +7,13 @@ plugins {
 android {
     namespace 'aenu.ax360e'
     compileSdk 35
+    // Pin the NDK version explicitly so AGP doesn't try to auto-install its
+    // own default (e.g. 27.0.12077973) which may not match what the CI
+    // workflow pre-installs (27.2.12479018). Without this pin, the build
+    // fails with "Failed to install the following SDK components:
+    // ndk;27.0.12077973" + "ZipException: Archive is not a ZIP archive"
+    // because Google sometimes serves a non-ZIP payload for old NDKs.
+    ndkVersion '27.2.12479018'
 
     defaultConfig {
         applicationId "aenu.ax360e.free"
