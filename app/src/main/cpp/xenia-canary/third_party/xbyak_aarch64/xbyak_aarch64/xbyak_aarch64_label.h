@@ -74,31 +74,31 @@ class LabelManager {
     return label.id;
   }
   template <class DefList, class UndefList, class T> void define_inner(DefList &defList, UndefList &undefList, const T &labelId, size_t addrOffset) {
-    // [LONG BRANCH VENEER] Phase 1: Check if any undefined reference to this
-    // label would exceed the branch instruction's range. If so, we need to
-    // emit a veneer trampoline at the label position.
+    // [LONG BRANCH VENEER] When a forward branch reference exceeds the
+    // encoding range (CBZ/CBNZ/B.cond ±1MB, TBZ/TBNZ ±32KB), xbyak emits
+    // the branch with offset 0 (label not yet defined). When the label is
+    // bound, the offset is resolved — and if it's too far, the old code
+    // threw ERR_LABEL_IS_TOO_FAR, crashing the process.
     //
-    // Strategy: replace the original short-range branch (CBZ/CBNZ/B.cond/
-    // TBZ/TBNZ) with an unconditional B (±128MB) that jumps to the veneer.
-    // The veneer re-checks the same condition and either:
-    //   (a) branches to the actual code right after the veneer, or
-    //   (b) jumps back to the instruction immediately after the original branch.
+    // Fix: emit an 8-byte veneer trampoline at the label position, then
+    // rewrite the original branch to B the veneer (±128MB range — always
+    // reachable for ≤8MB functions). The veneer contains:
+    //   [veneer+0]: the original conditional branch, targeting veneer+8
+    //               (the actual code, only 8 bytes away — always in range)
+    //   [veneer+4]: B back to the instruction after the original branch
+    //               (for the "not taken" path)
+    //   [veneer+8]: ... actual code starts here ...
     //
-    // This works because:
-    //   - B has ±128MB range, so it can reach the veneer at the label position
-    //     (function code is at most 8MB).
-    //   - The veneer's conditional branch only needs to reach addrOffset+8
-    //     (8 bytes away), well within ±1MB or ±32KB.
-    //   - The veneer's B back to the original branch's successor is also
-    //     within ±128MB.
-    //
-    // Veneer layout (8 bytes = 2 instructions):
-    //   [addrOffset+0]: <original cond branch> reg, addrOffset+8  (to actual code)
-    //   [addrOffset+4]: B (offset+1)                              (back to orig+4)
-    //   [addrOffset+8]: ... actual code starts here ...
-    //
-    // The original branch at 'offset' is rewritten to: B addrOffset (uncond)
+    // Phase 1: Determine if a veneer is needed and handle too-far refs.
+    // Phase 2: Add label and resolve all remaining (non-too-far) refs.
+
+    bool needs_veneer = false;
     size_t veneer_size = 0;  // in dd units (instructions)
+
+    // --- Phase 1: Scan for too-far references, emit veneer, rewrite them ---
+    // Collect too-far references in a set so Phase 2 can skip them.
+    std::unordered_set<size_t> handled_offsets;  // endOfJmp offsets already rewritten
+
     for (auto itr = undefList.begin(); itr != undefList.end(); ++itr) {
       if (itr->first != labelId) continue;
       const JmpLabel *jmp = &itr->second;
@@ -108,79 +108,65 @@ class LabelManager {
         jmp->encFunc(labelOffset);
       } catch (const Error& e) {
         if ((int)e != ERR_LABEL_IS_TOO_FAR) throw;
-        veneer_size = 2;  // 2 instructions = 8 bytes
-        break;
+
+        needs_veneer = true;
+        if (veneer_size == 0) veneer_size = 2;  // 2 instructions = 8 bytes
+
+        // Emit veneer at addrOffset (only once).
+        if (base_->getSize() / CSIZE == addrOffset) {
+          // Veneer instruction 1: the original conditional branch targeting
+          // the actual code (addrOffset + 8 = veneer_size * CSIZE bytes away).
+          int64_t veneer_cond_offset = (int64_t)(veneer_size * CSIZE);
+          uint32_t veneer_cond = jmp->encFunc(veneer_cond_offset);
+          base_->dd(veneer_cond);
+
+          // Veneer instruction 2: unconditional B back to the instruction
+          // immediately after the original branch (orig_offset + 1).
+          int64_t back_offset = (int64_t)((orig_offset + 1) - (addrOffset + veneer_size)) * (int64_t)CSIZE;
+          uint32_t b_imm26 = static_cast<uint32_t>((back_offset >> 2) & 0x3FFFFFF);
+          uint32_t back_code = 0x14000000u | b_imm26;  // B back
+          base_->dd(back_code);
+        }
+
+        // Rewrite the original branch instruction to B the veneer (±128MB).
+        int64_t branch_to_veneer = (int64_t)((int64_t)addrOffset - (int64_t)orig_offset) * (int64_t)CSIZE;
+        uint32_t b_imm26 = static_cast<uint32_t>((branch_to_veneer >> 2) & 0x3FFFFFF);
+        uint32_t b_code = 0x14000000u | b_imm26;  // B veneer
+        base_->rewrite(orig_offset, b_code);
+
+        // Mark this offset as handled so Phase 2 skips it.
+        handled_offsets.insert(orig_offset);
       }
     }
 
-    // The label points to the actual code, which is after the veneer.
+    // --- Phase 2: Add label and resolve all remaining undefined refs ---
     size_t actual_label_offset = addrOffset + veneer_size;
 
-    // Phase 2: Emit veneer if needed, handling all too-far references.
-    if (veneer_size > 0) {
-      for (auto itr = undefList.begin(); itr != undefList.end(); ++itr) {
-        if (itr->first != labelId) continue;
-        const JmpLabel *jmp = &itr->second;
-        const size_t orig_offset = jmp->endOfJmp;
-        int64_t labelOffset = (addrOffset - orig_offset) * CSIZE;
-        try {
-          // Try encoding — if it succeeds now (shouldn't for the too-far ones),
-          // we handle it normally in Phase 4.
-          jmp->encFunc(labelOffset);
-        } catch (const Error& e) {
-          if ((int)e != ERR_LABEL_IS_TOO_FAR) throw;
-
-          // Emit veneer at addrOffset (only once, for the first too-far ref).
-          // We check if veneer code was already emitted by comparing size.
-          if (base_->getSize() / CSIZE == addrOffset) {
-            // Step A: Emit the original conditional branch targeting actual code.
-            // The offset from addrOffset to actual_label_offset is veneer_size * CSIZE
-            // (= 8 bytes), well within any conditional branch range.
-            int64_t veneer_cond_offset = (int64_t)(actual_label_offset - addrOffset) * (int64_t)CSIZE;
-            uint32_t veneer_cond = jmp->encFunc(veneer_cond_offset);
-            base_->dd(veneer_cond);
-
-            // Step B: Emit B back to the instruction after the original branch.
-            // offset+1 is the dd index of the next instruction after the original.
-            int64_t back_offset = (int64_t)((orig_offset + 1) - actual_label_offset) * (int64_t)CSIZE;
-            uint32_t b_imm26 = static_cast<uint32_t>((back_offset >> 2) & 0x3FFFFFF);
-            uint32_t back_code = 0x14000000u | b_imm26;  // B back
-            base_->dd(back_code);
-          }
-
-          // Rewrite the original branch instruction to an unconditional B
-          // that jumps to the veneer at addrOffset.
-          int64_t branch_to_veneer = (int64_t)((int64_t)addrOffset - (int64_t)orig_offset) * (int64_t)CSIZE;
-          uint32_t b_imm26 = static_cast<uint32_t>((branch_to_veneer >> 2) & 0x3FFFFFF);
-          uint32_t b_code = 0x14000000u | b_imm26;  // B veneer
-          base_->rewrite(orig_offset, b_code);
-        }
-      }
-    }
-
-    // Phase 3: Add label at the actual code position (after veneer if present).
     typename DefList::value_type item(labelId, actual_label_offset);
     std::pair<typename DefList::iterator, bool> ret = defList.insert(item);
     if (!ret.second)
       throw Error(ERR_LABEL_IS_REDEFINED);
 
-    // Phase 4: Process remaining undefined references (both the ones that
-    // were already within range and the ones that were too far but now have
-    // the adjusted label position).
     for (;;) {
       typename UndefList::iterator itr = undefList.find(labelId);
       if (itr == undefList.end())
         break;
       const JmpLabel *jmp = &itr->second;
       const size_t offset = jmp->endOfJmp;
+
+      // Skip references that were already rewritten with B-to-veneer
+      // in Phase 1. They should NOT be overwritten.
+      if (handled_offsets.count(offset)) {
+        undefList.erase(itr);
+        continue;
+      }
+
       int64_t labelOffset = (actual_label_offset - offset) * CSIZE;
       uint32_t disp;
       try {
         disp = jmp->encFunc(labelOffset);
       } catch (const Error& e) {
         if ((int)e != ERR_LABEL_IS_TOO_FAR) throw;
-        // If this still fails, the function is genuinely too large even with
-        // the veneer offset adjustment. Throw to let the caller handle it.
         throw;
       }
       base_->rewrite(offset, disp);
