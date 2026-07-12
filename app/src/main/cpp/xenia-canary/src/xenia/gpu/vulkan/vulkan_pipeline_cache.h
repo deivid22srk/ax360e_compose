@@ -324,6 +324,16 @@ class VulkanPipelineCache {
   // Previously used pipeline, to avoid lookups if the state wasn't changed.
   const std::pair<const PipelineDescription, Pipeline>* last_pipeline_ =
       nullptr;
+
+  // [PERF] Vulkan pipeline cache. Lets the driver reuse compilation artifacts
+  // across pipelines with similar shaders / state and — crucially — across
+  // frames within the same session. Without this, every distinct render-state
+  // combination triggers a full pipeline compilation from scratch, causing
+  // the heavy stuttering that's been observed during gameplay. Upstream
+  // xenia-canary uses this; ax360e was passing VK_NULL_HANDLE.
+  // The cache lives in memory only by default (no disk persistence yet),
+  // which still removes all in-session recompilations.
+  VkPipelineCache vk_pipeline_cache_ = VK_NULL_HANDLE;
 };
 
 }  // namespace vulkan

@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
@@ -36,6 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -53,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import aenu.ax360e.R
@@ -80,6 +83,12 @@ fun EmulatorLogScreen(
     var pendingExport by remember { mutableStateOf<GameLogEntry?>(null) }
     var currentLogLevel by remember { mutableIntStateOf(2) }
     var showVerbosityHelp by remember { mutableStateOf(false) }
+    // [PERF] Master "Modo Debug" toggle — OFF by default. When ON, enables
+    // all JIT/MMIO instrumentation flags (break_on_unimplemented_instructions,
+    // record_mmio_access_exceptions, emit_mmio_aware_stores, etc.) at the
+    // cost of significant FPS overhead. The user must opt in to debug.
+    var debugMode by remember { mutableStateOf(false) }
+    var showDebugModeConfirmDialog by remember { mutableStateOf(false) }
 
     val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("text/plain")
@@ -107,6 +116,7 @@ fun EmulatorLogScreen(
             LoggingConfigHelper.disableHirFileDumps()
             logs = EmulatorLogRepository.listLogs(context)
             currentLogLevel = LoggingConfigHelper.readLogLevel()
+            debugMode = LoggingConfigHelper.isDebugMode()
         }
     }
 
@@ -255,6 +265,34 @@ fun EmulatorLogScreen(
                     )
                 }
 
+                // [PERF] Master "Modo Debug" toggle. Off by default — when ON,
+                // enables all JIT/MMIO instrumentation flags at the cost of
+                // significant FPS overhead. The user must explicitly opt in.
+                item {
+                    DebugModeCard(
+                        enabled = debugMode,
+                        onToggle = { newValue ->
+                            if (newValue) {
+                                // Confirm before enabling — it's expensive.
+                                showDebugModeConfirmDialog = true
+                            } else {
+                                scope.launch(Dispatchers.IO) {
+                                    val ok = LoggingConfigHelper.setDebugMode(false)
+                                    withContext(Dispatchers.Main) {
+                                        debugMode = LoggingConfigHelper.isDebugMode()
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                if (ok) "Modo Debug desativado — performance restaurada"
+                                                else "Falha ao desativar Modo Debug"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+
                 if (logs.isEmpty()) {
                     item {
                         Surface(
@@ -352,6 +390,54 @@ fun EmulatorLogScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+    // [PERF] Confirmation dialog for enabling Modo Debug — warns the user
+    // about the FPS overhead before they opt in.
+    if (showDebugModeConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showDebugModeConfirmDialog = false },
+            title = { Text("Ativar Modo Debug?") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "O Modo Debug ativa instrumentação extra no JIT e em cada " +
+                        "acesso de memória do guest. Isso pode reduzir " +
+                        "significativamente a performance (FPS) — use apenas " +
+                        "para investigar bugs específicos."
+                    )
+                    Text(
+                        "Flags ativadas: break_on_unimplemented_instructions, " +
+                        "record_mmio_access_exceptions, emit_mmio_aware_stores, " +
+                        "emit_inline_mmio_checks, trace_functions, etc.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDebugModeConfirmDialog = false
+                    scope.launch(Dispatchers.IO) {
+                        val ok = LoggingConfigHelper.setDebugMode(true)
+                        withContext(Dispatchers.Main) {
+                            debugMode = LoggingConfigHelper.isDebugMode()
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    if (ok) "Modo Debug ativado — reinicie o jogo para aplicar"
+                                    else "Falha ao ativar Modo Debug"
+                                )
+                            }
+                        }
+                    }
+                }) { Text("Ativar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDebugModeConfirmDialog = false }) {
+                    Text("Cancelar")
+                }
             }
         )
     }
@@ -542,6 +628,74 @@ private fun LogContentView(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
+        }
+    }
+}
+
+/**
+ * [PERF] Master "Modo Debug" card. Shows the current state (on/off) and
+ * a switch. When the user turns it ON, a confirmation dialog is shown by
+ * the caller (because the FPS impact is significant). When turned OFF,
+ * all debug/instrumentation flags are immediately cleared from the config.
+ *
+ * The card explicitly warns the user about the performance impact so they
+ * don't leave it on accidentally.
+ */
+@Composable
+private fun DebugModeCard(
+    enabled: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = if (enabled) MaterialTheme.colorScheme.errorContainer
+                else MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.BugReport,
+                    contentDescription = null,
+                    tint = if (enabled) MaterialTheme.colorScheme.onErrorContainer
+                           else MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Modo Debug",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    color = if (enabled) MaterialTheme.colorScheme.onErrorContainer
+                            else MaterialTheme.colorScheme.onSurface
+                )
+                androidx.compose.material3.Switch(
+                    checked = enabled,
+                    onCheckedChange = onToggle
+                )
+            }
+            Text(
+                text = if (enabled) {
+                    "ATIVO — instrumentação JIT/MMIO habilitada. " +
+                    "Performance reduzida. Desative para jogar."
+                } else {
+                    "Desativado — performance máxima. Ative apenas para " +
+                    "investigar bugs (adiciona overhead ao JIT e acessos " +
+                    "de memória)."
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = if (enabled) MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.85f)
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

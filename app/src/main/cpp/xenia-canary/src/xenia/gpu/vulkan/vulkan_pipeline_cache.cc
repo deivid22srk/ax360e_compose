@@ -49,6 +49,28 @@ bool VulkanPipelineCache::Initialize() {
   const ui::vulkan::VulkanDevice* const vulkan_device =
       command_processor_.GetVulkanDevice();
 
+  // [PERF] Create an in-memory VkPipelineCache so the Vulkan driver can
+  // reuse compilation artifacts across pipelines. This is the single most
+  // impactful Vulkan perf fix for ax360e — previously every distinct
+  // render-state combo triggered a full pipeline compilation. With this
+  // cache, the driver reuses compiled pipelines across frames within the
+  // same session.
+  VkPipelineCacheCreateInfo pipeline_cache_create_info = {};
+  pipeline_cache_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+  pipeline_cache_create_info.pNext = nullptr;
+  pipeline_cache_create_info.flags = 0;
+  // Initial data is empty (no disk persistence yet). The driver will
+  // populate the cache as pipelines are created.
+  pipeline_cache_create_info.initialDataSize = 0;
+  pipeline_cache_create_info.pInitialData = nullptr;
+  if (vulkan_device->functions().vkCreatePipelineCache(
+          vulkan_device->device(), &pipeline_cache_create_info, nullptr,
+          &vk_pipeline_cache_) != VK_SUCCESS) {
+    XELOGE("VulkanPipelineCache: Failed to create the VkPipelineCache");
+    vk_pipeline_cache_ = VK_NULL_HANDLE;
+    // Not fatal — fall back to no cache (previous behavior).
+  }
+
   bool edram_fragment_shader_interlock =
       render_target_cache_.GetPath() ==
       RenderTargetCache::Path::kPixelShaderInterlock;
@@ -95,6 +117,14 @@ void VulkanPipelineCache::Shutdown() {
     }
   }
   pipelines_.clear();
+
+  // [PERF] Destroy the VkPipelineCache. Must happen AFTER all pipelines are
+  // destroyed (the spec allows destroying the cache while pipelines built
+  // from it are still alive, but destroying pipelines first is cleaner).
+  if (vk_pipeline_cache_ != VK_NULL_HANDLE) {
+    dfn.vkDestroyPipelineCache(device, vk_pipeline_cache_, nullptr);
+    vk_pipeline_cache_ = VK_NULL_HANDLE;
+  }
 
   // Destroy all internal shaders.
   ui::vulkan::util::DestroyAndNullHandle(dfn.vkDestroyShaderModule, device,
@@ -2162,7 +2192,9 @@ bool VulkanPipelineCache::EnsurePipelineCreated(
   const ui::vulkan::VulkanDevice::Functions& dfn = vulkan_device->functions();
   const VkDevice device = vulkan_device->device();
   VkPipeline pipeline;
-  if (dfn.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1,
+  // [PERF] Pass vk_pipeline_cache_ instead of VK_NULL_HANDLE so the Vulkan
+  // driver can reuse compiled pipeline artifacts across frames.
+  if (dfn.vkCreateGraphicsPipelines(device, vk_pipeline_cache_, 1,
                                     &pipeline_create_info, nullptr,
                                     &pipeline) != VK_SUCCESS) {
     // TODO(Triang3l): Move these error messages outside.
