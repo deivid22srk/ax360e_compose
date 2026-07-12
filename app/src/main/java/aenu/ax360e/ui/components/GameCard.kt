@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -151,7 +152,7 @@ private sealed interface ThumbState {
     data object Missing : ThumbState
 }
 
-private fun loadThumb(context: android.content.Context, game: GameItem): ThumbState {
+private suspend fun loadThumb(context: android.content.Context, game: GameItem): ThumbState {
     // Built-in icon from GOD/STFS — use it directly without network.
     if (game.icon != null) {
         return runCatching {

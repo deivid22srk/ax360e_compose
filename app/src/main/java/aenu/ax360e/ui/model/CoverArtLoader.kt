@@ -1,7 +1,6 @@
 package aenu.ax360e.ui.model
 
 import android.content.Context
-import android.util.Log
 import androidx.collection.LruCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +9,18 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+
+/**
+ * Wrapper for the in-memory cache. [LruCache] requires its value type to be
+ * non-null (`V : Any`), so we can't store `ByteArray?` directly. [CoverEntry]
+ * lets us represent both "we have bytes" and "we've confirmed there's no art"
+ * without resorting to two separate maps.
+ */
+private data class CoverEntry(val bytes: ByteArray?) {
+    companion object {
+        val MISSING = CoverEntry(null)
+    }
+}
 
 /**
  * Orchestrates cover-art loading with three layers:
@@ -26,13 +37,12 @@ import kotlinx.coroutines.sync.withLock
  */
 object CoverArtLoader {
 
-    private const val TAG = "CoverArtLoader"
     private const val PREFS_NAME = "cover_art_prefs"
     private const val PREF_API_KEY = "tgdb_api_key"
 
-    private const val MEMORY_CACHE_SIZE = 64 // entries; each entry is a small ByteArray
+    private const val MEMORY_CACHE_SIZE = 64 // entries
 
-    private val memoryCache = LruCache<String, ByteArray?>(MEMORY_CACHE_SIZE)
+    private val memoryCache = LruCache<String, CoverEntry>(MEMORY_CACHE_SIZE)
     private val inflightLocks = HashMap<String, Mutex>()
     private val inflightLocksLock = Mutex()
 
@@ -50,19 +60,19 @@ object CoverArtLoader {
         if (gameName.isBlank()) return null
 
         // 1. Memory
-        memoryCache.get(gameName)?.let { return it }
+        memoryCache.get(gameName)?.let { return it.bytes }
 
         // 2. Disk
         val appCtx = context.applicationContext
         CoverArtCache.readBytes(appCtx, gameName)?.let {
-            memoryCache.put(gameName, it)
+            memoryCache.put(gameName, CoverEntry(it))
             return it
         }
 
         // If we already know TGDB doesn't have this cover, bail out fast
         // (until the user clears the cache or changes the API key).
         if (CoverArtCache.isKnownMissing(appCtx, gameName)) {
-            memoryCache.put(gameName, null)
+            memoryCache.put(gameName, CoverEntry.MISSING)
             return null
         }
 
@@ -75,23 +85,23 @@ object CoverArtLoader {
         val result = mutex.withLock {
             // Re-check memory after acquiring the lock — another caller
             // may have just finished fetching.
-            memoryCache.get(gameName)?.let { return@withLock it }
+            memoryCache.get(gameName)?.let { return@withLock it.bytes }
 
             val apiKey = readApiKey(appCtx)
             val bytes = CoverArtRepository.fetchCoverBytes(gameName, apiKey)
             if (bytes != null) {
                 CoverArtCache.writeBytes(appCtx, gameName, bytes)
+                memoryCache.put(gameName, CoverEntry(bytes))
             } else {
                 CoverArtCache.markMissing(appCtx, gameName)
+                memoryCache.put(gameName, CoverEntry.MISSING)
             }
-            memoryCache.put(gameName, bytes)
             bytes
         }
 
         // Cleanup the mutex entry once the lock is released — prevents the
         // map from growing without bound as the user scrolls.
         inflightLocksLock.withLock {
-            // Only remove if still owned by us AND not held by anyone.
             // (Mutex doesn't expose isLocked, so we just remove — worst case
             // a concurrent caller creates a new mutex and re-fetches once.)
             inflightLocks.remove(gameName)
