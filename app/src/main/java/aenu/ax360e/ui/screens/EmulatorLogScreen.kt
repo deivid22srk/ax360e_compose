@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -79,6 +80,7 @@ fun EmulatorLogScreen(
     var showDeleteDialog by remember { mutableStateOf<GameLogEntry?>(null) }
     var pendingExport by remember { mutableStateOf<GameLogEntry?>(null) }
     var currentLogLevel by remember { mutableIntStateOf(2) }
+    var isDebugMode by remember { mutableStateOf(false) }
     var showVerbosityHelp by remember { mutableStateOf(false) }
 
     val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -107,6 +109,7 @@ fun EmulatorLogScreen(
             LoggingConfigHelper.disableHirFileDumps()
             logs = EmulatorLogRepository.listLogs(context)
             currentLogLevel = LoggingConfigHelper.readLogLevel()
+            isDebugMode = LoggingConfigHelper.readDebugMode()
         }
     }
 
@@ -121,12 +124,32 @@ fun EmulatorLogScreen(
         scope.launch(Dispatchers.IO) {
             val ok = LoggingConfigHelper.setLogLevel(level)
             val newLevel = LoggingConfigHelper.readLogLevel()
+            val newDebug = LoggingConfigHelper.readDebugMode()
             withContext(Dispatchers.Main) {
                 currentLogLevel = newLevel
+                isDebugMode = newDebug
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         if (ok) context.getString(R.string.log_level_saved)
                         else "Failed to update log_level"
+                    )
+                }
+            }
+        }
+    }
+
+    fun toggleDebugMode(enabled: Boolean) {
+        scope.launch(Dispatchers.IO) {
+            val ok = LoggingConfigHelper.setDebugMode(enabled)
+            val newDebug = LoggingConfigHelper.readDebugMode()
+            val newLevel = LoggingConfigHelper.readLogLevel()
+            withContext(Dispatchers.Main) {
+                isDebugMode = newDebug
+                currentLogLevel = newLevel
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        if (ok) "Debug mode updated"
+                        else "Failed to update debug mode"
                     )
                 }
             }
@@ -249,7 +272,9 @@ fun EmulatorLogScreen(
                 item {
                     LogVerbosityCard(
                         currentLevel = currentLogLevel,
+                        isDebugMode = isDebugMode,
                         onSelectLevel = { applyLogLevel(it) },
+                        onToggleDebugMode = { toggleDebugMode(it) },
                         onEnableJitDetail = { applyJitDetail() },
                         onHelp = { showVerbosityHelp = true }
                     )
@@ -360,7 +385,9 @@ fun EmulatorLogScreen(
 @Composable
 private fun LogVerbosityCard(
     currentLevel: Int,
+    isDebugMode: Boolean,
     onSelectLevel: (Int) -> Unit,
+    onToggleDebugMode: (Boolean) -> Unit,
     onEnableJitDetail: () -> Unit,
     onHelp: () -> Unit
 ) {
@@ -432,6 +459,30 @@ private fun LogVerbosityCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Debug Mode",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Text(
+                        text = "Enables MMIO tracing and unimplemented instruction breaks. MAY REDUCE PERFORMANCE.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                androidx.compose.material3.Switch(
+                    checked = isDebugMode,
+                    onCheckedChange = onToggleDebugMode
+                )
+            }
         }
     }
 }

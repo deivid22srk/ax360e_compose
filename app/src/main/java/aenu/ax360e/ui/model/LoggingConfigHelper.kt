@@ -27,6 +27,9 @@ object LoggingConfigHelper {
     const val KEY_DISASSEMBLE = "CPU|disassemble_functions"
     const val KEY_DUMP_HIR = "CPU|dump_translated_hir_functions"
     const val KEY_TRACE_FUNCTIONS = "CPU|trace_functions"
+    const val KEY_RECORD_MMIO = "CPU|record_mmio_access_exceptions"
+    const val KEY_MMIO_STORES = "CPU|emit_mmio_aware_stores_for_recorded_exception_addresses"
+    const val KEY_BREAK_UNIMPLEMENTED = "CPU|break_on_unimplemented_instructions"
 
     private val LEVEL_NAMES = listOf("error", "warning", "info", "debug", "trace")
 
@@ -84,6 +87,46 @@ object LoggingConfigHelper {
     fun disableHirFileDumps(): Boolean {
         return mutateConfig { cfg ->
             cfg.save_config_entry(KEY_DUMP_HIR, "false")
+        }
+    }
+
+    /**
+     * Master Debug Mode:
+     * - log_level = 3 (debug)
+     * - record_mmio_access_exceptions = true
+     * - emit_mmio_aware_stores_for_recorded_exception_addresses = true
+     * - break_on_unimplemented_instructions = true
+     */
+    fun readDebugMode(): Boolean {
+        if (!Emulator.ensure_library_loaded()) return false
+        return runCatching {
+            val path = Application.ensure_global_config_file().absolutePath
+            val cfg = NativeEmulator.Config.open_config_file(path)
+            try {
+                val recordMmio = cfg.load_config_entry(KEY_RECORD_MMIO)?.toBoolean() ?: false
+                val mmioStores = cfg.load_config_entry(KEY_MMIO_STORES)?.toBoolean() ?: false
+                val breakUnimpl = cfg.load_config_entry(KEY_BREAK_UNIMPLEMENTED)?.toBoolean() ?: false
+                val level = cfg.load_config_entry(KEY_LOG_LEVEL)?.toIntOrNull() ?: 2
+                recordMmio && mmioStores && breakUnimpl && level >= 3
+            } finally {
+                cfg.close_config_file()
+            }
+        }.getOrDefault(false)
+    }
+
+    fun setDebugMode(enabled: Boolean): Boolean {
+        return mutateConfig { cfg ->
+            cfg.save_config_entry(KEY_RECORD_MMIO, enabled.toString())
+            cfg.save_config_entry(KEY_MMIO_STORES, enabled.toString())
+            cfg.save_config_entry(KEY_BREAK_UNIMPLEMENTED, enabled.toString())
+            if (enabled) {
+                val current = cfg.load_config_entry(KEY_LOG_LEVEL)?.toIntOrNull() ?: 2
+                if (current < 3) {
+                    cfg.save_config_entry(KEY_LOG_LEVEL, "3")
+                }
+            } else {
+                cfg.save_config_entry(KEY_LOG_LEVEL, "2")
+            }
         }
     }
 
