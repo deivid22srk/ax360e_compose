@@ -20,3 +20,6 @@ DEFINE_bool(headless, false,
 #endif
 DEFINE_bool(log_high_frequency_kernel_calls, false,
             "Log kernel calls with the kHighFrequency tag.", "Kernel");
+DEFINE_bool(app_use_performance_cores, true,
+            "Pins guest threads to performance cores on big.LITTLE systems.",
+            "Kernel");

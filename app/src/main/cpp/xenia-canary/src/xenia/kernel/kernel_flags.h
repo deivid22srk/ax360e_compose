@@ -13,5 +13,6 @@
 
 DECLARE_bool(headless);
 DECLARE_bool(log_high_frequency_kernel_calls);
+DECLARE_bool(app_use_performance_cores);
 
 #endif  // XENIA_KERNEL_KERNEL_FLAGS_H_

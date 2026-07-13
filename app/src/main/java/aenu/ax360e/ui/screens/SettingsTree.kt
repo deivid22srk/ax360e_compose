@@ -188,6 +188,7 @@ object SettingsTree {
                     SettingsEntry.Bool(key = "Kernel|kernel_pix", title = context.getString(R.string.es_kernel_kernel_pix)),
                     SettingsEntry.Bool(key = "Kernel|log_high_frequency_kernel_calls", title = context.getString(R.string.es_kernel_log_high_frequency_kernel_calls)),
                     SettingsEntry.Bool(key = "Kernel|staging_mode", title = context.getString(R.string.es_kernel_staging_mode)),
+                    SettingsEntry.Bool(key = "Kernel|app_use_performance_cores", title = context.getString(R.string.es_kernel_app_use_performance_cores)),
                 )
             ),
             SettingsEntry.Section(

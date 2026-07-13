@@ -240,6 +240,7 @@
     <string name="es_kernel_kernel_pix">PIX</string>
     <string name="es_kernel_log_high_frequency_kernel_calls">Log High Frequency Calls</string>
     <string name="es_kernel_staging_mode">Staging Mode</string>
+    <string name="es_kernel_app_use_performance_cores">Use Performance Cores</string>
 
     <string name="es_logging">Logging</string>
     <string name="es_logging_flush_log">Flush Log</string>

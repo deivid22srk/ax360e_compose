@@ -9,8 +9,11 @@
 
 #include "xenia/gpu/vulkan/vulkan_pipeline_cache.h"
 
+#include "xenia/base/cvar.h"
 #include <cstdint>
 #include <cstring>
+#include <fstream>
+#include <vector>
 
 #include "third_party/fmt/include/fmt/format.h"
 #include "xenia/base/assert.h"
@@ -33,6 +36,8 @@ namespace xe {
 namespace gpu {
 namespace vulkan {
 
+DECLARE_path(storage_root);
+
 VulkanPipelineCache::VulkanPipelineCache(
     VulkanCommandProcessor& command_processor,
     const RegisterFile& register_file,
@@ -48,10 +53,41 @@ VulkanPipelineCache::~VulkanPipelineCache() { Shutdown(); }
 bool VulkanPipelineCache::Initialize() {
   const ui::vulkan::VulkanDevice* const vulkan_device =
       command_processor_.GetVulkanDevice();
+  const ui::vulkan::VulkanDevice::Functions& dfn = vulkan_device->functions();
+  const VkDevice device = vulkan_device->device();
 
   bool edram_fragment_shader_interlock =
       render_target_cache_.GetPath() ==
       RenderTargetCache::Path::kPixelShaderInterlock;
+
+  // Load pipeline cache from disk.
+  std::vector<uint8_t> cache_data;
+  std::filesystem::path cache_path =
+      std::filesystem::path(cvars::storage_root) / "cache" /
+      "vulkan_pipelines.bin";
+  std::ifstream cache_file(cache_path, std::ios::binary | std::ios::ate);
+  if (cache_file.is_open()) {
+    std::streamsize size = cache_file.tellg();
+    if (size > 0) {
+      cache_data.resize(static_cast<size_t>(size));
+      cache_file.seekg(0, std::ios::beg);
+      cache_file.read(reinterpret_cast<char*>(cache_data.data()), size);
+    }
+    cache_file.close();
+  }
+
+  VkPipelineCacheCreateInfo cache_create_info;
+  cache_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+  cache_create_info.pNext = nullptr;
+  cache_create_info.flags = 0;
+  cache_create_info.initialDataSize = cache_data.size();
+  cache_create_info.pInitialData =
+      cache_data.empty() ? nullptr : cache_data.data();
+  if (dfn.vkCreatePipelineCache(device, &cache_create_info, nullptr,
+                                &pipeline_cache_) != VK_SUCCESS) {
+    XELOGE("VulkanPipelineCache: Failed to create the pipeline cache");
+    pipeline_cache_ = VK_NULL_HANDLE;
+  }
 
   shader_translator_ = std::make_unique<SpirvShaderTranslator>(
       SpirvShaderTranslator::Features(vulkan_device),
@@ -86,6 +122,31 @@ void VulkanPipelineCache::Shutdown() {
       command_processor_.GetVulkanDevice();
   const ui::vulkan::VulkanDevice::Functions& dfn = vulkan_device->functions();
   const VkDevice device = vulkan_device->device();
+
+  // Save pipeline cache to disk.
+  if (pipeline_cache_ != VK_NULL_HANDLE) {
+    size_t cache_size = 0;
+    if (dfn.vkGetPipelineCacheData(device, pipeline_cache_, &cache_size,
+                                   nullptr) == VK_SUCCESS &&
+        cache_size > 0) {
+      std::vector<uint8_t> cache_data(cache_size);
+      if (dfn.vkGetPipelineCacheData(device, pipeline_cache_, &cache_size,
+                                     cache_data.data()) == VK_SUCCESS) {
+        std::filesystem::path cache_path =
+            std::filesystem::path(cvars::storage_root) / "cache" /
+            "vulkan_pipelines.bin";
+        std::filesystem::create_directories(cache_path.parent_path());
+        std::ofstream cache_file(cache_path, std::ios::binary);
+        if (cache_file.is_open()) {
+          cache_file.write(reinterpret_cast<const char*>(cache_data.data()),
+                           cache_data.size());
+          cache_file.close();
+        }
+      }
+    }
+    dfn.vkDestroyPipelineCache(device, pipeline_cache_, nullptr);
+    pipeline_cache_ = VK_NULL_HANDLE;
+  }
 
   // Destroy all pipelines.
   last_pipeline_ = nullptr;
@@ -2162,7 +2223,7 @@ bool VulkanPipelineCache::EnsurePipelineCreated(
   const ui::vulkan::VulkanDevice::Functions& dfn = vulkan_device->functions();
   const VkDevice device = vulkan_device->device();
   VkPipeline pipeline;
-  if (dfn.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1,
+  if (dfn.vkCreateGraphicsPipelines(device, pipeline_cache_, 1,
                                     &pipeline_create_info, nullptr,
                                     &pipeline) != VK_SUCCESS) {
     // TODO(Triang3l): Move these error messages outside.

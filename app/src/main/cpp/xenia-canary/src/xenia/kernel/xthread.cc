@@ -22,6 +22,7 @@
 #include "xenia/cpu/processor.h"
 #include "xenia/emulator.h"
 #include "xenia/kernel/kernel_state.h"
+#include "xenia/kernel/kernel_flags.h"
 #include "xenia/kernel/user_module.h"
 #include "xenia/kernel/xboxkrnl/xboxkrnl_threading.h"
 
@@ -420,6 +421,14 @@ X_STATUS XThread::Create() {
 
     // Profiler needs to know about the thread.
     xe::Profiler::ThreadEnter(thread_name_.c_str());
+
+    // Set performance core affinity if requested.
+    if (cvars::app_use_performance_cores) {
+      uint64_t perf_mask = xe::threading::get_performance_cpu_mask();
+      if (perf_mask != 0) {
+        thread_->set_affinity_mask(perf_mask);
+      }
+    }
 
     // Execute user code.
     current_xthread_tls_ = this;
@@ -1174,6 +1183,14 @@ object_ref<XThread> XThread::Restore(KernelState* kernel_state,
 
       // Profiler needs to know about the thread.
       xe::Profiler::ThreadEnter(thread->name().c_str());
+
+      // Set performance core affinity if requested.
+      if (cvars::app_use_performance_cores) {
+        uint64_t perf_mask = xe::threading::get_performance_cpu_mask();
+        if (perf_mask != 0) {
+          thread->thread_->set_affinity_mask(perf_mask);
+        }
+      }
 
       current_xthread_tls_ = thread;
       current_thread_ = thread;
