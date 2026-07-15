@@ -315,6 +315,44 @@ void AndroidWindow::UpdateSurface(){
 }
 
 void AndroidWindow::Paint(){
+    // ax360e real-fix: skip Paint() entirely when the Android surface is gone.
+    //
+    // Before this guard, Paint() was called from main_loop's EVENT_PAINT
+    // handler even when surfaceDestroyed() had already cleared ae::window.
+    // OnPaint(false) would then route through the presenter, which would
+    // attempt to vkAcquireNextImageKHR on a stale/outdated swapchain and log
+    // "Presentation to the swapchain image has been dropped as the swapchain
+    // or the surface has become outdated" — repeating every frame and
+    // poisoning the log. It also kept the guest output thread spinning on
+    // surface recovery attempts that could never succeed without a new
+    // ANativeWindow from surfaceCreated.
+    //
+    // With this guard:
+    //   - If ae::window is null (surfaceDestroyed ran), Paint() is a no-op.
+    //   - The guest output thread is allowed to keep running its emulation
+    //     loop (CPU keeps stepping, audio keeps playing), but presentation
+    //     is suspended until surfaceCreated provides a new ANativeWindow.
+    //   - When surfaceCreated arrives, EVENT_SURFACE_CHANGED is pushed,
+    //     AndroidWindow::UpdateSurface() reconnects the presenter, and the
+    //     next Paint() will actually present.
+    //
+    // This is a "pause presentation, not pause emulation" strategy. It
+    // matches what the user expects when the app is briefly backgrounded
+    // or when the surface is recreated during orientation change.
+    if (!ae::window) {
+        static int64_t last_skip_log_ns = 0;
+        const auto now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                std::chrono::steady_clock::now().time_since_epoch())
+                                .count();
+        // Throttle the skip log to once per 5 seconds to avoid log noise.
+        if (now_ns - last_skip_log_ns > 5'000'000'000LL) {
+            last_skip_log_ns = now_ns;
+            XELOGI("[AndroidWindow::Paint] surface is null (destroyed) — "
+                   "skipping OnPaint, emulation continues but presentation "
+                   "is paused until surfaceCreated");
+        }
+        return;
+    }
     OnPaint(false);
 }
 

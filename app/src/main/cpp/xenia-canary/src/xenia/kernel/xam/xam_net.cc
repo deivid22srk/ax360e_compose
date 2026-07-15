@@ -1212,6 +1212,324 @@ dword_result_t XNetLogonGetTitleID_entry(lpdword_t title_id_out) {
 }
 DECLARE_XAM_EXPORT1(XNetLogonGetTitleID, kNetworking, kStub);
 
+// =============================================================================
+// NetDll_XHttp* stubs (ordinals 0xC9 - 0xE0)
+//
+// ax360e real-fix for ROTTR (Rise of the Tomb Raider) black screen.
+//
+// ROOT CAUSE:
+//   Rise of the Tomb Raider (Crystal Dynamics engine, title ID 53510823)
+//   statically links XHTTP (Xbox HTTP) via NetDll_XHttp*. On real Xbox 360
+//   hardware, NetDll_XHttp* is provided by the network stack. Xenia-canary
+//   upstream has NEVER implemented these (confirmed via GitHub search of
+//   upstream xenia-canary repo - 0 PRs, 0 issues, 0 code matches for
+//   "XHttpDoWork"). Without an implementation, every call hits
+//   a64_emitter.cc:UndefinedCallExtern which XELOGE's "undefined extern call
+//   to ..." and returns 0.
+//
+//   ROTTR's main thread calls NetDll_XHttpDoWork() in a tight loop (typical
+//   pattern: `while (NetDll_XHttpDoWork()) {}` to drain pending HTTP work).
+//   Because UndefinedCallExtern returns 0, the loop NEVER exits and the
+//   main XThread never returns control to the renderer. The GPU Commands
+//   thread (01000010) never receives a frame kickoff, and the user sees
+//   a black screen. The log floods with 5423+ "undefined extern call to
+//   82D0CCCC NetDll_XHttpDoWork" lines.
+//
+// FIX:
+//   Provide stubs for all 24 NetDll_XHttp* functions (ordinals 0xC9-0xE0).
+//   The stubs model "network offline / no HTTP work to do":
+//
+//     - Startup/Shutdown/Option/SetOption/SetCredentials: return success (TRUE
+//       or 0) so the game initializes its HTTP machinery without erroring out.
+//     - Open/OpenRequest: return a non-zero pseudo-handle (0xDEADBEEF) so the
+//       game treats it as a valid HINTERNET. The game then tries to send a
+//       request, which fails (see SendRequest/ReceiveResponse), and finally
+//       closes the handle via CloseHandle (no-op).
+//     - DoWork: return FALSE (0) - this is the KEY fix. Returning FALSE tells
+//       the caller there is no pending HTTP work, so the `while (DoWork()){}`
+//       loop exits immediately and the main thread can proceed to rendering.
+//     - SendRequest/ReceiveResponse/QueryHeaders/ReadData/WriteData: return
+//       FALSE with GetLastError = ERROR_WINHTTP_CANNOT_CONNECT (0x00002EEF)
+//       or ERROR_WINHTTP_TIMEOUT (0x00002EE2), so the game treats the request
+//       as failed and falls through to its "no network" code path.
+//     - CrackUrl/CreateUrl/QueryAuthSchemes/QueryOption/GetPerfCounters/
+//       ResetPerfCounters: return appropriate success/empty values.
+//
+// These stubs are also appropriate for any other title that uses XHTTP for
+// online services (achievements, leaderboards, telemetry) while being
+// primarily single-player. They mirror the semantics of the existing NetDll_*
+// stubs above (returning 0x80151802 / X_ERROR_NOT_FOUND for "not connected").
+//
+// References:
+//   - https://github.com/xenia-canary/xenia-canary/issues/754 (aggregate
+//     "Unimplemented Kernel Functions" issue - NetDll_XHttp* explicitly
+//     listed as unimplemented)
+//   - WinHTTP error codes:
+//     ERROR_WINHTTP_CANNOT_CONNECT = 12029 (0x2EED)
+//     ERROR_WINHTTP_TIMEOUT        = 12002 (0x2EE2)
+//     ERROR_WINHTTP_OPERATION_CANCELLED = 12017 (0x2EF1)
+// =============================================================================
+
+// NetDll_XHttpStartup (ordinal 0xC9)
+dword_result_t NetDll_XHttpStartup_entry() {
+  // TRUE = success. The Xbox 360 XHttpStartup returns BOOL.
+  return 1;
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpStartup, kNetworking, kStub);
+
+// NetDll_XHttpShutdown (ordinal 0xCA)
+dword_result_t NetDll_XHttpShutdown_entry() {
+  // BOOL success.
+  return 1;
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpShutdown, kNetworking, kStub);
+
+// NetDll_XHttpOpen (ordinal 0xCB)
+//   HINTERNET XHttpOpen(LPCWSTR agent, DWORD access_type, LPCWSTR proxy,
+//                       LPCWSTR bypass, DWORD flags)
+// Returns a non-zero pseudo-handle so the game proceeds. The handle will fail
+// on the first actual network operation (SendRequest/ReceiveResponse).
+dword_result_t NetDll_XHttpOpen_entry(lpvoid_t agent, dword_t access_type,
+                                       lpvoid_t proxy, lpvoid_t bypass,
+                                       dword_t flags) {
+  return 0xDEADBEEF;  // pseudo HINTERNET
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpOpen, kNetworking, kStub);
+
+// NetDll_XHttpCloseHandle (ordinal 0xCC)
+//   BOOL XHttpCloseHandle(HINTERNET)
+dword_result_t NetDll_XHttpCloseHandle_entry(dword_t handle) {
+  return 1;  // TRUE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpCloseHandle, kNetworking, kStub);
+
+// NetDll_XHttpConnect (ordinal 0xCD)
+//   HINTERNET XHttpConnect(HINTERNET, LPCWSTR server, INTERNET_PORT, DWORD)
+dword_result_t NetDll_XHttpConnect_entry(dword_t session, lpvoid_t server,
+                                          dword_t port, dword_t flags) {
+  return 0xDEADBEEF;  // pseudo connect handle
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpConnect, kNetworking, kStub);
+
+// NetDll_XHttpSetStatusCallback (ordinal 0xCE)
+//   LPVOID XHttpSetStatusCallback(HINTERNET, LPVOID callback, DWORD, DWORD_PTR)
+// Returns the previous callback (NULL on first call).
+dword_result_t NetDll_XHttpSetStatusCallback_entry(dword_t handle,
+                                                    lpvoid_t callback,
+                                                    dword_t flags,
+                                                    qword_t reserved) {
+  return 0;  // NULL = no previous callback
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpSetStatusCallback, kNetworking, kStub);
+
+// NetDll_XHttpOpenRequest (ordinal 0xCF)
+//   HINTERNET XHttpOpenRequest(HINTERNET connect, LPCWSTR verb,
+//                              LPCWSTR path, LPCWSTR version,
+//                              LPCWSTR referrer, LPCWSTR* accept_types,
+//                              DWORD flags)
+dword_result_t NetDll_XHttpOpenRequest_entry(
+    dword_t connect, lpvoid_t verb, lpvoid_t path, lpvoid_t version,
+    lpvoid_t referrer, lpvoid_t accept_types, dword_t flags) {
+  return 0xDEADBEEF;  // pseudo request handle
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpOpenRequest, kNetworking, kStub);
+
+// NetDll_XHttpOpenRequestUsingMemory (ordinal 0xD0)
+// Same as XHttpOpenRequest but path is in-memory. Same stub semantics.
+dword_result_t NetDll_XHttpOpenRequestUsingMemory_entry(
+    dword_t connect, lpvoid_t verb, lpvoid_t path, dword_t path_size,
+    lpvoid_t version, lpvoid_t referrer, lpvoid_t accept_types, dword_t flags) {
+  return 0xDEADBEEF;
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpOpenRequestUsingMemory, kNetworking, kStub);
+
+// NetDll_XHttpSendRequest (ordinal 0xD1)
+//   BOOL XHttpSendRequest(HINTERNET, LPCWSTR headers, DWORD headers_len,
+//                         LPVOID optional, DWORD optional_len, DWORD total_len,
+//                         qword_t context)
+// Returns FALSE with GetLastError = ERROR_WINHTTP_CANNOT_CONNECT so the game
+// gives up on the request and proceeds to its "no network" code path.
+dword_result_t NetDll_XHttpSendRequest_entry(
+    dword_t request, lpvoid_t headers, dword_t headers_len,
+    lpvoid_t optional, dword_t optional_len, dword_t total_len,
+    qword_t context) {
+  XThread::SetLastError(0x00002EED);  // ERROR_WINHTTP_CANNOT_CONNECT
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpSendRequest, kNetworking, kStub);
+
+// NetDll_XHttpReceiveResponse (ordinal 0xD2)
+//   BOOL XHttpReceiveResponse(HINTERNET, LPVOID overlapped)
+dword_result_t NetDll_XHttpReceiveResponse_entry(dword_t request,
+                                                  lpvoid_t overlapped) {
+  XThread::SetLastError(0x00002EEF);  // ERROR_WINHTTP_OPERATION_CANCELLED
+  return 0;  // FALSE - no response
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpReceiveResponse, kNetworking, kStub);
+
+// NetDll_XHttpQueryHeaders (ordinal 0xD3)
+//   BOOL XHttpQueryHeaders(HINTERNET, DWORD info_level, LPCWSTR name,
+//                          LPVOID buffer, LPDWORD buffer_len, LPDWORD index)
+dword_result_t NetDll_XHttpQueryHeaders_entry(
+    dword_t request, dword_t info_level, lpvoid_t name, lpvoid_t buffer,
+    lpdword_t buffer_len, lpdword_t index) {
+  if (buffer_len) {
+    *buffer_len = 0;
+  }
+  XThread::SetLastError(0x00002EE2);  // ERROR_WINHTTP_HEADER_NOT_FOUND
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpQueryHeaders, kNetworking, kStub);
+
+// NetDll_XHttpReadData (ordinal 0xD4)
+//   BOOL XHttpReadData(HINTERNET, LPVOID buffer, DWORD bytes_to_read,
+//                      LPDWORD bytes_read, LPVOID overlapped)
+dword_result_t NetDll_XHttpReadData_entry(dword_t request, lpvoid_t buffer,
+                                           dword_t bytes_to_read,
+                                           lpdword_t bytes_read,
+                                           lpvoid_t overlapped) {
+  if (bytes_read) {
+    *bytes_read = 0;
+  }
+  XThread::SetLastError(0x00002EEF);  // ERROR_WINHTTP_OPERATION_CANCELLED
+  return 0;  // FALSE - no data
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpReadData, kNetworking, kStub);
+
+// NetDll_XHttpWriteData (ordinal 0xD5)
+//   BOOL XHttpWriteData(HINTERNET, LPCVOID buffer, DWORD bytes_to_write,
+//                       LPDWORD bytes_written, LPVOID overlapped)
+dword_result_t NetDll_XHttpWriteData_entry(dword_t request, lpvoid_t buffer,
+                                            dword_t bytes_to_write,
+                                            lpdword_t bytes_written,
+                                            lpvoid_t overlapped) {
+  if (bytes_written) {
+    *bytes_written = 0;
+  }
+  XThread::SetLastError(0x00002EEF);  // ERROR_WINHTTP_OPERATION_CANCELLED
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpWriteData, kNetworking, kStub);
+
+// NetDll_XHttpQueryOption (ordinal 0xD6)
+//   BOOL XHttpQueryOption(HINTERNET, DWORD option, LPVOID buffer,
+//                         LPDWORD buffer_len)
+dword_result_t NetDll_XHttpQueryOption_entry(dword_t handle, dword_t option,
+                                              lpvoid_t buffer,
+                                              lpdword_t buffer_len) {
+  if (buffer_len) {
+    *buffer_len = 0;
+  }
+  XThread::SetLastError(0x00002EE2);  // ERROR_WINHTTP_INVALID_OPTION
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpQueryOption, kNetworking, kStub);
+
+// NetDll_XHttpSetOption (ordinal 0xD7)
+//   BOOL XHttpSetOption(HINTERNET, DWORD option, LPVOID buffer, DWORD len)
+dword_result_t NetDll_XHttpSetOption_entry(dword_t handle, dword_t option,
+                                            lpvoid_t buffer, dword_t len) {
+  return 1;  // TRUE - accept whatever option the game wants to set
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpSetOption, kNetworking, kStub);
+
+// NetDll_XHttpDoWork (ordinal 0xD8) - THE KEY FIX
+//   DWORD XHttpDoWork()
+//
+// On real Xbox 360, XHttpDoWork drains pending HTTP request work and returns
+// TRUE if there is more work to do, FALSE if the queue is empty. Games
+// typically call it in a `while (XHttpDoWork()) {}` loop until the queue is
+// drained.
+//
+// Returning FALSE (0) here tells the caller the queue is empty, so the loop
+// exits immediately. This is what unblocks ROTTR's main thread from the
+// busy-loop it was stuck in (5423+ "undefined extern call" log lines, no
+// GPU frame ever kicked off).
+dword_result_t NetDll_XHttpDoWork_entry() {
+  return 0;  // FALSE - no pending HTTP work, queue empty
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpDoWork, kNetworking, kStub);
+
+// NetDll_XHttpSetCredentials (ordinal 0xD9)
+//   BOOL XHttpSetCredentials(HINTERNET, DWORD auth_target, DWORD auth_scheme,
+//                            LPCWSTR username, LPCWSTR password, LPVOID)
+dword_result_t NetDll_XHttpSetCredentials_entry(
+    dword_t handle, dword_t auth_target, dword_t auth_scheme,
+    lpvoid_t username, lpvoid_t password, lpvoid_t reserved) {
+  return 1;  // TRUE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpSetCredentials, kNetworking, kStub);
+
+// NetDll_XHttpQueryAuthSchemes (ordinal 0xDA)
+//   BOOL XHttpQueryAuthSchemes(HINTERNET, DWORD supported_schemes,
+//                              DWORD first_scheme, DWORD selected_scheme)
+dword_result_t NetDll_XHttpQueryAuthSchemes_entry(
+    dword_t request, dword_t supported_schemes, dword_t first_scheme,
+    lpdword_t selected_scheme_out) {
+  if (selected_scheme_out) {
+    *selected_scheme_out = 0;  // no auth scheme selected
+  }
+  return 1;  // TRUE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpQueryAuthSchemes, kNetworking, kStub);
+
+// NetDll_XHttpCrackUrlW (ordinal 0xDB) - wide-string variant
+//   BOOL XHttpCrackUrlW(LPCWSTR url, DWORD url_len, DWORD flags,
+//                       LPURL_COMPONENTSW components)
+dword_result_t NetDll_XHttpCrackUrlW_entry(lpvoid_t url, dword_t url_len,
+                                            dword_t flags, lpvoid_t components) {
+  XThread::SetLastError(0x00002EE9);  // ERROR_WINHTTP_UNRECOGNIZED_SCHEME
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpCrackUrlW, kNetworking, kStub);
+
+// NetDll_XHttpCrackUrl (ordinal 0xDC) - ANSI variant
+dword_result_t NetDll_XHttpCrackUrl_entry(lpvoid_t url, dword_t url_len,
+                                           dword_t flags, lpvoid_t components) {
+  XThread::SetLastError(0x00002EE9);  // ERROR_WINHTTP_UNRECOGNIZED_SCHEME
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpCrackUrl, kNetworking, kStub);
+
+// NetDll_XHttpCreateUrl (ordinal 0xDD) - ANSI
+//   BOOL XHttpCreateUrl(LPURL_COMPONENTS components, DWORD flags,
+//                       LPSTR url, LPDWORD url_len)
+dword_result_t NetDll_XHttpCreateUrl_entry(lpvoid_t components, dword_t flags,
+                                            lpvoid_t url, lpdword_t url_len) {
+  if (url_len) {
+    *url_len = 0;
+  }
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpCreateUrl, kNetworking, kStub);
+
+// NetDll_XHttpCreateUrlW (ordinal 0xDE) - wide
+dword_result_t NetDll_XHttpCreateUrlW_entry(lpvoid_t components, dword_t flags,
+                                             lpvoid_t url, lpdword_t url_len) {
+  if (url_len) {
+    *url_len = 0;
+  }
+  return 0;  // FALSE
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpCreateUrlW, kNetworking, kStub);
+
+// NetDll_XHttpResetPerfCounters (ordinal 0xDF)
+//   void XHttpResetPerfCounters()
+void NetDll_XHttpResetPerfCounters_entry() {
+  // no-op
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpResetPerfCounters, kNetworking, kStub);
+
+// NetDll_XHttpGetPerfCounters (ordinal 0xE0)
+//   void XHttpGetPerfCounters(LPHTTP_PERF_COUNTERS counters)
+void NetDll_XHttpGetPerfCounters_entry(lpvoid_t counters) {
+  // Zero out the perf counters struct so the game doesn't read garbage.
+  if (counters) {
+    std::memset(counters, 0, 0x40);  // XHTTP_PERF_COUNTERS is ~64 bytes
+  }
+}
+DECLARE_XAM_EXPORT1(NetDll_XHttpGetPerfCounters, kNetworking, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

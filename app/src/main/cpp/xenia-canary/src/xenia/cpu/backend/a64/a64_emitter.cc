@@ -9,7 +9,11 @@
 
 #include "xenia/cpu/backend/a64/a64_emitter.h"
 
+#include <atomic>
+#include <chrono>
 #include <cstring>
+#include <unordered_map>
+#include <mutex>
 
 #include "xenia/base/debugging.h"
 #include "xenia/base/logging.h"
@@ -47,10 +51,73 @@ using namespace Xbyak_aarch64;
 // Defined in a64_backend.cc.
 extern uint64_t ResolveFunction(void* raw_context, uint64_t target_address);
 
+// ax360e real-fix: throttle the "undefined extern call" log.
+//
+// Problem: when a game calls an unimplemented export in a tight loop (e.g.
+// ROTTR calling NetDll_XHttpDoWork() in `while (DoWork()) {}`), the original
+// code logged every single call. This produced thousands of identical log
+// lines (5423+ in the ROTTR v2 log) that buried every other diagnostic and
+// filled the log file with noise. The flood itself became the disease: even
+// after the NetDll_XHttp* stubs were added to xam_net.cc, any OTHER
+// unimplemented export called in a loop would produce the same flood.
+//
+// Fix: rate-limit per (function_address, function_name) pair to at most 1 log
+// line per 5 seconds, plus a periodic summary of how many calls were
+// suppressed. This preserves discoverability (the first call still logs, so
+// the developer knows the export is missing) while preventing log poisoning.
+//
+// Concurrency: this function is called from JIT-compiled guest code on any
+// thread, so the counters and timestamps must be thread-safe. We use a
+// mutex-guarded unordered_map; the critical section is bounded to a hash
+// lookup + arithmetic, so contention is negligible.
+namespace {
+struct UndefinedCallStats {
+  uint64_t first_seen_ns;
+  uint64_t last_logged_ns;
+  uint64_t total_calls;
+  uint64_t calls_since_last_log;
+};
+std::mutex g_undefined_call_mutex;
+std::unordered_map<uint32_t, UndefinedCallStats> g_undefined_call_stats;
+
+constexpr int64_t kUndefinedCallLogIntervalNs = 5'000'000'000LL;  // 5 seconds
+}  // namespace
+
 static uint64_t UndefinedCallExtern(void* raw_context, uint64_t function_ptr) {
   auto function = reinterpret_cast<Function*>(function_ptr);
-  XELOGE("undefined extern call to {:08X} {}", function->address(),
-         function->name());
+  const uint32_t fn_addr = function->address();
+  const auto now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                          std::chrono::steady_clock::now().time_since_epoch())
+                          .count();
+
+  bool should_log = false;
+  uint64_t suppressed_count = 0;
+  {
+    std::lock_guard<std::mutex> lock(g_undefined_call_mutex);
+    auto& stats = g_undefined_call_stats[fn_addr];
+    if (stats.total_calls == 0) {
+      stats.first_seen_ns = now_ns;
+      stats.last_logged_ns = now_ns;
+      should_log = true;
+    } else if (now_ns - stats.last_logged_ns >= kUndefinedCallLogIntervalNs) {
+      should_log = true;
+      suppressed_count = stats.calls_since_last_log;
+      stats.calls_since_last_log = 0;
+      stats.last_logged_ns = now_ns;
+    }
+    stats.total_calls++;
+    stats.calls_since_last_log++;
+  }
+
+  if (should_log) {
+    if (suppressed_count > 0) {
+      XELOGE("undefined extern call to {:08X} {} (suppressed {} duplicate "
+             "calls in last 5s)",
+             fn_addr, function->name(), suppressed_count);
+    } else {
+      XELOGE("undefined extern call to {:08X} {}", fn_addr, function->name());
+    }
+  }
   return 0;
 }
 
