@@ -26,9 +26,18 @@ DECLARE_bool(non_seamless_cube_map);
 
 DECLARE_bool(half_pixel_offset);
 
-DECLARE_int32(query_occlusion_sample_lower_threshold);
+// ax360e backport: new occlusion query system (upstream fbd620c2 + 73945c06).
+DECLARE_string(occlusion_query);
 
-DECLARE_int32(query_occlusion_sample_upper_threshold);
+DECLARE_int32(occlusion_query_fake_lower_threshold);
+
+DECLARE_int32(occlusion_query_fake_upper_threshold);
+
+DECLARE_int32(occlusion_query_querybatch_range);
+
+DECLARE_double(occlusion_query_saturation);
+
+DECLARE_int32(anisotropic_override);
 
 DECLARE_bool(disassemble_pm4);
 

@@ -28,6 +28,7 @@
 #include "xenia/gpu/vulkan/vulkan_shader.h"
 #include "xenia/gpu/vulkan/vulkan_shared_memory.h"
 #include "xenia/gpu/xenos.h"
+#include "xenia/gpu/xenos_zpd_report.h"
 #include "xenia/kernel/kernel_state.h"
 #include "xenia/kernel/user_module.h"
 #include "xenia/ui/vulkan/vulkan_presenter.h"
@@ -104,6 +105,95 @@ void VulkanCommandProcessor::TracePlaybackWroteMemory(uint32_t base_ptr,
 }
 
 void VulkanCommandProcessor::RestoreEdramSnapshot(const void* snapshot) {}
+
+// ax360e backport: ZPD occlusion query backend stubs (upstream fbd620c2).
+//
+// The full Vulkan ZPD implementation requires VK_EXT_host_query_reset, a
+// VkQueryPool, readback buffers, FSI counter buffers, and integration with
+// the render pass lifecycle (BeginQuery/EndQuery must happen inside a pass).
+// That's ~800 lines of Vulkan-specific code in vulkan_zpd_query_pool.cc
+// plus ~500 lines of integration in this file.
+//
+// For now, these stubs return false/kFailed, which causes the shared
+// CommandProcessor::OpenQuerySegment to set zpd_force_fake_fallback_ = true
+// and fall back to the improved fake mode (XenosZPDReport::WriteSampleCount
+// with oscillating values). This is the same behavior as before this commit
+// for Vulkan, but now through the new shared infrastructure.
+//
+// Games that previously worked with fake mode continue to work. Games that
+// need real occlusion queries (lens flares, occlusion culling) will still
+// get fake results until the full Vulkan backend is implemented.
+//
+// TODO(ax360e): implement real Vulkan ZPD query pool with:
+// - vkCreateQueryPool with kZPDQueryPoolCapacity slots
+// - vkCmdBeginQuery/vkCmdEndQuery in render passes
+// - vkCmdCopyQueryPoolResults to readback buffer
+// - VK_EXT_host_query_reset for slot recycling
+// - FSI counter buffer for fragment shader interlock path
+
+void VulkanCommandProcessor::PollCompletedSubmission() {
+  // Refresh submission_completed_ by checking fences. This is needed by
+  // strict ZPD mode to know which submissions have completed.
+  CheckSubmissionFenceAndDeviceLoss(GetCurrentSubmission());
+}
+
+bool VulkanCommandProcessor::CanEndSubmissionImmediately() const {
+  // True if there are no pending async operations (pipeline compilation,
+  // query resolves) that would require waiting.
+  return !pipeline_cache_->IsCreatingPipelines();
+}
+
+void VulkanCommandProcessor::EnsureZPDQueryResources() {
+  // Stub: real implementation would create zpd_host_query_pool_ here.
+  // For now, leave it null so IsZPDQueryPoolReady returns false and the
+  // shared code falls back to fake mode.
+}
+
+bool VulkanCommandProcessor::IsZPDQueryPoolReady() const {
+  // Stub: pool is never ready, forcing fake fallback.
+  return false;
+}
+
+bool VulkanCommandProcessor::CanOpenZPDQuery() const {
+  // Stub: can't open real queries without a pool.
+  return false;
+}
+
+CommandProcessor::QueryOpenResult VulkanCommandProcessor::OpenZPDQuery(
+    ReportHandle report_handle, bool can_close_submission) {
+  // Stub: no real query pool available.
+  return QueryOpenResult::kFailed;
+}
+
+bool VulkanCommandProcessor::CloseZPDQuery(ReportHandle report_handle,
+                                           uint64_t& out_submission) {
+  // Stub: nothing to close.
+  return false;
+}
+
+bool VulkanCommandProcessor::DiscardZPDQuery() {
+  // Stub: nothing to discard.
+  return false;
+}
+
+void VulkanCommandProcessor::PumpQueryResolves() {
+  // Stub: no resolves to pump. Process deferred releases if any.
+  uint64_t completed = GetCompletedSubmission();
+  while (!zpd_deferred_releases_.empty() &&
+         zpd_deferred_releases_.front().submission <= completed) {
+    zpd_deferred_releases_.pop_front();
+  }
+}
+
+bool VulkanCommandProcessor::AwaitQueryResolve(ReportHandle report_handle,
+                                               uint64_t wait_for_submission) {
+  // Stub: wait for the submission to complete via fence check.
+  if (wait_for_submission == 0) {
+    return true;
+  }
+  CheckSubmissionFenceAndDeviceLoss(wait_for_submission);
+  return GetCompletedSubmission() >= wait_for_submission;
+}
 
 std::string VulkanCommandProcessor::GetWindowTitleText() const {
   std::ostringstream title;
