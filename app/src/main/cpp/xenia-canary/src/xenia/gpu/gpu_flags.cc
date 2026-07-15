@@ -111,6 +111,26 @@ DEFINE_int32(anisotropic_override, -1,
              "Positive values clamp to the device's maxSamplerAnisotropy.",
              "GPU");
 
+// ax360e fix: use native BCn compressed textures when supported by the
+// driver. Default is FALSE because the BCn passthrough load shader applies
+// XeEndianSwap32 which corrupts BCn block data (swaps the two 16-bit
+// endpoints within each 32-bit word). This causes black/garbled textures
+// on drivers that support BCn natively (like Turnip/Mesa). When false,
+// DXT textures are always decompressed to R8G8B8A8 via load shaders, which
+// correctly handle endianness per-component. This uses 4-8x more VRAM but
+// produces correct rendering. Set to true only if the endianness bug has
+// been fixed in the load shaders.
+DEFINE_bool(
+    vulkan_use_native_bcn, false,
+    "Use native BCn compressed texture formats when supported by the Vulkan "
+    "driver. Currently DISABLED by default because the BCn passthrough load "
+    "shader has an endianness bug that corrupts block data (swaps 16-bit "
+    "endpoints within 32-bit words). When false (default), DXT textures are "
+    "decompressed to R8G8B8A8 (correct rendering, 4-8x VRAM). When true, "
+    "DXT textures stay as BCn (may produce black/garbled textures on "
+    "Turnip/Mesa drivers).",
+    "Vulkan");
+
 // ax360e backport of upstream commit 5845f343 (async shader compilation).
 DEFINE_bool(
     async_shader_compilation, true,

@@ -1885,6 +1885,23 @@ bool VulkanTextureCache::Initialize() {
           LoadShaderIndex decompress_shader, VkFormat decompress_format,
           xenos::TextureFormat alias_format =
               xenos::TextureFormat::k_1_REVERSE /* sentinel */) {
+        // ax360e fix: check vulkan_use_native_bcn cvar first.
+        // The BCn passthrough load shader applies XeEndianSwap32 which
+        // corrupts BCn block data (swaps the two 16-bit endpoints within
+        // each 32-bit word). This causes black/garbled textures on drivers
+        // that support BCn natively (like Turnip/Mesa). When the cvar is
+        // false (default), always decompress to R8G8B8A8 which correctly
+        // handles endianness per-component.
+        if (!cvars::vulkan_use_native_bcn) {
+          // Force decompression — skip BCn format check entirely.
+          host_fmt.format_unsigned.load_shader = decompress_shader;
+          host_fmt.format_unsigned.format = decompress_format;
+          host_fmt.format_unsigned.block_compressed = false;
+          if (alias_format != xenos::TextureFormat::k_1_REVERSE) {
+            host_formats_[uint32_t(alias_format)] = host_fmt;
+          }
+          return false;
+        }
         ifn.vkGetPhysicalDeviceFormatProperties(physical_device, bc_format,
                                                 &format_properties);
         if ((format_properties.optimalTilingFeatures & kBcSampledFeatures) ==
@@ -2130,16 +2147,28 @@ bool VulkanTextureCache::Initialize() {
     const auto& dxt1 =
         host_formats_[uint32_t(xenos::TextureFormat::k_DXT1)].format_unsigned;
     if (!dxt1.block_compressed && dxt1.format != VK_FORMAT_UNDEFINED) {
-      XELOGGPU(
-          "VulkanTextureCache: DXT/BC formats are decompressed to uncompressed "
-          "host images (e.g. R8G8B8A8). Expect 4-8x higher texture memory use. "
-          "On Adreno, ensure BCeNabler ran successfully (see log) or install a "
-          "custom driver that exposes BCn. Consider lowering "
-          "texture_cache_memory_limit_soft if the device is low on RAM.");
+      if (cvars::vulkan_use_native_bcn) {
+        XELOGGPU(
+            "VulkanTextureCache: DXT/BC formats are decompressed to uncompressed "
+            "host images (e.g. R8G8B8A8). Expect 4-8x higher texture memory use. "
+            "On Adreno, ensure BCeNabler ran successfully (see log) or install a "
+            "custom driver that exposes BCn. Consider lowering "
+            "texture_cache_memory_limit_soft if the device is low on RAM.");
+      } else {
+        XELOGI(
+            "VulkanTextureCache: DXT/BC decompression forced (vulkan_use_native_bcn=false) "
+            "— textures decompressed to R8G8B8A8 (4-8x VRAM). This is the default "
+            "because the BCn passthrough load shader has an endianness bug that "
+            "corrupts block data on some drivers (Turnip/Mesa). Set "
+            "vulkan_use_native_bcn=true in config.toml to enable native BCn if "
+            "the bug has been fixed.");
+      }
     } else if (dxt1.block_compressed) {
       XELOGI(
           "VulkanTextureCache: DXT/BC host formats available — textures stay "
-          "compressed (good for mobile VRAM)");
+          "compressed (good for mobile VRAM). WARNING: BCn passthrough may "
+          "produce garbled textures due to endianness bug. If you see black/"
+          "corrupted textures, set vulkan_use_native_bcn=false in config.toml.");
     }
   }
 

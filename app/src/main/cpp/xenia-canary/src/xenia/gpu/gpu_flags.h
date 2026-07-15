@@ -39,6 +39,9 @@ DECLARE_double(occlusion_query_saturation);
 
 DECLARE_int32(anisotropic_override);
 
+// ax360e fix: control native BCn texture usage (default false due to endianness bug).
+DECLARE_bool(vulkan_use_native_bcn);
+
 DECLARE_bool(disassemble_pm4);
 
 // ax360e backport: async shader compilation (upstream 5845f343).
