@@ -1863,26 +1863,55 @@ bool VulkanTextureCache::Initialize() {
   // storage precision, possibly unwanted filtering precision change).
   // TODO(Triang3l): k_11_11_10 -> filterable R16G16B16A16_SFLOAT (enough
   // storage precision, possibly unwanted filtering precision change).
-  // S3TC.
+  // S3TC / BCn (Xbox 360 DXT).
   // Not checking the textureCompressionBC feature because its availability
   // means that all BC formats are supported, however, the device may expose
   // some BC formats without this feature. Xenia doesn't use BC6H and BC7 at
   // all, and has fallbacks for each used format.
-  // TODO(Triang3l): Raise the host texture memory usage limit if S3TC has to be
-  // decompressed.
+  //
+  // Mobile (AX360E / Android): keep BCn whenever SAMPLED_IMAGE is available.
+  // Requiring SAMPLED_IMAGE_FILTER_LINEAR as well was too strict on some Adreno
+  // drivers and forced R8G8B8A8 decompression (4-8x VRAM). Linear filtering of
+  // BC is optional; if missing we keep the compressed format and disable
+  // linear filtering for that host format (nearest still works).
+  // On Adreno, BCeNabler (see vulkan_provider) may enable BCn before this runs.
   // TODO(Triang3l): S3TC -> 5551 or 4444 as an option.
   // TODO(Triang3l): S3TC -> ETC2 / EAC (a huge research topic).
+  // TODO(ax360e): S3TC -> ASTC 4x4 GPU transcoder when neither BCn nor ETC2.
+  constexpr VkFormatFeatureFlags kBcSampledFeatures =
+      VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+  auto use_bc_or_decompress =
+      [&](HostFormatPair& host_fmt, VkFormat bc_format,
+          LoadShaderIndex decompress_shader, VkFormat decompress_format,
+          xenos::TextureFormat alias_format =
+              xenos::TextureFormat::k_1_REVERSE /* sentinel */) {
+        ifn.vkGetPhysicalDeviceFormatProperties(physical_device, bc_format,
+                                                &format_properties);
+        if ((format_properties.optimalTilingFeatures & kBcSampledFeatures) ==
+            kBcSampledFeatures) {
+          // Keep compressed. Linear filterability is recorded later in the
+          // common format-support pass.
+          return true;
+        }
+        host_fmt.format_unsigned.load_shader = decompress_shader;
+        host_fmt.format_unsigned.format = decompress_format;
+        host_fmt.format_unsigned.block_compressed = false;
+        if (alias_format != xenos::TextureFormat::k_1_REVERSE) {
+          host_formats_[uint32_t(alias_format)] = host_fmt;
+        }
+        return false;
+      };
+
   HostFormatPair& host_format_dxt1 =
       host_formats_[uint32_t(xenos::TextureFormat::k_DXT1)];
   assert_true(host_format_dxt1.format_unsigned.format ==
               VK_FORMAT_BC1_RGBA_UNORM_BLOCK);
-  ifn.vkGetPhysicalDeviceFormatProperties(
-      physical_device, VK_FORMAT_BC1_RGBA_UNORM_BLOCK, &format_properties);
-  if ((format_properties.optimalTilingFeatures & kLinearFilterFeatures) !=
-      kLinearFilterFeatures) {
-    host_format_dxt1.format_unsigned.load_shader = kLoadShaderIndexDXT1ToRGBA8;
-    host_format_dxt1.format_unsigned.format = VK_FORMAT_R8G8B8A8_UNORM;
-    host_format_dxt1.format_unsigned.block_compressed = false;
+  if (!use_bc_or_decompress(
+          host_format_dxt1, VK_FORMAT_BC1_RGBA_UNORM_BLOCK,
+          kLoadShaderIndexDXT1ToRGBA8, VK_FORMAT_R8G8B8A8_UNORM,
+          xenos::TextureFormat::k_DXT1_AS_16_16_16_16)) {
+    // decompressed path already applied alias
+  } else {
     host_formats_[uint32_t(xenos::TextureFormat::k_DXT1_AS_16_16_16_16)] =
         host_format_dxt1;
   }
@@ -1890,14 +1919,11 @@ bool VulkanTextureCache::Initialize() {
       host_formats_[uint32_t(xenos::TextureFormat::k_DXT2_3)];
   assert_true(host_format_dxt2_3.format_unsigned.format ==
               VK_FORMAT_BC2_UNORM_BLOCK);
-  ifn.vkGetPhysicalDeviceFormatProperties(
-      physical_device, VK_FORMAT_BC2_UNORM_BLOCK, &format_properties);
-  if ((format_properties.optimalTilingFeatures & kLinearFilterFeatures) !=
-      kLinearFilterFeatures) {
-    host_format_dxt2_3.format_unsigned.load_shader =
-        kLoadShaderIndexDXT3ToRGBA8;
-    host_format_dxt2_3.format_unsigned.format = VK_FORMAT_R8G8B8A8_UNORM;
-    host_format_dxt2_3.format_unsigned.block_compressed = false;
+  if (!use_bc_or_decompress(
+          host_format_dxt2_3, VK_FORMAT_BC2_UNORM_BLOCK,
+          kLoadShaderIndexDXT3ToRGBA8, VK_FORMAT_R8G8B8A8_UNORM,
+          xenos::TextureFormat::k_DXT2_3_AS_16_16_16_16)) {
+  } else {
     host_formats_[uint32_t(xenos::TextureFormat::k_DXT2_3_AS_16_16_16_16)] =
         host_format_dxt2_3;
   }
@@ -1905,14 +1931,11 @@ bool VulkanTextureCache::Initialize() {
       host_formats_[uint32_t(xenos::TextureFormat::k_DXT4_5)];
   assert_true(host_format_dxt4_5.format_unsigned.format ==
               VK_FORMAT_BC3_UNORM_BLOCK);
-  ifn.vkGetPhysicalDeviceFormatProperties(
-      physical_device, VK_FORMAT_BC3_UNORM_BLOCK, &format_properties);
-  if ((format_properties.optimalTilingFeatures & kLinearFilterFeatures) !=
-      kLinearFilterFeatures) {
-    host_format_dxt4_5.format_unsigned.load_shader =
-        kLoadShaderIndexDXT5ToRGBA8;
-    host_format_dxt4_5.format_unsigned.format = VK_FORMAT_R8G8B8A8_UNORM;
-    host_format_dxt4_5.format_unsigned.block_compressed = false;
+  if (!use_bc_or_decompress(
+          host_format_dxt4_5, VK_FORMAT_BC3_UNORM_BLOCK,
+          kLoadShaderIndexDXT5ToRGBA8, VK_FORMAT_R8G8B8A8_UNORM,
+          xenos::TextureFormat::k_DXT4_5_AS_16_16_16_16)) {
+  } else {
     host_formats_[uint32_t(xenos::TextureFormat::k_DXT4_5_AS_16_16_16_16)] =
         host_format_dxt4_5;
   }
@@ -1920,26 +1943,42 @@ bool VulkanTextureCache::Initialize() {
       host_formats_[uint32_t(xenos::TextureFormat::k_DXN)];
   assert_true(host_format_dxn.format_unsigned.format ==
               VK_FORMAT_BC5_UNORM_BLOCK);
-  ifn.vkGetPhysicalDeviceFormatProperties(
-      physical_device, VK_FORMAT_BC5_UNORM_BLOCK, &format_properties);
-  if ((format_properties.optimalTilingFeatures & kLinearFilterFeatures) !=
-      kLinearFilterFeatures) {
-    host_format_dxn.format_unsigned.load_shader = kLoadShaderIndexDXNToRG8;
-    host_format_dxn.format_unsigned.format = VK_FORMAT_R8G8_UNORM;
-    host_format_dxn.format_unsigned.block_compressed = false;
-  }
+  use_bc_or_decompress(host_format_dxn, VK_FORMAT_BC5_UNORM_BLOCK,
+                       kLoadShaderIndexDXNToRG8, VK_FORMAT_R8G8_UNORM);
   HostFormatPair& host_format_dxt5a =
       host_formats_[uint32_t(xenos::TextureFormat::k_DXT5A)];
   assert_true(host_format_dxt5a.format_unsigned.format ==
               VK_FORMAT_BC4_UNORM_BLOCK);
-  ifn.vkGetPhysicalDeviceFormatProperties(
-      physical_device, VK_FORMAT_BC4_UNORM_BLOCK, &format_properties);
-  if ((format_properties.optimalTilingFeatures & kLinearFilterFeatures) !=
-      kLinearFilterFeatures) {
-    host_format_dxt5a.format_unsigned.load_shader = kLoadShaderIndexDXT5AToR8;
-    host_format_dxt5a.format_unsigned.format = VK_FORMAT_R8_UNORM;
-    host_format_dxt5a.format_unsigned.block_compressed = false;
+  use_bc_or_decompress(host_format_dxt5a, VK_FORMAT_BC4_UNORM_BLOCK,
+                       kLoadShaderIndexDXT5AToR8, VK_FORMAT_R8_UNORM);
+  // k_2_10_10_10 signed: A2B10G10R10_SNORM_PACK32 is optional on many mobile
+  // GPUs. Prefer reusing the UNORM host image (same bit layout for sampling
+  // with a note that the numeric range is unsigned) rather than leaving the
+  // format completely unsupported.
+  {
+    HostFormatPair& host_210 =
+        host_formats_[uint32_t(xenos::TextureFormat::k_2_10_10_10)];
+    HostFormatPair& host_210_as = host_formats_[uint32_t(
+        xenos::TextureFormat::k_2_10_10_10_AS_16_16_16_16)];
+    ifn.vkGetPhysicalDeviceFormatProperties(
+        physical_device, VK_FORMAT_A2B10G10R10_SNORM_PACK32, &format_properties);
+    if ((format_properties.optimalTilingFeatures &
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) == 0) {
+      ifn.vkGetPhysicalDeviceFormatProperties(
+          physical_device, VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+          &format_properties);
+      if (format_properties.optimalTilingFeatures &
+          VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) {
+        host_210.format_signed = host_210.format_unsigned;
+        host_210_as.format_signed = host_210_as.format_unsigned;
+        XELOGGPU(
+            "VulkanTextureCache: k_2_10_10_10 signed: SNORM not supported by "
+            "device, using UNORM host format as fallback (signed range not "
+            "preserved)");
+      }
+    }
   }
+
   // k_16, k_16_16, k_16_16_16_16 - UNORM / SNORM are optional, fall back to
   // SFLOAT, which is mandatory and is always filterable (the guest 16-bit
   // format is filterable, 16-bit fixed-point is the full texture filtering
@@ -2022,6 +2061,24 @@ bool VulkanTextureCache::Initialize() {
            VK_FORMAT_R16G16B16A16_SFLOAT &&
        host_format_16_16_16_16.format_signed.format ==
            VK_FORMAT_R16G16B16A16_SFLOAT);
+
+  // Warn when S3TC had to be decompressed (huge VRAM impact on mobile UMA).
+  {
+    const auto& dxt1 =
+        host_formats_[uint32_t(xenos::TextureFormat::k_DXT1)].format_unsigned;
+    if (!dxt1.block_compressed && dxt1.format != VK_FORMAT_UNDEFINED) {
+      XELOGGPU(
+          "VulkanTextureCache: DXT/BC formats are decompressed to uncompressed "
+          "host images (e.g. R8G8B8A8). Expect 4-8x higher texture memory use. "
+          "On Adreno, ensure BCeNabler ran successfully (see log) or install a "
+          "custom driver that exposes BCn. Consider lowering "
+          "texture_cache_memory_limit_soft if the device is low on RAM.");
+    } else if (dxt1.block_compressed) {
+      XELOGI(
+          "VulkanTextureCache: DXT/BC host formats available — textures stay "
+          "compressed (good for mobile VRAM)");
+    }
+  }
 
   // Normalize format information structures.
   for (size_t i = 0; i < xe::countof(host_formats_); ++i) {

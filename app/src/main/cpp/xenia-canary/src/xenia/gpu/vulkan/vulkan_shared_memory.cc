@@ -65,8 +65,17 @@ bool VulkanSharedMemory::Initialize() {
   buffer_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
   buffer_create_info.queueFamilyIndexCount = 0;
   buffer_create_info.pQueueFamilyIndices = nullptr;
-  if (cvars::vulkan_sparse_shared_memory &&
-      vulkan_device->properties().sparseResidencyBuffer) {
+  const bool sparse_residency_supported =
+      vulkan_device->properties().sparseResidencyBuffer;
+  const bool sparse_binding_supported =
+      vulkan_device->properties().sparseBinding;
+  XELOGI(
+      "Shared memory: sparseBinding={} sparseResidencyBuffer={} "
+      "cvar vulkan_sparse_shared_memory={}",
+      sparse_binding_supported ? 1 : 0, sparse_residency_supported ? 1 : 0,
+      cvars::vulkan_sparse_shared_memory ? 1 : 0);
+
+  if (cvars::vulkan_sparse_shared_memory && sparse_residency_supported) {
     if (dfn.vkCreateBuffer(device, &buffer_create_info, nullptr, &buffer_) ==
         VK_SUCCESS) {
       VkMemoryRequirements buffer_memory_requirements;
@@ -109,11 +118,34 @@ bool VulkanSharedMemory::Initialize() {
 
   // Create a non-sparse buffer if there were issues with the sparse buffer.
   if (buffer_ == VK_NULL_HANDLE) {
-    XELOGGPU(
-        "Vulkan sparse binding is not used for shared memory emulation - video "
-        "memory usage may increase significantly because a full {} MB buffer "
-        "will be created",
-        kBufferSize >> 20);
+    if (!cvars::vulkan_sparse_shared_memory) {
+      XELOGGPU(
+          "Vulkan sparse shared memory disabled by config "
+          "(vulkan_sparse_shared_memory=false) — allocating a full {} MB "
+          "buffer. Enable the option if your driver supports "
+          "sparseResidencyBuffer.",
+          kBufferSize >> 20);
+    } else if (!sparse_binding_supported) {
+      XELOGGPU(
+          "Vulkan sparse binding not supported by this driver/device "
+          "(VkPhysicalDeviceFeatures::sparseBinding=0) — falling back to a "
+          "full {} MB shared-memory buffer. This increases memory use on "
+          "UMA mobile GPUs (Adreno/Mali). Not a config bug.",
+          kBufferSize >> 20);
+    } else if (!sparse_residency_supported) {
+      XELOGGPU(
+          "Vulkan sparse residency for buffers not supported by this "
+          "driver/device (sparseResidencyBuffer=0; sparseBinding may still be "
+          "1) — falling back to a full {} MB shared-memory buffer. Xenia "
+          "requires sparse residency to commit only used 512 MB pages.",
+          kBufferSize >> 20);
+    } else {
+      XELOGGPU(
+          "Vulkan sparse shared-memory buffer creation failed despite driver "
+          "reporting sparseResidencyBuffer — falling back to a full {} MB "
+          "buffer (see earlier Shared memory: errors).",
+          kBufferSize >> 20);
+    }
     buffer_create_info.flags &= ~sparse_flags;
     if (dfn.vkCreateBuffer(device, &buffer_create_info, nullptr, &buffer_) !=
         VK_SUCCESS) {

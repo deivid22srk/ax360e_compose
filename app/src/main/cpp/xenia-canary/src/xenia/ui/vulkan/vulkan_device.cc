@@ -613,6 +613,15 @@ std::unique_ptr<VulkanDevice> VulkanDevice::CreateIfSupported(
     XE_UI_VULKAN_FEATURE(shaderCullDistance)
     XE_UI_VULKAN_FEATURE(sparseBinding)
     XE_UI_VULKAN_FEATURE(sparseResidencyBuffer)
+    if (!supported_features.sparseBinding) {
+      XELOGI(
+          "* sparseBinding: 0 (driver does not support sparse binding; "
+          "shared memory will use a full 512 MB buffer)");
+    } else if (!supported_features.sparseResidencyBuffer) {
+      XELOGI(
+          "* sparseResidencyBuffer: 0 (sparse binding without buffer "
+          "residency; shared memory will use a full 512 MB buffer)");
+    }
   }
 
   if (properties.apiVersion >= VK_MAKE_API_VERSION(0, 1, 2, 0)) {

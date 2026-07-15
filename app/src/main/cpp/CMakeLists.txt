@@ -81,6 +81,13 @@ add_subdirectory(xenia-canary EXCLUDE_FROM_ALL)
 
 add_subdirectory(libadrenotools EXCLUDE_FROM_ALL)
 
+# BCeNabler: link into Vulkan UI layer after both targets exist (order matters).
+if(TARGET xenia-ui-vulkan AND TARGET adrenotools)
+  target_link_libraries(xenia-ui-vulkan PRIVATE adrenotools)
+  target_include_directories(xenia-ui-vulkan PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/libadrenotools/include)
+endif()
+
 target_include_directories(emu PRIVATE
         xenia-canary
         xenia-canary/src
