@@ -11,6 +11,10 @@
 #include "xenia/vfs/devices/stfs_xbox.h"
 #include "xenia/base/mapped_memory.h"
 
+#include <algorithm>
+#include <cctype>
+#include <string_view>
+
 #include "cpuinfo.h"
 #include "vkapi.h"
 #include "vkutil.h"
@@ -250,8 +254,27 @@ static jobject j_meta_info_from_uri(JNIEnv* env,jobject self,jstring uri_str ){
     });
 
     std::string name = file->getName();
-    if(name.ends_with(".xex")){
+    // Case-insensitive extension check (Android SAF preserves the original
+    // byte sequence, so "Foo.ISO" must match ".iso" etc.).
+    auto ieq = [](std::string_view s, std::string_view ext) {
+        return s.size() >= ext.size() &&
+               std::equal(s.end() - ext.size(), s.end(), ext.begin(), ext.end(),
+                          [](char a, char b) {
+                              return std::tolower(static_cast<unsigned char>(a)) ==
+                                     std::tolower(static_cast<unsigned char>(b));
+                          });
+    };
+    if(ieq(name, ".xex")){
         result = emulator->LaunchXexFile(std::move(file));
+    }
+    else if(ieq(name, ".iso")){
+        // Route Xbox 360 ISO/XGD images to the disc-image loader instead of
+        // falling through to STFS (which would log "Error reading STFS
+        // header: -30" because an XGD/ISO is not an STFS container).
+        result = emulator->LaunchDiscImage(std::move(file));
+    }
+    else if(ieq(name, ".zar")){
+        result = emulator->LaunchDiscArchive(std::move(file));
     }
     else{
         const char* path = env->GetStringUTFChars(uri_str,NULL);
@@ -373,37 +396,37 @@ static const std::pair<std::string,entries> gen_list[]={
         {"Kernel|kernel_display_gamma_type",{"linear@0","sRGB(CRT)@1","BT.709(HDTV)@2",/*kernel_display_gamma_power@3*/}},
         {"Logging|log_level",{"error@0","warning@1","info@2","debug@3",}},
         /*
-                                                  	#  0 = PAL-60 Component (SD)
-                                                  	#  1 = Unused
-                                                  	#  2 = PAL-60 SCART
-                                                  	#  3 = 480p Component (HD)
-                                                  	#  4 = HDMI+A
-                                                  	#  5 = PAL-60 Composite/S-Video
-                                                  	#  6 = VGA
-                                                  	#  7 = TV PAL-60
-                                                  	#  8 = HDMI (default)*/
+                                                        #  0 = PAL-60 Component (SD)
+                                                        #  1 = Unused
+                                                        #  2 = PAL-60 SCART
+                                                        #  3 = 480p Component (HD)
+                                                        #  4 = HDMI+A
+                                                        #  5 = PAL-60 Composite/S-Video
+                                                        #  6 = VGA
+                                                        #  7 = TV PAL-60
+                                                        #  8 = HDMI (default)*/
         {"Video|avpack",{"PAL-60 Component (SD)@0", "Unused@1","PAL-60 SCART@2","480p Component (HD)@3","HDMI+A@4","PAL-60 Composite/S-Video@5","VGA@6","TV PAL-60@7","HDMI@8"}},
         /*#    1=NTSC
-                                                  	#    2=NTSC-J
-                                                  	#    3=PAL*/
+                                                        #    2=NTSC-J
+                                                        #    3=PAL*/
         {"Video|video_standard",{ "NTSC@1","NTSC-J@2","PAL-60@3"}},
 /*#    0=640x480
-                                                  	#    1=640x576
-                                                  	#    2=720x480
-                                                  	#    3=720x576
-                                                  	#    4=800x600
-                                                  	#    5=848x480
-                                                  	#    6=1024x768
-                                                  	#    7=1152x864
-                                                  	#    8=1280x720 (Default)
-                                                  	#    9=1280x768
-                                                  	#    10=1280x960
-                                                  	#    11=1280x1024
-                                                  	#    12=1360x768
-                                                  	#    13=1440x900
-                                                  	#    14=1680x1050
-                                                  	#    15=1920x540
-                                                  	#    16=1920x1080*/
+                                                        #    1=640x576
+                                                        #    2=720x480
+                                                        #    3=720x576
+                                                        #    4=800x600
+                                                        #    5=848x480
+                                                        #    6=1024x768
+                                                        #    7=1152x864
+                                                        #    8=1280x720 (Default)
+                                                        #    9=1280x768
+                                                        #    10=1280x960
+                                                        #    11=1280x1024
+                                                        #    12=1360x768
+                                                        #    13=1440x900
+                                                        #    14=1680x1050
+                                                        #    15=1920x540
+                                                        #    16=1920x1080*/
         {"Video|internal_display_resolution",{ "640x480@0","640x576@1","720x480@2","720x576@3","800x600@4","848x480@5","1024x768@6","1152x864@7","1280x720@8"
                                                ,"1280x768@9","1280x960@10","1280x1024@11","1360x768@12","1440x900@13", "1680x1050@14","1920x540@15","1920x1080@16"}},
                                                /*Kernel = 1, Apu = 2, Cpu = 4.*/

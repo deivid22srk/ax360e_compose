@@ -15,9 +15,12 @@
 #include <android/native_window_jni.h>
 #include <android/log.h>
 #include <jni.h>
+#include <algorithm>
 #include <array>
+#include <cctype>
 #include <chrono>
 #include <memory>
+#include <string_view>
 #include <thread>
 #include <sys/prctl.h>
 #include <sys/resource.h>
@@ -745,15 +748,29 @@ void EmulatorApp::emu_thr_main() {
         std::string name = file->getName();
 
 
-        if(name.ends_with(".xex")){
+        // Case-insensitive extension check. Android SAF document names preserve
+        // the original byte sequence, so "Far Cry 2 [RF].ISO" (uppercase) was
+        // misrouted to the STFS branch and produced "Error reading STFS header:
+        // -30 / Failed to open STFS container" because the XGD/ISO magic at the
+        // start of the file is not a valid STFS header.
+        auto ieq = [](std::string_view s, std::string_view ext) {
+            return s.size() >= ext.size() &&
+                   std::equal(s.end() - ext.size(), s.end(), ext.begin(),
+                              ext.end(),
+                              [](char a, char b) {
+                                  return std::tolower(static_cast<unsigned char>(a)) ==
+                                         std::tolower(static_cast<unsigned char>(b));
+                              });
+        };
+        if(ieq(name, ".xex")){
             result = app_context().CallInUIThread(
                     [this, &file]() { return emu->LaunchXexFile(std::move(file)); });
         }
-        else if(name.ends_with(".iso")){
+        else if(ieq(name, ".iso")){
             result = app_context().CallInUIThread(
                     [this, &file]() { return emu->LaunchDiscImage(std::move(file)); });
         }
-        else if(name.ends_with(".zar")){
+        else if(ieq(name, ".zar")){
             result = app_context().CallInUIThread(
                     [this, &file]() { return emu->LaunchDiscArchive(std::move(file)); });
         }

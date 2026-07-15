@@ -53,6 +53,24 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
     };
     static_assert(sizeof(Branch) == 4, "Branch size is invalid");
 
+    // ax360e real-fix: bound the pattern scans so they cannot walk past the
+    // function boundary on drivers with a different layout. The previous code
+    // used unbounded `while (... != sig) ptr++` loops; on Adreno 619 driver
+    // 0x80212000 (Qualcomm BLOB, minor=530) the QGL format-conversion
+    // function does NOT contain the expected `0x2a1f03e0` (MOV w0, wzr)
+    // sentinel within its body, so the scan walked into unrelated driver
+    // code, eventually matched a coincidental instruction, and the patch
+    // trampoline got written to the WRONG location. adrenotools_patch_bcn
+    // then returned `true` (because the scan "found" something) but BC1
+    // optimalTilingFeatures stayed 0x0 — a silent failure that produced the
+    // misleading "patch applied successfully / post-patch BC1 = 0x0" log
+    // sequence we saw in the Far Cry 2 trace. With bounded scans we now
+    // return false on drivers where the expected pattern is not present in
+    // the function's prologue/epilogue window, allowing the caller to log
+    // "patch failed" honestly and fall back without writing garbage.
+    constexpr size_t kMaxBranchScanInsns = 256;     // 1 KB at 4 bytes/insn
+    constexpr size_t kMaxClearResultScanInsns = 4096; // 16 KB at 4 bytes/insn
+
     // Find the nearest unmapped page where we can place patch code
     void *patchPage{find_free_page(reinterpret_cast<uintptr_t>(vkGetPhysicalDeviceFormatPropertiesFn))};
     if (!patchPage)
@@ -73,9 +91,16 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
 
     constexpr uint8_t BranchLinkSignature{0x25};
 
-    // Search for first instruction with the BL signature
-    while (blInst->sig != BranchLinkSignature)
+    // Search for first instruction with the BL signature — BOUNDED.
+    Branch *blInstStart{blInst};
+    Branch *blInstEnd{blInstStart + kMaxBranchScanInsns};
+    while (blInst < blInstEnd && blInst->sig != BranchLinkSignature)
         blInst++;
+    if (blInst >= blInstEnd) {
+        // No BL found within the first 1 KB of the function — newer driver
+        // layout; the patch cannot be applied safely here.
+        return false;
+    }
 
     // Internal QGL format conversion function that we need to patch
     uint32_t *convFormatFn{reinterpret_cast<uint32_t *>(blInst) + blInst->offset};
@@ -89,9 +114,17 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
     constexpr uint32_t ClearResultSignature{0x2a1f03e0};
 
     // We replace it with a branch to our own extended if statement which adds in the extra things for BCn
+    // BOUNDED scan — see kMaxClearResultScanInsns rationale above.
     uint32_t *clearResultPtr{convFormatFn};
-    while (*clearResultPtr != ClearResultSignature)
+    uint32_t *clearResultEnd{convFormatFn + kMaxClearResultScanInsns};
+    while (clearResultPtr < clearResultEnd && *clearResultPtr != ClearResultSignature)
         clearResultPtr++;
+    if (clearResultPtr >= clearResultEnd) {
+        // The MOV w0, wzr sentinel was not found within 16 KB of convFormatFn
+        // — newer driver layout, give up rather than writing the trampoline
+        // to an unrelated location.
+        return false;
+    }
 
     // Ensure we don't write out of bounds
     if (PatchRawData_size > getpagesize())

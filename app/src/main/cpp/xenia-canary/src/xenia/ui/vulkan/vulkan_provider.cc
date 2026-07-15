@@ -97,11 +97,32 @@ std::unique_ptr<VulkanProvider> VulkanProvider::Create(
         // Additionally: if major==512 regardless of minor threshold, try patch
         // when BC1 is not currently reported (helps drivers that advertise BLOB
         // incorrectly for this app's loader path).
+        //
+        // IMPORTANT (ax360e real-fix): adrenotools_patch_bcn was designed for
+        // older Adreno drivers (minor < 514). On newer drivers (minor >= 514,
+        // classified as BLOB) the internal QGL format-conversion function has
+        // a different layout. The unbounded pattern scan in bcenabler.cpp can
+        // walk past the function boundary, find a coincidental 0x2a1f03e0
+        // (MOV w0, wzr) elsewhere, return true, and write the patch trampoline
+        // to the WRONG location — producing the misleading log sequence
+        //   "patch applied successfully"
+        //   "post-patch BC1 optimalTilingFeatures=0x0"
+        // we saw on Adreno 619 driver 0x80212000 (minor=530). To stop lying
+        // in the log:
+        //   1) For minor >= 514, do NOT call adrenotools_patch_bcn at all
+        //      (the BLOB classification is correct — the driver has BCn code
+        //      but Qualcomm chose not to expose it; patching the wrong spot
+        //      in a newer driver is risky and has zero upside).
+        //   2) For minor < 514, call the patch but verify post-patch that
+        //      BC1 optimalTilingFeatures actually became non-zero. If still
+        //      0x0, log "patch INEFFECTIVE on this driver" instead of the
+        //      misleading "applied successfully".
+        // The accompanying libadrenotools/src/bcenabler.cpp change bounds
+        // the pattern scans so future drivers won't cause unbounded reads.
         bool should_patch = (bcn_type == ADRENOTOOLS_BCN_PATCH);
         if (bcn_type == ADRENOTOOLS_BCN_BLOB ||
             bcn_type == ADRENOTOOLS_BCN_INCOMPATIBLE) {
-          // Probe BC1 before device creation; if unsupported, try patch anyway
-          // for vendor Qualcomm (safe no-op / fail on truly incompatible).
+          // Probe BC1 before device creation.
           VkFormatProperties fp = {};
           ifn_bc.vkGetPhysicalDeviceFormatProperties(
               pd, VK_FORMAT_BC1_RGBA_UNORM_BLOCK, &fp);
@@ -109,27 +130,65 @@ std::unique_ptr<VulkanProvider> VulkanProvider::Create(
               (fp.optimalTilingFeatures &
                VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0;
           if (!bc1_ok) {
-            XELOGW(
-                "Adreno BCeNabler: BC1 not exposed despite type={}; "
-                "attempting patch anyway (vendor 0x{:X})",
-                int(bcn_type), props.vendorID);
-            should_patch = true;
+            if (minor >= 514) {
+              // Newer driver layout — patch is known to be ineffective and
+              // may write to the wrong code location. Do NOT attempt it.
+              XELOGW(
+                  "Adreno BCeNabler: BC1 not exposed on driver major={} "
+                  "minor={} (>=514). The adrenotools BCn patch is designed "
+                  "for older driver layouts and is known to be ineffective "
+                  "(or worse, can corrupt unrelated driver code) on this "
+                  "version. Skipping patch. DXT textures will decompress to "
+                  "R8G8B8A8 (4-8x VRAM expansion). Install a custom Vulkan "
+                  "driver (Turnip/Mesa) or a Qualcomm blob that exposes BCn "
+                  "to fix this.",
+                  major, minor);
+            } else {
+              XELOGW(
+                  "Adreno BCeNabler: BC1 not exposed despite type={}; "
+                  "attempting patch anyway (vendor 0x{:X}, minor={})",
+                  int(bcn_type), props.vendorID, minor);
+              should_patch = true;
+            }
           }
         }
         if (should_patch) {
           void* fn = reinterpret_cast<void*>(
               ifn_bc.vkGetPhysicalDeviceFormatProperties);
           if (adrenotools_patch_bcn(fn)) {
-            XELOGI("Adreno BCeNabler: patch applied successfully");
-            // Verify
+            // VERIFY that the patch actually enabled BCn. The bool return
+            // from adrenotools_patch_bcn only means "pattern scan found a
+            // candidate and the trampoline was written"; it does NOT mean
+            // BCn is now exposed. On drivers where the scan matched the
+            // wrong instruction, features stay 0x0.
             VkFormatProperties fp = {};
             ifn_bc.vkGetPhysicalDeviceFormatProperties(
                 pd, VK_FORMAT_BC1_RGBA_UNORM_BLOCK, &fp);
-            XELOGI(
-                "Adreno BCeNabler: post-patch BC1 optimalTilingFeatures=0x{:X}",
-                uint32_t(fp.optimalTilingFeatures));
+            const bool bc1_now_ok =
+                (fp.optimalTilingFeatures &
+                 VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0;
+            if (bc1_now_ok) {
+              XELOGI(
+                  "Adreno BCeNabler: patch applied successfully and verified "
+                  "(BC1 optimalTilingFeatures=0x{:X})",
+                  uint32_t(fp.optimalTilingFeatures));
+            } else {
+              // The patch returned true but BC1 is still 0x0. This is the
+              // silent-failure mode observed on Adreno 619 minor=530 before
+              // this fix. Log clearly so users don't think BCn is working.
+              XELOGW(
+                  "Adreno BCeNabler: patch returned success but post-patch "
+                  "BC1 optimalTilingFeatures=0x{:X} (still unsupported). The "
+                  "patch was INEFFECTIVE on this driver version — BCn "
+                  "remains unavailable and DXT textures will decompress to "
+                  "R8G8B8A8 (4-8x VRAM expansion). This is a driver-level "
+                  "limitation; install a custom Vulkan driver (Turnip/Mesa) "
+                  "to enable native BCn.",
+                  uint32_t(fp.optimalTilingFeatures));
+            }
           } else {
-            XELOGW("Adreno BCeNabler: patch failed");
+            XELOGW("Adreno BCeNabler: patch failed (pattern scan could not "
+                   "find a candidate within the bounded scan window)");
           }
         }
         break;  // first Qualcomm device is enough

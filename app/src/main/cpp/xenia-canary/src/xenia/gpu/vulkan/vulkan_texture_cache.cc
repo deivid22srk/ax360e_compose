@@ -1899,6 +1899,69 @@ bool VulkanTextureCache::Initialize() {
         if (alias_format != xenos::TextureFormat::k_1_REVERSE) {
           host_formats_[uint32_t(alias_format)] = host_fmt;
         }
+        // ax360e real-fix: per-format honest logging of the VRAM impact when
+        // BCn cannot be kept compressed. Previously only a single summary
+        // warning was emitted at the end of initialization; the per-format
+        // "fallback format (using 37 instead of 133)" lines gave no hint
+        // that this was a 4-8x memory expansion. Now we log the actual
+        // byte/pixel expansion ratio per format so users can understand
+        // the cost and the mitigation (custom Vulkan driver / BCeNabler).
+        const char* bc_name = "BC?";
+        float bc_bytes_per_pixel = 0.0f;
+        switch (bc_format) {
+          case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+            bc_name = "BC1 (DXT1)";
+            bc_bytes_per_pixel = 0.5f;
+            break;
+          case VK_FORMAT_BC2_UNORM_BLOCK:
+            bc_name = "BC2 (DXT3)";
+            bc_bytes_per_pixel = 1.0f;
+            break;
+          case VK_FORMAT_BC3_UNORM_BLOCK:
+            bc_name = "BC3 (DXT5)";
+            bc_bytes_per_pixel = 1.0f;
+            break;
+          case VK_FORMAT_BC4_UNORM_BLOCK:
+            bc_name = "BC4 (DXT5A)";
+            bc_bytes_per_pixel = 0.5f;
+            break;
+          case VK_FORMAT_BC5_UNORM_BLOCK:
+            bc_name = "BC5 (DXN)";
+            bc_bytes_per_pixel = 1.0f;
+            break;
+          default:
+            break;
+        }
+        float fallback_bytes_per_pixel = 0.0f;
+        switch (decompress_format) {
+          case VK_FORMAT_R8G8B8A8_UNORM:
+          case VK_FORMAT_R8G8B8A8_SNORM:
+            fallback_bytes_per_pixel = 4.0f;
+            break;
+          case VK_FORMAT_R8G8_UNORM:
+          case VK_FORMAT_R8G8_SNORM:
+            fallback_bytes_per_pixel = 2.0f;
+            break;
+          case VK_FORMAT_R8_UNORM:
+          case VK_FORMAT_R8_SNORM:
+            fallback_bytes_per_pixel = 1.0f;
+            break;
+          default:
+            break;
+        }
+        if (bc_bytes_per_pixel > 0.0f && fallback_bytes_per_pixel > 0.0f) {
+          const float ratio = fallback_bytes_per_pixel / bc_bytes_per_pixel;
+          XELOGGPU(
+              "VulkanTextureCache: {} not supported by driver "
+              "(optimalTilingFeatures=0x{:X}) — decompressing to Vulkan "
+              "format {} ({:.1f} B/px -> {:.1f} B/px = {:.1f}x VRAM "
+              "expansion). To fix: install a custom Vulkan driver (Turnip/"
+              "Mesa) or a Qualcomm blob that exposes BCn, or set "
+              "adrenotools BCeNabler (see earlier log).",
+              bc_name, uint32_t(format_properties.optimalTilingFeatures),
+              uint32_t(decompress_format), bc_bytes_per_pixel,
+              fallback_bytes_per_pixel, ratio);
+        }
         return false;
       };
 
