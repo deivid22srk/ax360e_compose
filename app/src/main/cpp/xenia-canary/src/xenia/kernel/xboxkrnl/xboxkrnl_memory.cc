@@ -8,6 +8,9 @@
  */
 
 #include "xenia/kernel/xboxkrnl/xboxkrnl_memory.h"
+#include <chrono>
+#include <mutex>
+#include <unordered_map>
 #include "xenia/base/logging.h"
 #include "xenia/kernel/kernel_state.h"
 #include "xenia/kernel/util/shim_utils.h"
@@ -456,28 +459,107 @@ uint32_t xeMmAllocatePhysicalMemoryEx(uint32_t flags, uint32_t region_size,
   // min_addr_range/max_addr_range are bounds in physical memory, not virtual.
   uint32_t heap_base = heap->heap_base();
   uint32_t heap_physical_address_offset = heap->GetPhysicalAddress(heap_base);
-  // TODO(Gliniak): Games like 545108B4 compares min_addr_range with value
-  // returned. 0x1000 offset causes it to go below that minimal range and goes
-  // haywire
-  if (min_addr_range && max_addr_range &&
-      cvars::ignore_offset_for_ranged_allocations) {
-    heap_physical_address_offset = 0;
+
+  // ax360e real-fix: auto-detect ranged-allocation offset failure.
+  //
+  // Original TODO(Gliniak) said:
+  //   "Games like 545108B4 compares min_addr_range with value returned.
+  //    0x1000 offset causes it to go below that minimal range and goes
+  //    haywire"
+  //
+  // The previous fix required the user to manually enable
+  // `ignore_offset_for_ranged_allocations` in config.toml. Most users don't
+  // know this cvar exists, so games like Rise of the Tomb Raider (53510823)
+  // fail with 55+ "MmAllocatePhysicalMemoryEx: Allocation failed" lines
+  // during boot because the 0x1000 offset makes the translated range fall
+  // below the game's requested min_addr_range.
+  //
+  // New behavior: if the game provides min_addr_range AND max_addr_range AND
+  // the first attempt fails, retry with offset=0. This is safe because the
+  // fallback only triggers when the original allocation would have failed
+  // anyway — no behavior change for titles where the offset is correct.
+  // The cvar remains as a hard override for power users / debugging.
+  const bool has_range = min_addr_range && max_addr_range;
+  const bool force_ignore_offset =
+      has_range && cvars::ignore_offset_for_ranged_allocations;
+
+  auto try_alloc = [&](uint32_t offset_to_use, uint32_t* out_address) -> bool {
+    uint32_t heap_min_addr = xe::sat_sub(min_addr_range, offset_to_use);
+    uint32_t heap_max_addr = xe::sat_sub(max_addr_range, offset_to_use);
+    uint32_t heap_size = heap->heap_size();
+    heap_min_addr = heap_base + std::min(heap_min_addr, heap_size - 1);
+    heap_max_addr = heap_base + std::min(heap_max_addr, heap_size - 1);
+    return heap->AllocRange(heap_min_addr, heap_max_addr, adjusted_size,
+                            adjusted_alignment, allocation_type, protect,
+                            top_down, out_address);
+  };
+
+  uint32_t base_address = 0;
+  bool ok = false;
+
+  if (force_ignore_offset) {
+    // User explicitly enabled the workaround — single attempt with offset 0.
+    ok = try_alloc(0, &base_address);
+  } else {
+    // Try with the real offset first (preserves original behavior).
+    ok = try_alloc(heap_physical_address_offset, &base_address);
+    if (!ok && has_range && heap_physical_address_offset != 0) {
+      // ax360e real-fix: retry with offset=0 when the first attempt failed
+      // due to the 0x1000 offset pushing the range below min_addr_range.
+      // This is the auto-detected fallback for titles like ROTTR (53510823).
+      uint32_t fallback_address = 0;
+      if (try_alloc(0, &fallback_address)) {
+        XELOGI(
+            "MmAllocatePhysicalMemoryEx: succeeded with offset=0 fallback "
+            "(original offset 0x{:X} caused range underflow). Size: {:08X}",
+            heap_physical_address_offset, adjusted_size);
+        base_address = fallback_address;
+        ok = true;
+      }
+    }
   }
 
-  uint32_t heap_min_addr =
-      xe::sat_sub(min_addr_range, heap_physical_address_offset);
-  uint32_t heap_max_addr =
-      xe::sat_sub(max_addr_range, heap_physical_address_offset);
-  uint32_t heap_size = heap->heap_size();
-  heap_min_addr = heap_base + std::min(heap_min_addr, heap_size - 1);
-  heap_max_addr = heap_base + std::min(heap_max_addr, heap_size - 1);
-  uint32_t base_address;
-  if (!heap->AllocRange(heap_min_addr, heap_max_addr, adjusted_size,
-                        adjusted_alignment, allocation_type, protect, top_down,
-                        &base_address)) {
-    // Failed - assume no memory available.
-    XELOGW("MmAllocatePhysicalMemoryEx: Allocation failed: {:08X} Size: {:08X}",
-           base_address, adjusted_size);
+  if (!ok) {
+    // ax360e real-fix: throttle this warning. ROTTR was producing 55+
+    // identical lines during boot because the game retries the same
+    // allocation in a loop. See UndefinedCallExtern throttle in a64_emitter.cc
+    // for the same pattern. Here we rate-limit per (size) to 1 line per 5s.
+    static std::mutex throttle_mutex;
+    static std::unordered_map<uint32_t, uint64_t> last_log_ns_per_size;
+    static std::unordered_map<uint32_t, uint64_t> suppressed_count_per_size;
+    constexpr int64_t kThrottleIntervalNs = 5'000'000'000LL;  // 5 seconds
+
+    const auto now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::steady_clock::now().time_since_epoch())
+                            .count();
+
+    bool should_log = false;
+    uint64_t suppressed = 0;
+    {
+      std::lock_guard<std::mutex> lock(throttle_mutex);
+      auto& last = last_log_ns_per_size[adjusted_size];
+      auto& count = suppressed_count_per_size[adjusted_size];
+      if (last == 0 || (now_ns - last) >= kThrottleIntervalNs) {
+        should_log = true;
+        suppressed = count;
+        count = 0;
+        last = now_ns;
+      }
+      count++;
+    }
+
+    if (should_log) {
+      if (suppressed > 0) {
+        XELOGW(
+            "MmAllocatePhysicalMemoryEx: Allocation failed: {:08X} Size: "
+            "{:08X} (suppressed {} duplicate warnings in last 5s)",
+            base_address, adjusted_size, suppressed);
+      } else {
+        XELOGW(
+            "MmAllocatePhysicalMemoryEx: Allocation failed: {:08X} Size: {:08X}",
+            base_address, adjusted_size);
+      }
+    }
     return 0;
   }
   XELOGD("MmAllocatePhysicalMemoryEx = {:08X} Size: {:08X}", base_address,
