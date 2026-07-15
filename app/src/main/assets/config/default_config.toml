@@ -24,10 +24,10 @@ break_condition_gpr = -1                          	# GPR compared to
 break_condition_op = "eq"                         	# comparison operator
 break_condition_truncate = true                   	# truncate value to 32-bits
 break_condition_value = 0                         	# value compared against
-break_on_debugbreak = true                        	# int3 on JITed __debugbreak requests.
+break_on_debugbreak = false                       	# int3 on JITed __debugbreak requests. (debug only — off by default for performance)
 break_on_instruction = 0                          	# int3 before the given guest address is executed.
 break_on_start = false                            	# Break into the debugger on startup.
-break_on_unimplemented_instructions = true        	# Break to the host debugger (or crash if no debugger attached) if an unimplemented PowerPC instruction is encountered.
+break_on_unimplemented_instructions = false       	# Break to the host debugger (or crash if no debugger attached) if an unimplemented PowerPC instruction is encountered. (debug only — off by default for performance)
 clock_no_scaling = false                          	# Disable scaling code. Time management and locking is bypassed. Guest system time is directly pulled from host.
 clock_source_raw = false                          	# On x64, Use the RDTSC instruction as the time source. Requires invariant TSC. On a64, Use the CNTVCT_EL0 register as the time source
 cpu = "a64"                                       	# CPU backend. On Android ARM64, both "any" and "a64" select the A64 backend.
@@ -37,7 +37,7 @@ disable_prefetch_and_cachecontrol = true          	# Disables translating ppc pr
 disassemble_functions = false                     	# Disassemble functions during generation.
 dump_translated_hir_functions = false             	# dumps translated hir
 emit_inline_mmio_checks = false                   	# Emit inline MMIO range checks for all I32 loads/stores instead of relying on exception-based MMIO detection.
-emit_mmio_aware_stores_for_recorded_exception_addresses = true	# Uses info gathered via record_mmio_access_exceptions to emit special stores that are faster than trapping the exception
+emit_mmio_aware_stores_for_recorded_exception_addresses = false	# Uses info gathered via record_mmio_access_exceptions to emit special stores that are faster than trapping the exception. Off by default (enable with Debug Mode for second-run MMIO optimization).
 enable_early_precompilation = false               	# Enable pre-compiling guest functions that we know we've called/that we've recognized as being functions via simple heuristics, good for error finding/stress testing with the JIT
 full_optimization_even_with_debug = false         	# For developer use to analyze the quality of the generated code, not intended for actual debugging of the code
 ignore_trap_instructions = true                   	# Generate no code for powerpc trap instructions, can result in better performance in games that aggressively check with trap.
@@ -56,7 +56,7 @@ pvr = 7407360                                     	# Known PVR's.
                                                   	# Bits 16 to 31 are the revision number.
                                                   	# Note: Some XEXs (such as mfgbootlauncher.xex) may check for a value that's less than 0x710700.
 
-record_mmio_access_exceptions = true              	# For guest addresses records whether we caught any mmio accesses for them. This info can then be used on a subsequent run to instruct the recompiler to emit checks
+record_mmio_access_exceptions = false             	# For guest addresses records whether we caught any mmio accesses for them. This info can then be used on a subsequent run to instruct the recompiler to emit checks. Off by default (enable with Debug Mode).
 store_all_context_values = false                  	# Don't strip dead context stores to aid in debugging.
 trace_function_coverage = false                   	# Generate tracing for function instruction coverage statistics.
 trace_function_data = false                       	# Generate tracing for function result data.
@@ -68,7 +68,7 @@ writable_code_segments = false                    	# Enables a program to write 
 
 
 [Config]
-defaults_date = 2026040912                        	# Do not modify - internal version of the default values in the config, for seamless updates if default value of any option is changed.
+defaults_date = 2026071518                        	# Do not modify - internal version of the default values in the config, for seamless updates if default value of any option is changed.
 
 
 [Content]
@@ -280,6 +280,7 @@ console_type = 0                                  	# Console Type Identifier: 0 
 default_achievements_backend = "GPD"              	# Defines which achievements backend should be used as an default. Possible options: GPD.
 ignore_thread_affinities = true                   	# Ignores game-specified thread affinities.
 ignore_thread_priorities = false                  	# Ignores game-specified thread priorities.
+pin_guest_threads_to_performance_cores = true     	# Pin guest CPU threads to big/prime cores on Android big.LITTLE SoCs for stable FPS.
 kernel_build_version = 1888                       	# Define current kernel version
 kernel_cert_monitor = false                       	# Enable cert monitor.
 kernel_debug_monitor = false                      	# Enable debug monitor.
@@ -291,7 +292,7 @@ staging_mode = false                              	# Enables preview mode in das
 
 
 [Logging]
-flush_log = true                                  	# Flush log file after each log line batch.
+flush_log = false                                 	# Flush log file after each log line batch. Off by default — flushing every batch is expensive on Android storage.
 log_file = ""                                     	# Logs are written to the given file (ax360e also forces --log_file=.../xe.log at boot)
 log_level = 2                                     	# Maximum level to be logged. (0=error, 1=warning, 2=info, 3=debug, 4=trace)
                                                   	# Raise to 3/4 for JIT/function-level detail (XELOGD, CPU tracers).
@@ -392,7 +393,7 @@ vulkan_allow_present_mode_immediate = true        	# When available, allow the i
 vulkan_allow_present_mode_mailbox = true          	# When available, allow the mailbox presentation mode (2nd priority), offering low latency without the possibility of tearing.
 vulkan_device = -1                                	# Index of the preferred Vulkan physical device, or -1 to use any compatible device.
 vulkan_lib_path = ""                              	# Custom Driver Library Path
-vulkan_log_debug_messages = true                  	# Write Vulkan VK_EXT_debug_utils messages to the Xenia log, as opposed to the OS debug output.
+vulkan_log_debug_messages = false                 	# Write Vulkan VK_EXT_debug_utils messages to the Xenia log, as opposed to the OS debug output. Off by default for performance.
 vulkan_sparse_shared_memory = true                	# Enable sparse binding for shared memory emulation. Disabling it increases video memory usage - a 512 MB buffer is created - but allows graphics debuggers that don't support sparse binding to work.
 vulkan_validation = false                         	# Enable the Vulkan validation layer (VK_LAYER_KHRONOS_validation). Messages will be written to the Xenia log if 'vulkan_log_debug_messages' is enabled, or to the OS debug output otherwise.
 

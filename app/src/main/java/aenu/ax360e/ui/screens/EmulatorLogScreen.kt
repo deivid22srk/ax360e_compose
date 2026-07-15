@@ -36,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -79,6 +80,8 @@ fun EmulatorLogScreen(
     var showDeleteDialog by remember { mutableStateOf<GameLogEntry?>(null) }
     var pendingExport by remember { mutableStateOf<GameLogEntry?>(null) }
     var currentLogLevel by remember { mutableIntStateOf(2) }
+    var debugModeEnabled by remember { mutableStateOf(false) }
+    var showDebugModeConfirm by remember { mutableStateOf(false) }
     var showVerbosityHelp by remember { mutableStateOf(false) }
 
     val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -107,6 +110,7 @@ fun EmulatorLogScreen(
             LoggingConfigHelper.disableHirFileDumps()
             logs = EmulatorLogRepository.listLogs(context)
             currentLogLevel = LoggingConfigHelper.readLogLevel()
+            debugModeEnabled = LoggingConfigHelper.isDebugMode()
         }
     }
 
@@ -247,6 +251,31 @@ fun EmulatorLogScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item {
+                    DebugModeCard(
+                        enabled = debugModeEnabled,
+                        onToggleRequest = { enabling ->
+                            if (enabling) {
+                                showDebugModeConfirm = true
+                            } else {
+                                scope.launch(Dispatchers.IO) {
+                                    val ok = LoggingConfigHelper.setDebugMode(false)
+                                    withContext(Dispatchers.Main) {
+                                        debugModeEnabled = LoggingConfigHelper.isDebugMode()
+                                        currentLogLevel = LoggingConfigHelper.readLogLevel()
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                if (ok) context.getString(R.string.debug_mode_disabled)
+                                                else "Failed to update Debug Mode"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+
+                item {
                     LogVerbosityCard(
                         currentLevel = currentLogLevel,
                         onSelectLevel = { applyLogLevel(it) },
@@ -291,6 +320,37 @@ fun EmulatorLogScreen(
                 }
             }
         }
+    }
+
+    if (showDebugModeConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDebugModeConfirm = false },
+            title = { Text(stringResource(R.string.debug_mode_title)) },
+            text = { Text(stringResource(R.string.debug_mode_confirm_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDebugModeConfirm = false
+                    scope.launch(Dispatchers.IO) {
+                        val ok = LoggingConfigHelper.setDebugMode(true)
+                        withContext(Dispatchers.Main) {
+                            debugModeEnabled = LoggingConfigHelper.isDebugMode()
+                            currentLogLevel = LoggingConfigHelper.readLogLevel()
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    if (ok) context.getString(R.string.debug_mode_enabled)
+                                    else "Failed to update Debug Mode"
+                                )
+                            }
+                        }
+                    }
+                }) { Text(stringResource(R.string.debug_mode_enable)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDebugModeConfirm = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
     }
 
     if (showVerbosityHelp) {
@@ -354,6 +414,68 @@ fun EmulatorLogScreen(
                 TextButton(onClick = { showDeleteDialog = null }) { Text("Cancel") }
             }
         )
+    }
+}
+
+@Composable
+private fun DebugModeCard(
+    enabled: Boolean,
+    onToggleRequest: (Boolean) -> Unit
+) {
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = if (enabled) {
+            MaterialTheme.colorScheme.errorContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerHigh
+        },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.debug_mode_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (enabled) {
+                            MaterialTheme.colorScheme.onErrorContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        }
+                    )
+                    Text(
+                        text = stringResource(R.string.debug_mode_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (enabled) {
+                            MaterialTheme.colorScheme.onErrorContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
+                }
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = onToggleRequest
+                )
+            }
+            Text(
+                text = stringResource(R.string.debug_mode_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = if (enabled) {
+                    MaterialTheme.colorScheme.onErrorContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            )
+        }
     }
 }
 

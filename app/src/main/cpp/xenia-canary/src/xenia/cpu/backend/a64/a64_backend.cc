@@ -35,6 +35,9 @@
 #include "xenia/cpu/stack_walker.h"
 #include "xenia/cpu/thread_state.h"
 #include "xenia/cpu/xex_module.h"
+#include "xenia/memory.h"
+
+DECLARE_bool(record_mmio_access_exceptions);
 
 DEFINE_int64(a64_max_stackpoints, 65536,
              "Max number of host->guest stack mappings we can record.", "a64");
@@ -53,6 +56,13 @@ namespace a64 {
 // Resolve a guest function at runtime. Called by the resolve thunk when
 // a guest address has not yet been compiled.
 uint64_t ResolveFunction(void* raw_context, uint64_t target_address);
+
+// Forward MMIO access-violation PCs to the A64 backend so subsequent JIT
+// recompiles can emit MMIO-aware loads/stores (when enabled via Debug Mode).
+static void ForwardMMIOAccessForRecording(void* context, void* hostaddr) {
+  reinterpret_cast<A64Backend*>(context)
+      ->RecordMMIOExceptionForGuestInstruction(hostaddr);
+}
 
 // ==========================================================================
 // A64HelperEmitter — generates thunks using xbyak_aarch64.
@@ -664,6 +674,15 @@ bool A64Backend::Initialize(Processor* processor) {
 
   // Register exception handler for MMIO access from JIT code.
   ExceptionHandler::Install(ExceptionCallbackThunk, this);
+
+  // Wire MMIO access recording so emit_mmio_aware_stores_for_recorded_exception_addresses
+  // can actually see which guest PCs hit MMIO (parity with x64 backend). Only
+  // enabled when the user turns on Debug Mode — the hot path is exception-based
+  // MMIO otherwise and recording is pure overhead on first run.
+  if (cvars::record_mmio_access_exceptions) {
+    processor->memory()->SetMMIOExceptionRecordingCallback(
+        ForwardMMIOAccessForRecording, static_cast<void*>(this));
+  }
 
   return true;
 }

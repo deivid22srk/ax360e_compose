@@ -39,10 +39,11 @@ DEFINE_bool(
 #endif
 
 DEFINE_bool(
-    vulkan_log_debug_messages, true,
+    vulkan_log_debug_messages, false,
     "Write Vulkan VK_EXT_debug_utils messages to the Xenia log, as opposed to "
     "the OS debug output.",
     "Vulkan");
+UPDATE_from_bool(vulkan_log_debug_messages, 2026, 7, 15, 18, true);
 
 namespace xe {
 namespace ui {

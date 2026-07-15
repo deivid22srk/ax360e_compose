@@ -48,6 +48,24 @@ VulkanPipelineCache::~VulkanPipelineCache() { Shutdown(); }
 bool VulkanPipelineCache::Initialize() {
   const ui::vulkan::VulkanDevice* const vulkan_device =
       command_processor_.GetVulkanDevice();
+  const ui::vulkan::VulkanDevice::Functions& dfn = vulkan_device->functions();
+  const VkDevice device = vulkan_device->device();
+
+  // Create a driver pipeline cache so identical graphics PSOs can be reused
+  // within the process without recompiling from scratch each time.
+  VkPipelineCacheCreateInfo pipeline_cache_info = {};
+  pipeline_cache_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+  pipeline_cache_info.pNext = nullptr;
+  pipeline_cache_info.flags = 0;
+  pipeline_cache_info.initialDataSize = 0;
+  pipeline_cache_info.pInitialData = nullptr;
+  if (dfn.vkCreatePipelineCache(device, &pipeline_cache_info, nullptr,
+                                &vulkan_pipeline_cache_) != VK_SUCCESS) {
+    XELOGW(
+        "VulkanPipelineCache: Failed to create VkPipelineCache — pipelines "
+        "will be created without a driver cache (possible mid-session stutter)");
+    vulkan_pipeline_cache_ = VK_NULL_HANDLE;
+  }
 
   bool edram_fragment_shader_interlock =
       render_target_cache_.GetPath() ==
@@ -116,6 +134,11 @@ void VulkanPipelineCache::Shutdown() {
 
   // Shut down shader translation.
   shader_translator_.reset();
+
+  if (vulkan_pipeline_cache_ != VK_NULL_HANDLE) {
+    dfn.vkDestroyPipelineCache(device, vulkan_pipeline_cache_, nullptr);
+    vulkan_pipeline_cache_ = VK_NULL_HANDLE;
+  }
 }
 
 VulkanShader* VulkanPipelineCache::LoadShader(xenos::ShaderType shader_type,
@@ -2162,7 +2185,7 @@ bool VulkanPipelineCache::EnsurePipelineCreated(
   const ui::vulkan::VulkanDevice::Functions& dfn = vulkan_device->functions();
   const VkDevice device = vulkan_device->device();
   VkPipeline pipeline;
-  if (dfn.vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1,
+  if (dfn.vkCreateGraphicsPipelines(device, vulkan_pipeline_cache_, 1,
                                     &pipeline_create_info, nullptr,
                                     &pipeline) != VK_SUCCESS) {
     // TODO(Triang3l): Move these error messages outside.

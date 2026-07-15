@@ -28,6 +28,21 @@ object LoggingConfigHelper {
     const val KEY_DUMP_HIR = "CPU|dump_translated_hir_functions"
     const val KEY_TRACE_FUNCTIONS = "CPU|trace_functions"
 
+    // Debug / instrumentation flags that add JIT + memory overhead.
+    // Flipped together by the single "Debug Mode" toggle (off by default).
+    private const val KEY_BREAK_ON_DEBUGBREAK = "CPU|break_on_debugbreak"
+    private const val KEY_BREAK_ON_UNIMPLEMENTED =
+        "CPU|break_on_unimplemented_instructions"
+    private const val KEY_RECORD_MMIO = "CPU|record_mmio_access_exceptions"
+    private const val KEY_EMIT_MMIO_AWARE =
+        "CPU|emit_mmio_aware_stores_for_recorded_exception_addresses"
+    private const val KEY_EMIT_INLINE_MMIO = "CPU|emit_inline_mmio_checks"
+    private const val KEY_STORE_ALL_CONTEXT = "CPU|store_all_context_values"
+    private const val KEY_TRACE_COVERAGE = "CPU|trace_function_coverage"
+    private const val KEY_TRACE_DATA = "CPU|trace_function_data"
+    private const val KEY_TRACE_REFS = "CPU|trace_function_references"
+    private const val KEY_VALIDATE_HIR = "CPU|validate_hir"
+
     private val LEVEL_NAMES = listOf("error", "warning", "info", "debug", "trace")
 
     fun levelName(level: Int): String =
@@ -71,6 +86,62 @@ object LoggingConfigHelper {
             cfg.save_config_entry(KEY_TRACE_FUNCTIONS, enabled.toString())
             // Keep HIR disk dumps off by default — they are optional and heavy.
             cfg.save_config_entry(KEY_DUMP_HIR, "false")
+            if (enabled) {
+                val current = cfg.load_config_entry(KEY_LOG_LEVEL)?.toIntOrNull() ?: 2
+                if (current < 3) {
+                    cfg.save_config_entry(KEY_LOG_LEVEL, "3")
+                }
+            }
+        }
+    }
+
+    /**
+     * Master Debug Mode: when ON, enables JIT/memory instrumentation flags used
+     * to diagnose crashes (MMIO recording, unimplemented traps, etc.).
+     * When OFF (default), all of those are disabled for maximum FPS.
+     *
+     * Changes apply on the next game launch.
+     */
+    fun isDebugMode(): Boolean {
+        if (!Emulator.ensure_library_loaded()) return false
+        return runCatching {
+            val path = Application.ensure_global_config_file().absolutePath
+            val cfg = NativeEmulator.Config.open_config_file(path)
+            try {
+                // Consider debug mode "on" if any core instrumentation flag is true.
+                listOf(
+                    KEY_RECORD_MMIO,
+                    KEY_BREAK_ON_UNIMPLEMENTED,
+                    KEY_EMIT_INLINE_MMIO,
+                    KEY_BREAK_ON_DEBUGBREAK
+                ).any { key ->
+                    cfg.load_config_entry(key)?.equals("true", ignoreCase = true) == true
+                }
+            } finally {
+                cfg.close_config_file()
+            }
+        }.getOrDefault(false)
+    }
+
+    fun setDebugMode(enabled: Boolean): Boolean {
+        val value = enabled.toString()
+        return mutateConfig { cfg ->
+            cfg.save_config_entry(KEY_BREAK_ON_DEBUGBREAK, value)
+            cfg.save_config_entry(KEY_BREAK_ON_UNIMPLEMENTED, value)
+            cfg.save_config_entry(KEY_RECORD_MMIO, value)
+            cfg.save_config_entry(KEY_EMIT_MMIO_AWARE, value)
+            // Inline MMIO checks are heavy (compare+branch on every I32 load/store);
+            // only enable when the user explicitly wants full debug mode.
+            cfg.save_config_entry(KEY_EMIT_INLINE_MMIO, value)
+            cfg.save_config_entry(KEY_STORE_ALL_CONTEXT, value)
+            cfg.save_config_entry(KEY_TRACE_COVERAGE, "false")
+            cfg.save_config_entry(KEY_TRACE_DATA, "false")
+            cfg.save_config_entry(KEY_TRACE_REFS, "false")
+            cfg.save_config_entry(KEY_DISASSEMBLE, if (enabled) "true" else "false")
+            cfg.save_config_entry(KEY_TRACE_FUNCTIONS, if (enabled) "true" else "false")
+            // HIR dumps always stay off — they flood storage and can crash on Android.
+            cfg.save_config_entry(KEY_DUMP_HIR, "false")
+            cfg.save_config_entry(KEY_VALIDATE_HIR, "false")
             if (enabled) {
                 val current = cfg.load_config_entry(KEY_LOG_LEVEL)?.toIntOrNull() ?: 2
                 if (current < 3) {

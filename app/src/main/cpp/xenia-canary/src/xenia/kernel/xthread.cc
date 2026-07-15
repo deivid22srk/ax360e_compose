@@ -30,6 +30,12 @@ DEFINE_bool(ignore_thread_priorities, false,
 UPDATE_from_bool(ignore_thread_priorities, 2026, 4, 9, 12, true);
 DEFINE_bool(ignore_thread_affinities, true,
             "Ignores game-specified thread affinities.", "Kernel");
+DEFINE_bool(
+    pin_guest_threads_to_performance_cores, true,
+    "Pin guest CPU threads to high-performance (big/prime) cores on "
+    "big.LITTLE Android SoCs. Improves FPS stability by avoiding migration "
+    "onto little cores. Disable if you prefer the OS scheduler fully.",
+    "Kernel");
 
 #if 0
 DEFINE_int64(stack_size_multiplier_hack, 1,
@@ -450,6 +456,25 @@ X_STATUS XThread::Create() {
 
   if (creation_params_.creation_flags & 0x60) {
     thread_->set_priority(creation_params_.creation_flags & 0x20 ? 1 : 0);
+  }
+
+  // [ANDROID PERF] Prefer big/prime cores on big.LITTLE SoCs so guest CPU
+  // work stays off little cores. Heuristic: pin to the upper half of logical
+  // CPUs (cores index >= count/2), which on typical 8-core Snapdragon layouts
+  // is cores 4-7 (big+prime). Harmless on homogeneous SoCs.
+  if (cvars::pin_guest_threads_to_performance_cores) {
+    const uint32_t cpu_count = xe::threading::logical_processor_count();
+    if (cpu_count > 2) {
+      uint64_t mask = 0;
+      const uint32_t first_big = cpu_count / 2;
+      const uint32_t max_bits = cpu_count < 64u ? cpu_count : 64u;
+      for (uint32_t i = first_big; i < max_bits; ++i) {
+        mask |= (uint64_t{1} << i);
+      }
+      if (mask) {
+        thread_->set_affinity_mask(mask);
+      }
+    }
   }
 
   // Assign the newly created thread to the logical processor, and also set up

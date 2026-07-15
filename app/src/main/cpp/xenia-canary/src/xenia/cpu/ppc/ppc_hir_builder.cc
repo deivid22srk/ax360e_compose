@@ -29,10 +29,11 @@
 #include "xenia/cpu/processor.h"
 #include "xenia/cpu/xex_module.h"
 DEFINE_bool(
-    break_on_unimplemented_instructions, true,
+    break_on_unimplemented_instructions, false,
     "Break to the host debugger (or crash if no debugger attached) if an "
     "unimplemented PowerPC instruction is encountered.",
     "CPU");
+UPDATE_from_bool(break_on_unimplemented_instructions, 2026, 7, 15, 18, true);
 
 namespace xe {
 namespace cpu {

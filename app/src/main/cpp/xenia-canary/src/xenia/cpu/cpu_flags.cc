@@ -59,5 +59,6 @@ DEFINE_uint64(break_condition_value, 0, "value compared against", "CPU");
 DEFINE_string(break_condition_op, "eq", "comparison operator", "CPU");
 DEFINE_bool(break_condition_truncate, true, "truncate value to 32-bits", "CPU");
 
-DEFINE_bool(break_on_debugbreak, true, "int3 on JITed __debugbreak requests.",
+DEFINE_bool(break_on_debugbreak, false, "int3 on JITed __debugbreak requests.",
             "CPU");
+UPDATE_from_bool(break_on_debugbreak, 2026, 7, 15, 18, true);

@@ -32,7 +32,7 @@
     <string name="_default">Default</string>
     <string name="driver_library_path_dialog_add_hint">Add Custom Driver(*.zip)</string>
     <string name="es_vulkan_vulkan_lib_path">Custom Driver Library Path</string>
-    <string name="es_vulkan_adrenotools_force_max_clocks">Custom Driver Force Max Clocks</string>
+    <string name="es_vulkan_adrenotools_force_max_clocks">Force Max GPU Clocks (Adreno only)</string>
 
     <string name="create_shortcut">Create Shortcut</string>
     <string name="disable_virtual_keyboard">Disable the virtual keyboard</string>
@@ -451,6 +451,14 @@ For scaling by factors of more than 2x2, multiple FSR passes are done.</string>
     <string name="log_level_enable_jit_detail">Enable JIT function detail flags</string>
     <string name="log_level_current">Current log_level: %1$s</string>
     <string name="log_level_saved">Saved. Relaunch a game to apply.</string>
+    <string name="debug_mode_title">Debug Mode</string>
+    <string name="debug_mode_subtitle">Instrumentation for diagnosing crashes / hangs</string>
+    <string name="debug_mode_hint">When enabled, turns on MMIO recording, unimplemented-instruction traps, and related JIT debug flags. This can reduce FPS significantly. Leave OFF for normal play. Applies on next game launch.</string>
+    <string name="debug_mode_confirm_body">Debug Mode adds JIT and memory instrumentation used to investigate bugs. It can reduce performance (FPS). Enable only when diagnosing a specific issue?</string>
+    <string name="debug_mode_enable">Enable</string>
+    <string name="debug_mode_enabled">Debug Mode ON. Relaunch a game to apply.</string>
+    <string name="debug_mode_disabled">Debug Mode OFF. Relaunch a game to apply.</string>
+    <string name="es_kernel_pin_guest_threads_to_performance_cores">Pin Guest Threads to Performance Cores</string>
     <string name="es_hint_logging_log_string_format_kernel_calls">Log kernel calls with the kHighFrequency tag.</string>
     <string name="es_hint_logging_log_to_debugprint">Dump the log to DebugPrint.</string>
     <string name="es_hint_logging_log_to_stdout">Write log output to stdout</string>

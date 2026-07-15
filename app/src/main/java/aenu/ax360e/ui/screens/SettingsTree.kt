@@ -182,6 +182,7 @@ object SettingsTree {
                     SettingsEntry.Bool(key = "Kernel|apply_title_update", title = context.getString(R.string.es_kernel_apply_title_update)),
                     SettingsEntry.Bool(key = "Kernel|ignore_thread_affinities", title = context.getString(R.string.es_kernel_ignore_thread_affinities)),
                     SettingsEntry.Bool(key = "Kernel|ignore_thread_priorities", title = context.getString(R.string.es_kernel_ignore_thread_priorities)),
+                    SettingsEntry.Bool(key = "Kernel|pin_guest_threads_to_performance_cores", title = context.getString(R.string.es_kernel_pin_guest_threads_to_performance_cores)),
                     SettingsEntry.Bool(key = "Kernel|kernel_cert_monitor", title = context.getString(R.string.es_kernel_kernel_cert_monitor)),
                     SettingsEntry.Bool(key = "Kernel|kernel_debug_monitor", title = context.getString(R.string.es_kernel_kernel_debug_monitor)),
                     SettingsEntry.StrArr(key = "Kernel|kernel_display_gamma_type", title = context.getString(R.string.es_kernel_kernel_display_gamma_type), entries = listOf("linear", "sRGB(CRT)", "BT.709(HDTV)"), values = listOf("0", "1", "2")),

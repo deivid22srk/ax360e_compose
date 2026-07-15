@@ -59,6 +59,10 @@ class VulkanPipelineCache {
   bool Initialize();
   void Shutdown();
 
+  // Vulkan driver pipeline cache (in-session). Passed to
+  // vkCreateGraphicsPipelines so the driver can reuse compiled PSOs within
+  // the process and avoid stutter when the same render state reappears.
+
   VulkanShader* LoadShader(xenos::ShaderType shader_type,
                            const uint32_t* host_address, uint32_t dword_count);
   // Analyze shader microcode on the translator thread.
@@ -324,6 +328,10 @@ class VulkanPipelineCache {
   // Previously used pipeline, to avoid lookups if the state wasn't changed.
   const std::pair<const PipelineDescription, Pipeline>* last_pipeline_ =
       nullptr;
+
+  // Driver-side VkPipelineCache. In-memory for the process lifetime; avoids
+  // recompiling identical graphics PSOs mid-session (major stutter source).
+  VkPipelineCache vulkan_pipeline_cache_ = VK_NULL_HANDLE;
 };
 
 }  // namespace vulkan
