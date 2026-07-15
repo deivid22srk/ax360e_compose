@@ -182,6 +182,7 @@
     <string name="es_gpu_force_convert_triangle_fans_to_lists">Force Convert Triangle Fans</string>
     <string name="es_gpu_framerate_limit">Framerate Limit</string>
     <string name="es_gpu_gamma_render_target_as_srgb">Gamma RT as sRGB</string>
+    <string name="es_gpu_async_shader_compilation">Async Shader Compilation (reduces stutter)</string>
     <string name="es_gpu_gpu">Graphics System</string>
     <string name="es_gpu_gpu_allow_invalid_fetch_constants">Allow Invalid Fetch Constants</string>
     <string name="es_gpu_half_pixel_offset">Half Pixel Offset</string>
@@ -294,6 +295,7 @@
     <string name="es_vulkan_vulkan_allow_present_mode_immediate">Allow Immediate Present Mode</string>
     <string name="es_vulkan_vulkan_allow_present_mode_mailbox">Allow Mailbox Present Mode</string>
     <string name="es_vulkan_vulkan_device">Vulkan Device Index</string>
+    <string name="es_vulkan_vulkan_pipeline_creation_threads">Pipeline Creation Threads (-1=auto, 0=off)</string>
     <string name="es_vulkan_vulkan_log_debug_messages">Log Vulkan Debug Messages</string>
     <string name="es_vulkan_vulkan_sparse_shared_memory">Sparse Shared Memory</string>
     <string name="es_vulkan_vulkan_validation">Vulkan Validation Layer</string>

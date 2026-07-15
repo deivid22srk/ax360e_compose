@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import aenu.ax360e.Application
+import kotlinx.coroutines.delay
 import aenu.ax360e.Emulator
 import aenu.ax360e.R
 import aenu.ax360e.Utils
@@ -75,9 +76,13 @@ fun EmulatorSettingsScreen(
     val activity = context as? Activity
     LaunchedEffect(Unit) { SettingsTree.init(context) }
 
-    val libraryReady = remember {
-        Emulator.ensure_library_loaded()
-    }
+    // ax360e fix: use mutable state for libraryReady so we can retry loading
+    // the native library if the first attempt fails (e.g., still initializing
+    // when the Settings screen is opened immediately after app launch).
+    // Previously this was `remember { Emulator.ensure_library_loaded() }`
+    // which evaluated once and never retried, causing a permanent "Native
+    // library not loaded" error until the user manually clicked Retry.
+    var libraryReady by remember { mutableStateOf(Emulator.ensure_library_loaded()) }
 
     val effectivePath = remember(configPath) {
         if (configPath != null) {
@@ -113,6 +118,34 @@ fun EmulatorSettingsScreen(
         )
     }
 
+    // ax360e fix: auto-retry loading the native library and opening the config
+    // if the first attempt failed. This fixes the bug where the Settings screen
+    // showed an empty "Config file not available" state on first open, forcing
+    // the user to go back and re-enter Settings. The retry runs once 500ms
+    // after composition; if the library loads successfully by then, the config
+    // is opened automatically and the settings tree appears without user
+    // intervention.
+    LaunchedEffect(libraryReady, config) {
+        if (config == null) {
+            delay(500)
+            if (!libraryReady) {
+                val ok = Emulator.ensure_library_loaded()
+                if (ok) {
+                    libraryReady = true
+                }
+            }
+            if (libraryReady) {
+                if (isGlobal) Application.ensure_global_config_file()
+                val reopened = openConfigOrNull(effectivePath, true)
+                if (reopened != null) {
+                    session.config = reopened
+                    config = reopened
+                    loadError = null
+                }
+            }
+        }
+    }
+
     fun flushAndRelease() {
         val c = session.config ?: return
         runCatching { c.close_config_file() }
@@ -121,7 +154,11 @@ fun EmulatorSettingsScreen(
             }
         session.config = null
         session.dirty = false
-        config = null
+        // ax360e fix: do NOT null out `config` here. Setting config = null
+        // triggers a recomposition that shows the "Config file not available"
+        // error briefly before onBack() finishes the activity. The
+        // DisposableEffect.onDispose below already handles cleanup when the
+        // composition is destroyed by finish().
     }
 
     fun markDirtyAndRefresh(block: (NativeEmulator.Config) -> Unit) {
