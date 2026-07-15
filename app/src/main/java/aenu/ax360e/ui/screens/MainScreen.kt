@@ -261,7 +261,7 @@ fun MainScreen() {
                         }
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = "aX360e Free",
+                            text = "Xenon360",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -329,7 +329,7 @@ fun MainScreen() {
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            text = "aX360e Free",
+                            text = "Xenon360",
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )

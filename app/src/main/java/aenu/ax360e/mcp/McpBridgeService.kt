@@ -77,7 +77,7 @@ class McpBridgeService : Service() {
         createNotificationChannel()
         handler = McpCommandHandler(applicationContext)
         client = McpBridgeClient(applicationContext, handler)
-        startForeground(NOTIFICATION_ID, buildNotification("ax360e AI bridge running"))
+        startForeground(NOTIFICATION_ID, buildNotification("Xenon360 AI bridge running"))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -225,7 +225,7 @@ class McpBridgeService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("ax360e AI Bridge")
+            .setContentTitle("Xenon360 AI Bridge")
             .setContentText(text)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setOngoing(true)
