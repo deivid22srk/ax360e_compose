@@ -43,7 +43,9 @@ DEFINE_bool(record_mmio_access_exceptions, false,
             "for them. This info can then be used on a subsequent run to "
             "instruct the recompiler to emit checks",
             "CPU");
-UPDATE_from_bool(record_mmio_access_exceptions, 2026, 7, 15, 18, true);
+// NOTE: UPDATE_from_bool symbol names only include the hour token in practice
+// (macro pasting quirk), so two updates in the same .cc must use different hours.
+UPDATE_from_bool(record_mmio_access_exceptions, 2026, 7, 15, 19, true);
 DEFINE_bool(protect_on_release, false,
             "Protect released memory to prevent accesses.", "Memory");
 DEFINE_bool(scribble_heap, false,
