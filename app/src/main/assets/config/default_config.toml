@@ -68,7 +68,7 @@ writable_code_segments = false                    	# Enables a program to write 
 
 
 [Config]
-defaults_date = 2026071518                        	# Do not modify - internal version of the default values in the config, for seamless updates if default value of any option is changed.
+defaults_date = 2026071519                        	# Do not modify - internal version of the default values in the config, for seamless updates if default value of any option is changed.
 
 
 [Content]
