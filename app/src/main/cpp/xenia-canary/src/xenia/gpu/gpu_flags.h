@@ -32,6 +32,12 @@ DECLARE_int32(query_occlusion_sample_upper_threshold);
 
 DECLARE_bool(disassemble_pm4);
 
+// ax360e backport: async shader compilation (upstream 5845f343).
+DECLARE_bool(async_shader_compilation);
+
+// ax360e backport: thread pool for shader compilation (upstream ccf8fb66).
+DECLARE_int32(vulkan_pipeline_creation_threads);
+
 #define XE_GPU_FINE_GRAINED_DRAW_SCOPES 1
 
 #endif  // XENIA_GPU_GPU_FLAGS_H_

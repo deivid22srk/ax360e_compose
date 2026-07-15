@@ -2407,15 +2407,32 @@ bool VulkanCommandProcessor::IssueDraw(xenos::PrimitiveType prim_type,
   // Create the pipeline (for this, need the render pass from the render target
   // cache), translating the shaders - doing this now to obtain the used
   // textures.
-  VkPipeline pipeline;
-  const VulkanPipelineCache::PipelineLayoutProvider* pipeline_layout_provider;
+  // ax360e backport: ConfigurePipeline now returns a Pipeline* (with atomic
+  // VkPipeline handle) so the real pipeline can be swapped in by the creation
+  // thread while we're still building the command buffer.
+  VulkanPipelineCache::Pipeline* pipeline;
   if (!pipeline_cache_->ConfigurePipeline(
           vertex_shader_translation, pixel_shader_translation,
           primitive_processing_result, normalized_depth_control,
           normalized_color_mask,
-          render_target_cache_->last_update_render_pass_key(), pipeline,
-          pipeline_layout_provider)) {
+          render_target_cache_->last_update_render_pass_key(), &pipeline)) {
     return false;
+  }
+
+  // ax360e backport: in async mode, the pipeline may currently be a
+  // placeholder (real pipeline still compiling). Load the handle now; if it's
+  // VK_NULL_HANDLE, force the creation to complete synchronously via
+  // EndSubmission (rare path - only happens if the placeholder itself failed).
+  VkPipeline current_pipeline =
+      pipeline->pipeline.load(std::memory_order_acquire);
+  if (current_pipeline == VK_NULL_HANDLE) {
+    // Placeholder creation also failed - force sync creation.
+    pipeline_cache_->EndSubmission();
+    current_pipeline = pipeline->pipeline.load(std::memory_order_acquire);
+    if (current_pipeline == VK_NULL_HANDLE) {
+      // Still not ready - something is wrong.
+      return false;
+    }
   }
 
   // Update the textures before most other work in the submission because
@@ -2431,14 +2448,27 @@ bool VulkanCommandProcessor::IssueDraw(xenos::PrimitiveType prim_type,
   // Update the graphics pipeline, and if the new graphics pipeline has a
   // different layout, invalidate incompatible descriptor sets before updating
   // current_guest_graphics_pipeline_layout_.
-  if (current_guest_graphics_pipeline_ != pipeline) {
+  // The pipeline may be not ready yet if created asynchronously.
+  // EndSubmission (called later in EndSubmission) must be called before
+  // submitting the command buffer to await its creation.
+  if (current_guest_graphics_pipeline_ != current_pipeline) {
     deferred_command_buffer_.CmdVkBindPipeline(VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                               pipeline);
-    current_guest_graphics_pipeline_ = pipeline;
+                                               current_pipeline);
+    current_guest_graphics_pipeline_ = current_pipeline;
     current_external_graphics_pipeline_ = VK_NULL_HANDLE;
   }
+  // ax360e backport: re-load the pipeline handle in case the creation thread
+  // swapped the placeholder for the real one between the load above and now.
+  // Also re-load right before the draw to pick up any last-second swap.
+  current_pipeline = pipeline->pipeline.load(std::memory_order_acquire);
+  if (current_guest_graphics_pipeline_ != current_pipeline &&
+      current_pipeline != VK_NULL_HANDLE) {
+    deferred_command_buffer_.CmdVkBindPipeline(VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                               current_pipeline);
+    current_guest_graphics_pipeline_ = current_pipeline;
+  }
   auto pipeline_layout =
-      static_cast<const PipelineLayout*>(pipeline_layout_provider);
+      static_cast<const PipelineLayout*>(pipeline->pipeline_layout);
   if (current_guest_graphics_pipeline_layout_ != pipeline_layout) {
     if (current_guest_graphics_pipeline_layout_) {
       // Keep descriptor set layouts for which the new pipeline layout is
@@ -3429,6 +3459,14 @@ bool VulkanCommandProcessor::EndSubmission(bool is_swap) {
     EndRenderPass();
 
     render_target_cache_->EndSubmission();
+
+    // ax360e backport: wait for any pending async pipeline compilation to
+    // complete before submitting the command buffer. This ensures the real
+    // pipeline (replacing the placeholder) is ready by the time the GPU
+    // executes the draw, eliminating visual artifacts at frame boundaries.
+    // If async_shader_compilation is disabled, this is a no-op (just processes
+    // deferred destructions).
+    pipeline_cache_->EndSubmission();
 
     primitive_processor_->EndSubmission();
 

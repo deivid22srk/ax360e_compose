@@ -20,6 +20,7 @@
 #include "xenia/base/xxhash.h"
 #include "xenia/gpu/draw_util.h"
 #include "xenia/gpu/gpu_flags.h"
+#include "xenia/gpu/pipeline_util.h"
 #include "xenia/gpu/register_file.h"
 #include "xenia/gpu/registers.h"
 #include "xenia/gpu/spirv_builder.h"
@@ -28,6 +29,11 @@
 #include "xenia/gpu/vulkan/vulkan_shader.h"
 #include "xenia/gpu/xenos.h"
 #include "xenia/ui/vulkan/vulkan_util.h"
+
+// ax360e backport: placeholder pixel shader for pipeline hot-swap.
+namespace shaders {
+#include "xenia/gpu/shaders/bytecode/vulkan_spirv/placeholder_ps.h"
+}  // namespace shaders
 
 namespace xe {
 namespace gpu {
@@ -96,20 +102,104 @@ bool VulkanPipelineCache::Initialize() {
     }
   }
 
+  // ax360e backport: create placeholder pixel shader for pipeline hot-swap
+  // (stutter reduction). Outputs transparent black while the real shader
+  // compiles in background.
+  placeholder_pixel_shader_ = ui::vulkan::util::CreateShaderModule(
+      vulkan_device, shaders::placeholder_ps,
+      sizeof(shaders::placeholder_ps));
+  if (placeholder_pixel_shader_ == VK_NULL_HANDLE) {
+    XELOGW(
+        "VulkanPipelineCache: Failed to create placeholder pixel shader - "
+        "pipeline hot-swap will not be available (sync compilation fallback)");
+  }
+
+  // ax360e backport: spawn pipeline creation thread pool.
+  // Threads are only created if async_shader_compilation is enabled (default)
+  // and vulkan_pipeline_creation_threads != 0.
+  creation_completion_event_ =
+      xe::threading::Event::CreateManualResetEvent(true);
+  assert_not_null(creation_completion_event_);
+  if (cvars::async_shader_compilation &&
+      cvars::vulkan_pipeline_creation_threads != 0 &&
+      placeholder_pixel_shader_ != VK_NULL_HANDLE) {
+    uint32_t logical_processor_count =
+        xe::threading::logical_processor_count();
+    if (!logical_processor_count) {
+      // Pick some reasonable amount if couldn't determine the number of cores.
+      logical_processor_count = 6;
+    }
+    size_t creation_thread_count;
+    if (cvars::vulkan_pipeline_creation_threads < 0) {
+      creation_thread_count =
+          std::max(logical_processor_count * 3 / 4, uint32_t(1));
+    } else {
+      creation_thread_count = std::min(
+          uint32_t(cvars::vulkan_pipeline_creation_threads),
+          logical_processor_count);
+    }
+    creation_threads_shutdown_.store(false, std::memory_order_release);
+    XELOGI(
+        "VulkanPipelineCache: async pipeline compilation enabled with {} "
+        "background thread(s)",
+        creation_thread_count);
+    for (size_t i = 0; i < creation_thread_count; ++i) {
+      std::unique_ptr<xe::threading::Thread> creation_thread =
+          xe::threading::Thread::Create({}, [this]() { CreationThread(); });
+      if (creation_thread) {
+        creation_thread->set_name("Vulkan Pipelines");
+        creation_threads_.push_back(std::move(creation_thread));
+      }
+    }
+  } else {
+    XELOGI(
+        "VulkanPipelineCache: async pipeline compilation disabled - "
+        "pipelines will be created synchronously (shader stutter expected)");
+  }
+
   return true;
 }
 
 void VulkanPipelineCache::Shutdown() {
+  // ax360e backport: shut down all creation threads before destroying the
+  // pipelines since they may be in the middle of creating them.
+  if (!creation_threads_.empty()) {
+    {
+      std::lock_guard<std::mutex> lock(creation_request_lock_);
+      creation_threads_shutdown_.store(true, std::memory_order_release);
+    }
+    creation_request_cond_.notify_all();
+    for (size_t i = 0; i < creation_threads_.size(); ++i) {
+      xe::threading::Wait(creation_threads_[i].get(), false);
+    }
+    creation_threads_.clear();
+  }
+  creation_completion_event_.reset();
+
   const ui::vulkan::VulkanDevice* const vulkan_device =
       command_processor_.GetVulkanDevice();
   const ui::vulkan::VulkanDevice::Functions& dfn = vulkan_device->functions();
   const VkDevice device = vulkan_device->device();
 
+  // ax360e backport: process any remaining deferred destructions (force
+  // destroy all since the device should be idle at shutdown).
+  {
+    std::lock_guard<std::mutex> lock(deferred_destroy_mutex_);
+    for (const auto& pipeline_pair : deferred_destroy_pipelines_) {
+      if (pipeline_pair.first != VK_NULL_HANDLE) {
+        dfn.vkDestroyPipeline(device, pipeline_pair.first, nullptr);
+      }
+    }
+    deferred_destroy_pipelines_.clear();
+  }
+
   // Destroy all pipelines.
   last_pipeline_ = nullptr;
   for (const auto& pipeline_pair : pipelines_) {
-    if (pipeline_pair.second.pipeline != VK_NULL_HANDLE) {
-      dfn.vkDestroyPipeline(device, pipeline_pair.second.pipeline, nullptr);
+    VkPipeline p =
+        pipeline_pair.second.pipeline.load(std::memory_order_acquire);
+    if (p != VK_NULL_HANDLE) {
+      dfn.vkDestroyPipeline(device, p, nullptr);
     }
   }
   pipelines_.clear();
@@ -117,6 +207,8 @@ void VulkanPipelineCache::Shutdown() {
   // Destroy all internal shaders.
   ui::vulkan::util::DestroyAndNullHandle(dfn.vkDestroyShaderModule, device,
                                          depth_only_fragment_shader_);
+  ui::vulkan::util::DestroyAndNullHandle(dfn.vkDestroyShaderModule, device,
+                                         placeholder_pixel_shader_);
   for (const auto& geometry_shader_pair : geometry_shaders_) {
     if (geometry_shader_pair.second != VK_NULL_HANDLE) {
       dfn.vkDestroyShaderModule(device, geometry_shader_pair.second, nullptr);
@@ -286,13 +378,16 @@ bool VulkanPipelineCache::ConfigurePipeline(
     reg::RB_DEPTHCONTROL normalized_depth_control,
     uint32_t normalized_color_mask,
     VulkanRenderTargetCache::RenderPassKey render_pass_key,
-    VkPipeline& pipeline_out,
-    const PipelineLayoutProvider*& pipeline_layout_out) {
+    Pipeline** pipeline_out) {
 #if XE_GPU_FINE_GRAINED_DRAW_SCOPES
   SCOPE_profile_cpu_f("gpu");
 #endif  // XE_GPU_FINE_GRAINED_DRAW_SCOPES
 
-  // Ensure shaders are translated - needed now for GetCurrentStateDescription.
+  // ax360e backport: in async mode, shader translation may be deferred to the
+  // creation thread. But GetCurrentStateDescription needs shader metadata
+  // (writes_color_targets, writes_depth), so we still need to translate
+  // eagerly in async mode too. The expensive part (vkCreateGraphicsPipelines)
+  // is what gets deferred.
   if (!EnsureShadersTranslated(vertex_shader, pixel_shader)) {
     return false;
   }
@@ -305,15 +400,13 @@ bool VulkanPipelineCache::ConfigurePipeline(
     return false;
   }
   if (last_pipeline_ && last_pipeline_->first == description) {
-    pipeline_out = last_pipeline_->second.pipeline;
-    pipeline_layout_out = last_pipeline_->second.pipeline_layout;
+    *pipeline_out = &last_pipeline_->second;
     return true;
   }
   auto it = pipelines_.find(description);
   if (it != pipelines_.end()) {
     last_pipeline_ = &*it;
-    pipeline_out = it->second.pipeline;
-    pipeline_layout_out = it->second.pipeline_layout;
+    *pipeline_out = &it->second;
     return true;
   }
 
@@ -340,13 +433,14 @@ bool VulkanPipelineCache::ConfigurePipeline(
     return false;
   }
   VkShaderModule geometry_shader = VK_NULL_HANDLE;
-  GeometryShaderKey geometry_shader_key;
-  if (GetGeometryShaderKey(
-          description.geometry_shader,
-          SpirvShaderTranslator::Modification(vertex_shader->modification()),
-          SpirvShaderTranslator::Modification(
-              pixel_shader ? pixel_shader->modification() : 0),
-          geometry_shader_key)) {
+  if (description.geometry_shader != PipelineGeometryShader::kNone) {
+    GeometryShaderKey geometry_shader_key;
+    GetGeometryShaderKey(
+        description.geometry_shader,
+        SpirvShaderTranslator::Modification(vertex_shader->modification()),
+        SpirvShaderTranslator::Modification(
+            pixel_shader ? pixel_shader->modification() : 0),
+        geometry_shader_key);
     geometry_shader = GetGeometryShader(geometry_shader_key);
     if (geometry_shader == VK_NULL_HANDLE) {
       return false;
@@ -361,20 +455,206 @@ bool VulkanPipelineCache::ConfigurePipeline(
   if (render_pass == VK_NULL_HANDLE) {
     return false;
   }
-  PipelineCreationArguments creation_arguments;
-  auto& pipeline =
+
+  auto& pipeline_pair =
       *pipelines_.emplace(description, Pipeline(pipeline_layout)).first;
-  creation_arguments.pipeline = &pipeline;
-  creation_arguments.vertex_shader = vertex_shader;
-  creation_arguments.pixel_shader = pixel_shader;
-  creation_arguments.geometry_shader = geometry_shader;
-  creation_arguments.render_pass = render_pass;
-  if (!EnsurePipelineCreated(creation_arguments)) {
+
+  // ax360e backport: pipeline hot-swap. When async mode is enabled, we have
+  // creation threads and a pixel shader, create a placeholder pipeline
+  // immediately (fast compile, uses simple PS) and queue the real pipeline
+  // creation in the background. This reduces stutter from pipeline
+  // compilation dramatically.
+  bool use_async = cvars::async_shader_compilation &&
+                   !creation_threads_.empty() && pixel_shader &&
+                   placeholder_pixel_shader_ != VK_NULL_HANDLE;
+
+  if (use_async) {
+    // Set is_placeholder BEFORE creating the placeholder pipeline to avoid
+    // race condition with the creation thread checking this flag.
+    pipeline_pair.second.is_placeholder.store(true,
+                                              std::memory_order_release);
+
+    PipelineCreationArguments placeholder_args;
+    placeholder_args.pipeline = &pipeline_pair;
+    placeholder_args.vertex_shader = vertex_shader;
+    placeholder_args.pixel_shader = nullptr;  // Use placeholder PS override
+    placeholder_args.geometry_shader = geometry_shader;
+    placeholder_args.render_pass = render_pass;
+
+    if (EnsurePipelineCreatedWithPlaceholder(placeholder_args)) {
+      // Queue real pipeline creation in background.
+      uint8_t priority = 0;
+      if (pixel_shader) {
+        uint32_t bound_rts =
+            pipeline_util::GetBoundRTMaskFromNormalizedColorMask(
+                normalized_color_mask);
+        priority = pipeline_util::CalculatePipelinePriority(
+            bound_rts, pixel_shader->shader().writes_color_targets(),
+            pixel_shader->shader().writes_depth());
+      }
+      {
+        std::lock_guard<std::mutex> lock(creation_request_lock_);
+        PipelineCreationArguments creation_arguments;
+        creation_arguments.pipeline = &pipeline_pair;
+        creation_arguments.vertex_shader = vertex_shader;
+        creation_arguments.pixel_shader = pixel_shader;
+        creation_arguments.geometry_shader = geometry_shader;
+        creation_arguments.render_pass = render_pass;
+        creation_arguments.priority = priority;
+        creation_queue_.push(creation_arguments);
+      }
+      creation_request_cond_.notify_one();
+    } else {
+      // Placeholder creation failed, fall back to sync creation.
+      pipeline_pair.second.is_placeholder.store(false,
+                                                std::memory_order_release);
+      use_async = false;
+    }
+  }
+
+  if (!use_async) {
+    // Sync mode or no creation threads: create synchronously.
+    PipelineCreationArguments creation_arguments;
+    creation_arguments.pipeline = &pipeline_pair;
+    creation_arguments.vertex_shader = vertex_shader;
+    creation_arguments.pixel_shader = pixel_shader;
+    creation_arguments.geometry_shader = geometry_shader;
+    creation_arguments.render_pass = render_pass;
+    if (!EnsurePipelineCreated(creation_arguments)) {
+      return false;
+    }
+  }
+
+  last_pipeline_ = &pipeline_pair;
+  *pipeline_out = &pipeline_pair.second;
+  return true;
+}
+
+// ax360e backport: EndSubmission blocks until all queued pipelines have been
+// created. Called by the command processor before submitting the command
+// buffer to the GPU, so the real pipeline is ready by the time the GPU
+// executes the draw.
+void VulkanPipelineCache::EndSubmission() {
+  if (creation_threads_.empty()) {
+    // ax360e backport: still process deferred destructions when GPU is idle.
+    ProcessDeferredDestructions();
+    return;
+  }
+  bool await_creation_completion_event;
+  {
+    std::lock_guard<std::mutex> lock(creation_request_lock_);
+    await_creation_completion_event =
+        !creation_queue_.empty() || creation_threads_busy_.load() != 0;
+    if (await_creation_completion_event) {
+      creation_completion_event_->Reset();
+      creation_completion_set_event_.store(true, std::memory_order_release);
+    }
+  }
+  if (await_creation_completion_event) {
+    creation_request_cond_.notify_one();
+    xe::threading::Wait(creation_completion_event_.get(), false);
+  }
+  // Process deferred destructions after waiting for pipelines.
+  ProcessDeferredDestructions();
+}
+
+bool VulkanPipelineCache::IsCreatingPipelines() {
+  if (creation_threads_.empty()) {
     return false;
   }
-  pipeline_out = pipeline.second.pipeline;
-  pipeline_layout_out = pipeline_layout;
-  return true;
+  std::lock_guard<std::mutex> lock(creation_request_lock_);
+  return !creation_queue_.empty() || creation_threads_busy_.load() != 0;
+}
+
+// ax360e backport: CreationThread is the worker loop for each background
+// pipeline compilation thread. Pulls work from the priority queue, calls
+// EnsurePipelineCreated (which will swap the placeholder with the real
+// pipeline atomically), then signals completion if requested.
+void VulkanPipelineCache::CreationThread() {
+  for (;;) {
+    PipelineCreationArguments creation_arguments;
+    {
+      std::unique_lock<std::mutex> lock(creation_request_lock_);
+      creation_request_cond_.wait(lock, [this]() {
+        return !creation_queue_.empty() ||
+               creation_threads_shutdown_.load(std::memory_order_acquire);
+      });
+      if (creation_threads_shutdown_.load(std::memory_order_acquire)) {
+        break;
+      }
+      creation_arguments = creation_queue_.top();
+      creation_queue_.pop();
+      creation_threads_busy_.fetch_add(1, std::memory_order_acq_rel);
+    }
+
+    if (!EnsureShadersTranslated(creation_arguments.vertex_shader,
+                                 creation_arguments.pixel_shader)) {
+      XELOGE("Failed to translate shaders for pipeline creation");
+    } else if (!EnsurePipelineCreated(creation_arguments)) {
+      XELOGE("Failed to create Vulkan pipeline");
+    }
+    // On failure: if a placeholder exists it will remain in use permanently.
+    // Clear the flag so we're not in a misleading "waiting for real" state.
+    if (creation_arguments.pipeline->second.is_placeholder.load(
+            std::memory_order_acquire)) {
+      XELOGW(
+          "Real pipeline creation failed - placeholder will remain in use "
+          "(may cause visual artifacts)");
+      creation_arguments.pipeline->second.is_placeholder.store(
+          false, std::memory_order_release);
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(creation_request_lock_);
+      creation_threads_busy_.fetch_sub(1, std::memory_order_acq_rel);
+      if (creation_completion_set_event_.load(std::memory_order_acquire) &&
+          creation_threads_busy_.load() == 0 && creation_queue_.empty()) {
+        creation_completion_set_event_.store(false,
+                                             std::memory_order_release);
+        creation_completion_event_->Set();
+      }
+    }
+  }
+}
+
+// ax360e backport: ProcessDeferredDestructions destroys placeholder pipelines
+// that have been replaced by their real counterparts, but only after the GPU
+// submission that might still reference them has completed. This avoids
+// destroying a pipeline while the GPU is still drawing with it.
+void VulkanPipelineCache::ProcessDeferredDestructions() {
+  std::vector<VkPipeline> pipelines_to_destroy;
+  uint64_t completed_submission = command_processor_.GetCompletedSubmission();
+
+  {
+    std::lock_guard<std::mutex> lock(deferred_destroy_mutex_);
+    if (deferred_destroy_pipelines_.empty()) {
+      return;
+    }
+    // Only destroy pipelines whose submission has completed on the GPU.
+    auto it = deferred_destroy_pipelines_.begin();
+    while (it != deferred_destroy_pipelines_.end()) {
+      if (it->second <= completed_submission) {
+        pipelines_to_destroy.push_back(it->first);
+        it = deferred_destroy_pipelines_.erase(it);
+      } else {
+        ++it;
+      }
+    }
+  }
+
+  if (pipelines_to_destroy.empty()) {
+    return;
+  }
+
+  const ui::vulkan::VulkanDevice* const vulkan_device =
+      command_processor_.GetVulkanDevice();
+  const ui::vulkan::VulkanDevice::Functions& dfn = vulkan_device->functions();
+  VkDevice device = vulkan_device->device();
+  for (VkPipeline pipeline : pipelines_to_destroy) {
+    if (pipeline != VK_NULL_HANDLE) {
+      dfn.vkDestroyPipeline(device, pipeline, nullptr);
+    }
+  }
 }
 
 bool VulkanPipelineCache::TranslateAnalyzedShader(
@@ -1791,9 +2071,23 @@ VkShaderModule VulkanPipelineCache::GetGeometryShader(GeometryShaderKey key) {
 }
 
 bool VulkanPipelineCache::EnsurePipelineCreated(
-    const PipelineCreationArguments& creation_arguments) {
-  if (creation_arguments.pipeline->second.pipeline != VK_NULL_HANDLE) {
-    return true;
+    const PipelineCreationArguments& creation_arguments,
+    VkShaderModule fragment_shader_override) {
+  // ax360e backport: handle placeholder hot-swap.
+  // Check if we already have a pipeline. If it's a placeholder and we're not
+  // creating another placeholder, we need to replace it with the real pipeline.
+  VkPipeline existing_pipeline = creation_arguments.pipeline->second.pipeline.load(
+      std::memory_order_acquire);
+  bool is_placeholder = creation_arguments.pipeline->second.is_placeholder.load(
+      std::memory_order_acquire);
+  bool creating_placeholder = fragment_shader_override != VK_NULL_HANDLE;
+
+  if (existing_pipeline != VK_NULL_HANDLE) {
+    if (!is_placeholder || creating_placeholder) {
+      // Already have a real pipeline, or trying to create another placeholder.
+      return true;
+    }
+    // Have a placeholder, and we're creating the real pipeline to replace it.
   }
 
   // This function preferably should validate the description to prevent
@@ -1869,7 +2163,11 @@ bool VulkanPipelineCache::EnsurePipelineCreated(
   shader_stage_fragment.module = VK_NULL_HANDLE;
   shader_stage_fragment.pName = "main";
   shader_stage_fragment.pSpecializationInfo = nullptr;
-  if (creation_arguments.pixel_shader) {
+  // ax360e backport: if fragment_shader_override is set, use it instead of
+  // the real pixel shader (for placeholder pipelines).
+  if (fragment_shader_override != VK_NULL_HANDLE) {
+    shader_stage_fragment.module = fragment_shader_override;
+  } else if (creation_arguments.pixel_shader) {
     assert_true(creation_arguments.pixel_shader->is_translated());
     if (!creation_arguments.pixel_shader->is_valid()) {
       return false;
@@ -2200,7 +2498,32 @@ bool VulkanPipelineCache::EnsurePipelineCreated(
     } */
     return false;
   }
-  creation_arguments.pipeline->second.pipeline = pipeline;
+
+  // ax360e backport: store the new pipeline, handling placeholder hot-swap.
+  // If we're replacing a placeholder with the real pipeline, queue the old
+  // placeholder for deferred destruction (after GPU finishes with it).
+  VkPipeline old_pipeline =
+      creation_arguments.pipeline->second.pipeline.exchange(
+          pipeline, std::memory_order_acq_rel);
+
+  if (old_pipeline != VK_NULL_HANDLE) {
+    // We're replacing a placeholder pipeline with the real one.
+    // Queue the old placeholder for deferred destruction, recording the
+    // current submission number so we only destroy after the GPU is done.
+    uint64_t current_submission = command_processor_.GetCurrentSubmission();
+    {
+      std::lock_guard<std::mutex> lock(deferred_destroy_mutex_);
+      deferred_destroy_pipelines_.emplace_back(old_pipeline,
+                                               current_submission);
+    }
+  }
+
+  // Mark as no longer a placeholder (for the case where we just created real).
+  if (!creating_placeholder) {
+    creation_arguments.pipeline->second.is_placeholder.store(
+        false, std::memory_order_release);
+  }
+
   return true;
 }
 

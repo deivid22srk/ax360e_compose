@@ -10,15 +10,21 @@
 #ifndef XENIA_GPU_VULKAN_VULKAN_PIPELINE_STATE_CACHE_H_
 #define XENIA_GPU_VULKAN_VULKAN_PIPELINE_STATE_CACHE_H_
 
+#include <atomic>
+#include <condition_variable>
 #include <cstddef>
 #include <cstring>
 #include <functional>
 #include <memory>
+#include <mutex>
+#include <queue>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "xenia/base/hash.h"
 #include "xenia/base/platform.h"
+#include "xenia/base/threading.h"
 #include "xenia/base/xxhash.h"
 #include "xenia/gpu/primitive_processor.h"
 #include "xenia/gpu/register_file.h"
@@ -50,6 +56,45 @@ class VulkanPipelineCache {
     PipelineLayoutProvider() = default;
   };
 
+  // ax360e backport: Pipeline struct with atomic pipeline handle so it can be
+  // swapped safely from creation threads while the GPU thread reads it.
+  // The is_placeholder flag indicates the current pipeline uses the
+  // placeholder pixel shader (real pipeline still compiling in background).
+  struct Pipeline {
+    std::atomic<VkPipeline> pipeline{VK_NULL_HANDLE};
+    // The layouts are owned by the VulkanCommandProcessor, and must not be
+    // destroyed by it while the pipeline cache is active.
+    const PipelineLayoutProvider* pipeline_layout;
+
+    // Placeholder pipeline support for reduced stutter.
+    // When true, the current pipeline uses a placeholder pixel shader and
+    // the real pipeline is being compiled in the background.
+    std::atomic<bool> is_placeholder{false};
+
+    Pipeline(const PipelineLayoutProvider* pipeline_layout_provider)
+        : pipeline_layout(pipeline_layout_provider) {}
+
+    // Copy constructor needed for unordered_map
+    Pipeline(const Pipeline& other)
+        : pipeline(other.pipeline.load(std::memory_order_acquire)),
+          pipeline_layout(other.pipeline_layout),
+          is_placeholder(other.is_placeholder.load(std::memory_order_acquire)) {
+    }
+
+    // Move constructor
+    Pipeline(Pipeline&& other) noexcept
+        : pipeline(other.pipeline.load(std::memory_order_acquire)),
+          pipeline_layout(other.pipeline_layout),
+          is_placeholder(other.is_placeholder.load(std::memory_order_acquire)) {
+    }
+
+    // Deleted copy assignment to prevent accidental copying
+    Pipeline& operator=(const Pipeline&) = delete;
+
+    // Deleted move assignment
+    Pipeline& operator=(Pipeline&&) = delete;
+  };
+
   VulkanPipelineCache(VulkanCommandProcessor& command_processor,
                       const RegisterFile& register_file,
                       VulkanRenderTargetCache& render_target_cache,
@@ -58,6 +103,13 @@ class VulkanPipelineCache {
 
   bool Initialize();
   void Shutdown();
+
+  // ax360e backport: async pipeline creation API.
+  // EndSubmission blocks until all queued pipelines have been created.
+  // IsCreatingPipelines returns true if there are pending or in-progress
+  // pipeline creations.
+  void EndSubmission();
+  bool IsCreatingPipelines();
 
   // Vulkan driver pipeline cache (in-session). Passed to
   // vkCreateGraphicsPipelines so the driver can reuse compiled PSOs within
@@ -82,7 +134,9 @@ class VulkanPipelineCache {
 
   bool EnsureShadersTranslated(VulkanShader::VulkanTranslation* vertex_shader,
                                VulkanShader::VulkanTranslation* pixel_shader);
-  // TODO(Triang3l): Return a deferred creation handle.
+  // ax360e backport: returns Pipeline* (with atomic handle) instead of
+  // VkPipeline + layout pair, so the caller can re-load the handle if a
+  // placeholder is swapped for the real pipeline mid-submission.
   bool ConfigurePipeline(
       VulkanShader::VulkanTranslation* vertex_shader,
       VulkanShader::VulkanTranslation* pixel_shader,
@@ -90,8 +144,7 @@ class VulkanPipelineCache {
       reg::RB_DEPTHCONTROL normalized_depth_control,
       uint32_t normalized_color_mask,
       VulkanRenderTargetCache::RenderPassKey render_pass_key,
-      VkPipeline& pipeline_out,
-      const PipelineLayoutProvider*& pipeline_layout_out);
+      Pipeline** pipeline_out);
 
  private:
   enum class PipelineGeometryShader : uint32_t {
@@ -204,23 +257,28 @@ class VulkanPipelineCache {
     };
   });
 
-  struct Pipeline {
-    VkPipeline pipeline = VK_NULL_HANDLE;
-    // The layouts are owned by the VulkanCommandProcessor, and must not be
-    // destroyed by it while the pipeline cache is active.
-    const PipelineLayoutProvider* pipeline_layout;
-    Pipeline(const PipelineLayoutProvider* pipeline_layout_provider)
-        : pipeline_layout(pipeline_layout_provider) {}
-  };
+  // ax360e backport: Pipeline struct was moved to public section above
+  // (with atomic pipeline handle for async hot-swap).
 
   // Description that can be passed from the command processor thread to the
   // creation threads, with everything needed from caches pre-looked-up.
   struct PipelineCreationArguments {
     std::pair<const PipelineDescription, Pipeline>* pipeline;
-    const VulkanShader::VulkanTranslation* vertex_shader;
-    const VulkanShader::VulkanTranslation* pixel_shader;
+    VulkanShader::VulkanTranslation* vertex_shader;
+    VulkanShader::VulkanTranslation* pixel_shader;
     VkShaderModule geometry_shader;
     VkRenderPass render_pass;
+    // Priority for async compilation (higher = compiled sooner).
+    // Pipelines that write to visible render targets get higher priority.
+    uint8_t priority = 0;
+  };
+
+  // Comparator for priority queue - higher priority first.
+  struct PipelineCreationPriorityCompare {
+    bool operator()(const PipelineCreationArguments& a,
+                    const PipelineCreationArguments& b) const {
+      return a.priority < b.priority;  // max-heap: lower priority at bottom
+    }
   };
 
   union GeometryShaderKey {
@@ -279,8 +337,18 @@ class VulkanPipelineCache {
   // Can be called from creation threads - all needed data must be fully set up
   // at the point of the call: shaders must be translated, pipeline layout and
   // render pass objects must be available.
+  // ax360e backport: fragment_shader_override, when not VK_NULL_HANDLE, is used
+  // instead of creation_arguments.pixel_shader (for placeholder pipelines).
   bool EnsurePipelineCreated(
-      const PipelineCreationArguments& creation_arguments);
+      const PipelineCreationArguments& creation_arguments,
+      VkShaderModule fragment_shader_override = VK_NULL_HANDLE);
+
+  // Creates a placeholder pipeline using the placeholder pixel shader.
+  // Used for pipeline hot-swap to reduce stutter.
+  bool EnsurePipelineCreatedWithPlaceholder(
+      const PipelineCreationArguments& creation_arguments) {
+    return EnsurePipelineCreated(creation_arguments, placeholder_pixel_shader_);
+  }
 
   VulkanCommandProcessor& command_processor_;
   const RegisterFile& register_file_;
@@ -322,16 +390,45 @@ class VulkanPipelineCache {
   // shader interlock when no Xenos pixel shader provided.
   VkShaderModule depth_only_fragment_shader_ = VK_NULL_HANDLE;
 
+  // ax360e backport: placeholder pixel shader for pipeline hot-swap to reduce
+  // stutter. Outputs transparent black while the real shader compiles in
+  // background.
+  VkShaderModule placeholder_pixel_shader_ = VK_NULL_HANDLE;
+
   std::unordered_map<PipelineDescription, Pipeline, PipelineDescription::Hasher>
       pipelines_;
 
   // Previously used pipeline, to avoid lookups if the state wasn't changed.
-  const std::pair<const PipelineDescription, Pipeline>* last_pipeline_ =
-      nullptr;
+  std::pair<const PipelineDescription, Pipeline>* last_pipeline_ = nullptr;
 
   // Driver-side VkPipelineCache. In-memory for the process lifetime; avoids
   // recompiling identical graphics PSOs mid-session (major stutter source).
   VkPipelineCache vulkan_pipeline_cache_ = VK_NULL_HANDLE;
+
+  // ax360e backport: async pipeline creation infrastructure.
+  void CreationThread();
+  void ProcessDeferredDestructions();
+
+  // For asynchronous creation.
+  std::vector<std::unique_ptr<xe::threading::Thread>> creation_threads_;
+  std::atomic<bool> creation_threads_shutdown_{false};
+  std::atomic<size_t> creation_threads_busy_{0};
+  // Priority queue contains pipelines to be created. Higher priority pipelines
+  // (those writing to visible RTs) are compiled first.
+  std::priority_queue<PipelineCreationArguments,
+                      std::vector<PipelineCreationArguments>,
+                      PipelineCreationPriorityCompare>
+      creation_queue_;
+  std::mutex creation_request_lock_;
+  std::condition_variable creation_request_cond_;
+  std::unique_ptr<xe::threading::Event> creation_completion_event_ = nullptr;
+  std::atomic<bool> creation_completion_set_event_{false};
+
+  // Deferred destruction of replaced placeholder pipelines.
+  // Pipelines are only destroyed after the GPU submission that might reference
+  // them has completed (tracked via submission numbers from command processor).
+  std::vector<std::pair<VkPipeline, uint64_t>> deferred_destroy_pipelines_;
+  std::mutex deferred_destroy_mutex_;
 };
 
 }  // namespace vulkan

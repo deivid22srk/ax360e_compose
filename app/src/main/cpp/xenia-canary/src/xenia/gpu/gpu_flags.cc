@@ -70,3 +70,24 @@ DEFINE_int32(
     "Set to higher number than query_occlusion_sample_lower_threshold. This "
     "value is ignored if query_occlusion_sample_lower_threshold is set to -1.",
     "GPU");
+
+// ax360e backport of upstream commit 5845f343 (async shader compilation).
+DEFINE_bool(
+    async_shader_compilation, true,
+    "Compile shaders and create pipelines asynchronously in background "
+    "threads. "
+    "Eliminates shader compilation stutter but may cause brief rendering "
+    "artifacts while pipelines are being created. When disabled, pipelines are "
+    "created synchronously which causes stutter but no visual artifacts.",
+    "GPU");
+
+// ax360e backport of upstream commit ccf8fb66 (thread pool for shader
+// compilation). Number of background threads used to compile pipelines when
+// async_shader_compilation is enabled.
+DEFINE_int32(
+    vulkan_pipeline_creation_threads, -1,
+    "Number of threads used for graphics pipeline creation. -1 to calculate "
+    "automatically (75% of logical CPU cores), a positive number to specify "
+    "the number of threads explicitly (up to the number of logical CPU cores), "
+    "0 to disable multithreaded pipeline creation.",
+    "Vulkan");
