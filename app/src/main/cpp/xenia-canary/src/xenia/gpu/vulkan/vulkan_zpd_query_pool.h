@@ -45,12 +45,19 @@ class VulkanZPDQueryPool {
   VulkanZPDQueryPool() = default;
   VulkanZPDQueryPool(const VulkanZPDQueryPool&) = delete;
   VulkanZPDQueryPool& operator=(const VulkanZPDQueryPool&) = delete;
-  ~VulkanZPDQueryPool() { Shutdown(); }
+  // ax360e: destructor is default (no Shutdown call) because the .cc
+  // implementation was excluded from the build (it references VulkanDevice
+  // members like vkCreateQueryPool that don't exist in this fork yet).
+  // The stubs in VulkanCommandProcessor never create the pool, so Shutdown
+  // would never be called anyway. When the real backend is implemented,
+  // restore ~VulkanZPDQueryPool() { Shutdown(); } and re-add the .cc.
+  ~VulkanZPDQueryPool() = default;
 
   bool EnsureInitialized(const ui::vulkan::VulkanDevice* vulkan_device,
                          uint32_t requested_capacity, bool can_recreate,
                          bool initialize_fsi_counter = false);
-  void Shutdown();
+  // ax360e: Shutdown is inline stub (real impl was in the excluded .cc).
+  void Shutdown() {}
 
   bool fbo_initialized() const {
     return query_pool_ != VK_NULL_HANDLE &&
