@@ -125,7 +125,14 @@ ZPDMode GetZPDMode() {
 }
 
 void SetZPDMode(const std::string& mode) {
-  OVERRIDE_string(occlusion_query, mode);
+  // ax360e: can't use OVERRIDE_string(occlusion_query, mode) here because
+  // occlusion_query is DEFINE_string'd in gpu_flags.cc (different TU), and
+  // the cv::cv_occlusion_query pointer is static (not visible across TUs).
+  // Instead, set the cvars::occlusion_query value directly. The ConfigVar
+  // override mechanism is only needed for runtime config updates that
+  // propagate to disk; for in-memory mode changes, direct assignment is
+  // sufficient.
+  cvars::occlusion_query = mode;
 }
 
 using namespace xe::gpu::xenos;
