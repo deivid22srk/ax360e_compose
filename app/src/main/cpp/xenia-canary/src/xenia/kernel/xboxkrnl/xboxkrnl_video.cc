@@ -428,12 +428,41 @@ DECLARE_XBOXKRNL_EXPORT2(VdPersistDisplay, kVideo, kImplemented, kSketchy);
 dword_result_t VdRetrainEDRAMWorker_entry(unknown_t unk0) { return 0; }
 DECLARE_XBOXKRNL_EXPORT1(VdRetrainEDRAMWorker, kVideo, kStub);
 
-dword_result_t VdRetrainEDRAM_entry(unknown_t unk0, unknown_t unk1,
-                                    unknown_t unk2, unknown_t unk3,
-                                    unknown_t unk4, unknown_t unk5) {
-  return 0;
+// ax360e fix: VdRetrainEDRAM was a stub returning 0 without filling output
+// parameters. Far Cry 2 (and possibly other titles) call this per-frame and
+// expect unk3 (a pointer) to be filled with a status value. When the stub
+// returns 0 without writing anything, the game loops forever waiting for a
+// non-zero status, never calling VdSwap — resulting in a black screen with
+// the game running (audio, threads, texture loading all active).
+//
+// On the real Xbox 360, VdRetrainEDRAM "trains" the EDRAM memory (refreshes
+// it to prevent data loss) and writes a success status to the output pointer.
+// We don't have real EDRAM to train, but we can write a success status to
+// satisfy the game's polling loop.
+//
+// unk0: 0 = per-frame retrain, 1 = init
+// unk1: pointer to training buffer (input)
+// unk2: size of training buffer
+// unk3: pointer to output status (game polls this)
+// unk4: pointer to secondary output (base address or offset)
+// unk5: size for secondary output
+dword_result_t VdRetrainEDRAM_entry(unknown_t unk0, lpvoid_t unk1,
+                                    dword_t unk2, lpdword_t unk3,
+                                    lpdword_t unk4, dword_t unk5) {
+  // Write success status to unk3 (the game polls this).
+  // Status 1 = success (EDRAM training complete).
+  if (unk3) {
+    *unk3 = 1;
+  }
+  // Write a base address to unk4. On real hardware this would be the
+  // EDRAM base address from the training result. Writing 0 is safe
+  // since the game uses it as an offset, not a boolean.
+  if (unk4) {
+    *unk4 = 0;
+  }
+  return 1;
 }
-DECLARE_XBOXKRNL_EXPORT1(VdRetrainEDRAM, kVideo, kStub);
+DECLARE_XBOXKRNL_EXPORT1(VdRetrainEDRAM, kVideo, kImplemented);
 
 void VdSwap_entry(
     lpvoid_t buffer_ptr,        // ptr into primary ringbuffer
