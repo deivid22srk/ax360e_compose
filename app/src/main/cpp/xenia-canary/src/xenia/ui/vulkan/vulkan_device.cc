@@ -627,6 +627,15 @@ std::unique_ptr<VulkanDevice> VulkanDevice::CreateIfSupported(
   if (properties.apiVersion >= VK_MAKE_API_VERSION(0, 1, 2, 0)) {
     if (with_gpu_emulation) {
       XE_UI_VULKAN_FEATURE_2(features_1_2, samplerMirrorClampToEdge);
+      // ax360e backport: enable uniformBufferStandardLayout and scalarBlockLayout
+      // from Vulkan 1.2. These are critical for correct shader behavior on
+      // Vulkan 1.2+ drivers (like Turnip/Mesa). Without them, the SPIR-V
+      // translator generates shaders with std140 layout assumptions that may
+      // not match the driver's actual buffer layout, causing black screen /
+      // garbled rendering on Turnip. The Qualcomm blob (Vulkan 1.1) doesn't
+      // support these, so shaders are compiled conservatively and work.
+      XE_UI_VULKAN_FEATURE_2(features_1_2, uniformBufferStandardLayout);
+      XE_UI_VULKAN_FEATURE_2(features_1_2, scalarBlockLayout);
     }
   } else {
     if (ext_1_2_KHR_sampler_mirror_clamp_to_edge) {
