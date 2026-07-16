@@ -1031,8 +1031,28 @@ bool COMMAND_PROCESSOR::ExecutePacketType3_EVENT_WRITE_ZPD(
   }
 
   // Conventional fake fallback, which only touches records marked as pending.
-  if (cvars::occlusion_query_fake_lower_threshold < 0 || !report_record_base ||
-      !guest_marks_end) {
+  // ax360e fix: the old code ALWAYS memset'd the record to 0 before checking
+  // for end conditions. The new code skipped this for BEGIN records (which
+  // don't have guest_marks_end), leaving the sentinel (0xFFFFFEED) in place.
+  // This caused games to loop forever waiting for the sentinel to be cleared
+  // — the game thinks the GPU hasn't processed the BEGIN yet.
+  //
+  // Fix: always clear the record (like the old code did) before deciding
+  // whether to write a fake result. This ensures the game sees the BEGIN
+  // was processed, even in fake fallback mode.
+  if (!report_record_base || !report) {
+    return true;
+  }
+
+  // Check for end condition BEFORE clearing (need the sentinel to detect END).
+  bool is_end = guest_marks_end;
+
+  // Always clear the record — this matches the old behavior where
+  // std::memset(pSampleCounts, 0, sizeof(xe_gpu_depth_sample_counts))
+  // was called unconditionally.
+  std::memset(report, 0, sizeof(xe_gpu_depth_sample_counts));
+
+  if (cvars::occlusion_query_fake_lower_threshold < 0 || !is_end) {
     return true;
   }
 
