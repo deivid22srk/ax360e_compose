@@ -1145,7 +1145,22 @@ bool CommandProcessor::EndZPDReport(uint32_t report_address,
 void CommandProcessor::OpenQuerySegment(bool can_close_submission) {
   if (GetZPDMode() == ZPDMode::kFake || zpd_force_fake_fallback_ ||
       !zpd_active_segment_.logical_active ||
-      !zpd_active_segment_.segment_pending_begin || !CanOpenZPDQuery()) {
+      !zpd_active_segment_.segment_pending_begin) {
+    return;
+  }
+
+  // If we can't open a real query (e.g., Vulkan ZPD pool is stubbed), set
+  // the forced fake fallback flag so all subsequent EVENT_WRITE_ZPD calls
+  // go through the conventional fake fallback path. Without this, the real
+  // query path would be taken but never accumulate samples (resulting in 0
+  // always written), causing games to think everything is occluded.
+  if (!CanOpenZPDQuery()) {
+    zpd_force_fake_fallback_ = true;
+    auto it = logical_zpd_reports_.find(zpd_active_segment_.report_handle);
+    if (it != logical_zpd_reports_.end()) {
+      logical_zpd_reports_.erase(it);
+    }
+    zpd_active_segment_ = {};
     return;
   }
 
