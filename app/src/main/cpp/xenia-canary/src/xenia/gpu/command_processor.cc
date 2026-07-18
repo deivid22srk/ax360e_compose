@@ -114,7 +114,7 @@ void SetReadbackResolveMode(const std::string& mode) {
 // ax360e backport: ZPD occlusion query mode (upstream fbd620c2 + 73945c06).
 // ax360e fix: respect zpd_force_fake_fallback_ to prevent livelock when backend
 // doesn't have real query pool support (e.g., Vulkan stub implementation).
-ZPDMode GetZPDMode(bool force_fake_fallback = false) {
+ZPDMode GetZPDMode(bool force_fake_fallback) {
   // ax360e: if backend detected no real ZPD support, force fake mode
   if (force_fake_fallback) {
     return ZPDMode::kFake;
