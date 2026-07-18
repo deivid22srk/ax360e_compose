@@ -4,10 +4,17 @@
 #include <fstream>
 #include <string>
 #include <cstring>
+#include <cerrno>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <android/log.h>
 #include <adrenotools/bcenabler.h>
 #include "gen/bcenabler_patch.h"
+
+#define TAG "adrenotools/bcenabler"
+#define LOGI(fmt, ...) __android_log_print(ANDROID_LOG_INFO,  TAG, fmt, ##__VA_ARGS__)
+#define LOGW(fmt, ...) __android_log_print(ANDROID_LOG_WARN,  TAG, fmt, ##__VA_ARGS__)
+#define LOGE(fmt, ...) __android_log_print(ANDROID_LOG_ERROR, TAG, fmt, ##__VA_ARGS__)
 
 enum adrenotools_bcn_type adrenotools_get_bcn_type(uint32_t major, uint32_t minor, uint32_t vendorId) {
     if (vendorId != 0x5143 || major != 512)
@@ -73,18 +80,24 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
 
     // Find the nearest unmapped page where we can place patch code
     void *patchPage{find_free_page(reinterpret_cast<uintptr_t>(vkGetPhysicalDeviceFormatPropertiesFn))};
-    if (!patchPage)
+    if (!patchPage) {
+        LOGE("patch_bcn: no free page near %p", vkGetPhysicalDeviceFormatPropertiesFn);
         return false;
+    }
 
     // Map patch region
     void *ptr{mmap(patchPage, getpagesize(),  PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, 0, 0)};
-    if (ptr != patchPage)
+    if (ptr != patchPage) {
+        LOGE("patch_bcn: mmap(%p) failed — likely SELinux W^X enforcement", patchPage);
         return false;
+    }
 
     // Allow reading from the blob's .text section since some devices enable ---X
     // Protect two pages just in case we happen to land on a page boundary
-    if (mprotect(align_ptr(vkGetPhysicalDeviceFormatPropertiesFn), getpagesize() * 2, PROT_WRITE | PROT_READ | PROT_EXEC))
+    if (mprotect(align_ptr(vkGetPhysicalDeviceFormatPropertiesFn), getpagesize() * 2, PROT_WRITE | PROT_READ | PROT_EXEC)) {
+        LOGE("patch_bcn: mprotect(target fn) failed (errno=%d)", errno);
         return false;
+    }
 
     // First branch in this function is targeted at the function we want to patch
     Branch *blInst{reinterpret_cast<Branch *>(vkGetPhysicalDeviceFormatPropertiesFn)};
@@ -99,6 +112,8 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
     if (blInst >= blInstEnd) {
         // No BL found within the first 1 KB of the function — newer driver
         // layout; the patch cannot be applied safely here.
+        LOGW("patch_bcn: BL signature 0x%02x not found within %zu insns of %p — newer driver layout, skipping",
+             BranchLinkSignature, kMaxBranchScanInsns, blInstStart);
         return false;
     }
 
@@ -107,8 +122,10 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
 
     // See mprotect call above
     // This time we also set PROT_WRITE so we can write our patch to the page
-    if (mprotect(align_ptr(convFormatFn), getpagesize() * 2, PROT_WRITE | PROT_READ | PROT_EXEC))
+    if (mprotect(align_ptr(convFormatFn), getpagesize() * 2, PROT_WRITE | PROT_READ | PROT_EXEC)) {
+        LOGE("patch_bcn: mprotect(convFormatFn=%p) failed (errno=%d)", convFormatFn, errno);
         return false;
+    }
 
     // This would normally set the default result to 0 (error) in the format not found case
     constexpr uint32_t ClearResultSignature{0x2a1f03e0};
@@ -123,12 +140,17 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
         // The MOV w0, wzr sentinel was not found within 16 KB of convFormatFn
         // — newer driver layout, give up rather than writing the trampoline
         // to an unrelated location.
+        LOGW("patch_bcn: ClearResultSignature 0x%08x not found within %zu insns of %p — newer driver layout, skipping",
+             ClearResultSignature, kMaxClearResultScanInsns, convFormatFn);
         return false;
     }
 
     // Ensure we don't write out of bounds
-    if (PatchRawData_size > getpagesize())
+    if (PatchRawData_size > getpagesize()) {
+        LOGE("patch_bcn: PatchRawData_size=%zu > page=%d — patch payload too big",
+             PatchRawData_size, getpagesize());
         return false;
+    }
 
     // Copy the patch function to our mapped page
     memcpy(patchPage, PatchRawData, PatchRawData_size);
@@ -164,5 +186,7 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
     asm volatile("ISB");
 
     // Done!
+    LOGI("patch_bcn: applied BCn patch — trampoline at %p, target=%p, convFormatFn=%p",
+         patchPage, vkGetPhysicalDeviceFormatPropertiesFn, convFormatFn);
     return true;
 }

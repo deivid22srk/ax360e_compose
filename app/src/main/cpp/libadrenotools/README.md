@@ -10,6 +10,28 @@ Arm64
 
 Please create an issue if support for anything else is desired.
 
+#### ax360e additions
+
+This fork is based on upstream `bylaws/libadrenotools` (commit `8fae8ce`) and
+adds the following:
+
+- **`adrenotools_set_freedreno_env(varName, value)`** — sets a Freedreno/Turnip
+  environment variable (e.g. `TU_DEBUG`, `FD_RD_DUMP`, `MESA_DEBUG`) before the
+  driver is loaded. Must be called before `adrenotools_open_libvulkan()`. The
+  function verifies that the env var was actually applied (some Android
+  variants silently fail `setenv` when called too early in static init).
+- **Bounded pattern scans in `adrenotools_patch_bcn`** — the upstream scans
+  (`while (... != sig) ptr++`) are unbounded and can walk into unrelated
+  driver code on newer Adreno 619 driver layouts (e.g. Qualcomm BLOB
+  minor=530). The bounded version returns `false` instead of writing the
+  trampoline to a coincidental match — fixing a silent failure where
+  `adrenotools_patch_bcn` returned `true` but `BC1 optimalTilingFeatures`
+  stayed `0x0` (manifested as black textures in Far Cry 2).
+- **Structured logcat output** under the `adrenotools`, `adrenotools/bcenabler`
+  and `hook_impl` tags. Every fall-back path and pattern-scan failure now
+  emits an `ANDROID_LOG_WARN` / `ANDROID_LOG_ERROR` line, making custom-driver
+  load failures much easier to diagnose.
+
 ### FAQ
 
 #### Is there an example project?

@@ -13,7 +13,9 @@
 #include "hook_impl.h"
 
 #define TAG "hook_impl"
-#define LOGI(fmt, ...) __android_log_print(ANDROID_LOG_INFO, TAG, fmt, ##__VA_ARGS__)
+#define LOGI(fmt, ...) __android_log_print(ANDROID_LOG_INFO,  TAG, fmt, ##__VA_ARGS__)
+#define LOGW(fmt, ...) __android_log_print(ANDROID_LOG_WARN,  TAG, fmt, ##__VA_ARGS__)
+#define LOGE(fmt, ...) __android_log_print(ANDROID_LOG_ERROR, TAG, fmt, ##__VA_ARGS__)
 
 const HookImplParams *hook_params; //!< Bunch of info needed to load/patch the driver
 int (*gsl_memory_alloc_pure_sym)(uint32_t, uint32_t, void *);
@@ -26,7 +28,12 @@ using gsl_memory_alloc_pure_64_t = decltype(gsl_memory_alloc_pure_64_sym);
 using gsl_memory_free_pure_t = decltype(gsl_memory_free_pure_sym);
 
 __attribute__((visibility("default"))) void init_hook_param(const void *param) {
+    if (!param) {
+        LOGE("init_hook_param: received NULL hook_params — subsequent hooks will crash");
+        return;
+    }
     hook_params = reinterpret_cast<const HookImplParams *>(param);
+    LOGI("init_hook_param: hook params installed (featureFlags=0x%x)", static_cast<unsigned int>(hook_params->featureFlags));
 }
 
 __attribute__((visibility("default"))) void init_gsl(void *alloc, void *alloc64, void *free) {

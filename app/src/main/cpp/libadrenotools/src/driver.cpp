@@ -15,11 +15,25 @@
 #include "hook/hook_impl_params.h"
 #include <adrenotools/driver.h>
 #include <unistd.h>
+#include <cstring>
+#include <cerrno>
+#include <cstdlib>
+
+// Structured logging — surfaces adrenotools internals in logcat under the
+// "adrenotools" tag. Previously the library failed silently in several places
+// (e.g. linkernsbypass_load_status() returning false), which made debugging
+// custom-driver load failures very difficult.
+#define TAG "adrenotools"
+#define LOGI(fmt, ...) __android_log_print(ANDROID_LOG_INFO,  TAG, fmt, ##__VA_ARGS__)
+#define LOGW(fmt, ...) __android_log_print(ANDROID_LOG_WARN,  TAG, fmt, ##__VA_ARGS__)
+#define LOGE(fmt, ...) __android_log_print(ANDROID_LOG_ERROR, TAG, fmt, ##__VA_ARGS__)
 
 void *adrenotools_open_libvulkan(int dlopenFlags, int featureFlags, const char *tmpLibDir, const char *hookLibDir, const char *customDriverDir, const char *customDriverName, const char *fileRedirectDir, void **userMappingHandle) {
     // Bail out if linkernsbypass failed to load, this probably means we're on api < 28
-    if (!linkernsbypass_load_status())
+    if (!linkernsbypass_load_status()) {
+        LOGE("adrenotools_open_libvulkan: linkernsbypass_load_status() failed (likely Android < 28)");
         return nullptr;
+    }
 
     // Always use memfd on Q+ since it's guaranteed to work
     if (android_get_device_api_level() >= 29)
@@ -202,9 +216,42 @@ void adrenotools_set_turbo(bool turbo) {
     };
 
     int kgslFd{open("/dev/kgsl-3d0", O_RDWR)};
-    if (kgslFd < 0)
+    if (kgslFd < 0) {
+        LOGW("adrenotools_set_turbo: failed to open /dev/kgsl-3d0 (errno=%d)", errno);
         return;
+    }
 
-    ioctl(kgslFd, IOCTL_KGSL_SETPROPERTY, &prop);
-    close (kgslFd);
+    if (ioctl(kgslFd, IOCTL_KGSL_SETPROPERTY, &prop) < 0) {
+        LOGW("adrenotools_set_turbo: IOCTL_KGSL_SETPROPERTY failed (errno=%d)", errno);
+    } else {
+        LOGI("adrenotools_set_turbo: turbo=%s", turbo ? "ON" : "OFF");
+    }
+    close(kgslFd);
+}
+
+bool adrenotools_set_freedreno_env(const char *varName, const char *value) {
+    if (!varName || !value || std::strlen(varName) == 0) {
+        LOGE("adrenotools_set_freedreno_env: rejected null/empty varName or value");
+        return false;
+    }
+
+    // setenv with overwrite=1 so the caller can re-configure across runs.
+    int result = setenv(varName, value, 1);
+    if (result != 0) {
+        LOGE("adrenotools_set_freedreno_env: setenv('%s','%s') failed (errno=%d)",
+             varName, value, errno);
+        return false;
+    }
+
+    // Verify the env var actually took effect — on some Android variants
+    // setenv() can silently fail when called from a static init context.
+    const char *verifyValue = std::getenv(varName);
+    if (!verifyValue || std::strcmp(verifyValue, value) != 0) {
+        LOGE("adrenotools_set_freedreno_env: verification failed for '%s' (got '%s')",
+             varName, verifyValue ? verifyValue : "(null)");
+        return false;
+    }
+
+    LOGI("adrenotools_set_freedreno_env: %s=%s", varName, value);
+    return true;
 }
