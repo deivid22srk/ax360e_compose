@@ -312,6 +312,16 @@ fun EmulatorSettingsScreen(
 
         // Search bar shown on the root level (and inside sections when advancedMode is on).
         val showSearchBar = currentScreen.isEmpty() || isSearching
+        // Pre-compute the (possibly filtered) entries and search results in the
+        // composable scope — remember() can't be called inside LazyColumn's
+        // LazyListScope because that scope is not @Composable.
+        val q = if (isSearching) searchQuery else null
+        val entries = remember(currentScreen, refreshToken, advancedMode, q) {
+            SettingsTree.getEntriesFiltered(currentScreen, advancedMode, q)
+        }
+        val searchResults = remember(searchQuery, refreshToken) {
+            if (isSearching) SettingsTree.search(searchQuery) else emptyList()
+        }
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -342,16 +352,8 @@ fun EmulatorSettingsScreen(
                 }
             }
 
-            val q = if (isSearching) searchQuery else null
-            val entries = remember(currentScreen, refreshToken, advancedMode, q) {
-                SettingsTree.getEntriesFiltered(currentScreen, advancedMode, q)
-            }
-
             if (isSearching) {
                 // Flat search results across all sections
-                val searchResults = remember(searchQuery, refreshToken) {
-                    SettingsTree.search(searchQuery)
-                }
                 if (searchResults.isEmpty()) {
                     item {
                         Box(
