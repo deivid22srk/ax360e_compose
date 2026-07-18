@@ -62,7 +62,12 @@ fun AboutScreen(onBack: (() -> Unit)? = null) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.about)) },
+                title = {
+                    Text(
+                        stringResource(R.string.about),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
                 navigationIcon = {
                     if (onBack != null) {
                         IconButton(onClick = onBack) {
@@ -71,7 +76,7 @@ fun AboutScreen(onBack: (() -> Unit)? = null) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -84,6 +89,7 @@ fun AboutScreen(onBack: (() -> Unit)? = null) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Hero card with brand identity
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -94,12 +100,12 @@ fun AboutScreen(onBack: (() -> Unit)? = null) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(28.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(72.dp)
+                            .size(80.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
@@ -108,24 +114,26 @@ fun AboutScreen(onBack: (() -> Unit)? = null) {
                             Icons.Default.SportsEsports,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(44.dp)
                         )
                     }
                     Spacer(Modifier.height(16.dp))
                     Text(
                         text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
+                    Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "0.15-compose · Material You",
+                        text = "v${context.getString(R.string.app_version)} · Material You",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                     )
                 }
             }
 
+            // Action chips — Gratitude / Update log / Licenses
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -250,5 +258,11 @@ private fun getUpdateLog(): String {
          * Navigation drawer + game grid library
          * Preference-style settings components
          * Pull-to-refresh game list
+
+        0.17-compose (2026-07)
+         * Material You dynamic color (Android 12+)
+         * Grouped preference cards (M3 spec)
+         * Simplified settings: search + Advanced toggle
+         * Smoother motion + press feedback
     """.trimIndent()
 }

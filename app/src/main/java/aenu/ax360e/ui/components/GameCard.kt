@@ -1,9 +1,12 @@
 package aenu.ax360e.ui.components
 
 import android.graphics.BitmapFactory
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,11 +20,14 @@ import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -29,18 +35,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import aenu.ax360e.ui.theme.Motion
 import aenu.ax360e.ui.model.GameItem
 
 /**
- * v2 redesign game card.
+ * Material You game card.
  *
- * Aspect ratio 3:4 (poster style). Cover art fills the entire card; a
- * gradient scrim + info overlay sits at the bottom showing the game name
- * and the storage URI tail (so the user can identify which ISO is which
- * when multiple games share a similar title).
- *
- * No elevation, no separate footer section — keeps the grid dense and
- * cinematic, matching the reference mockup.
+ * Visual pattern:
+ *  • 3:4 poster aspect ratio
+ *  • Cover art fills the card; if missing, a soft primaryContainer radial wash
+ *    with a centered gamepad icon is rendered
+ *  • A two-stop vertical gradient (transparent → surfaceContainerHigh ~0.92)
+ *    anchors the title and URI tail at the bottom
+ *  • Press feedback: subtle scale-down to 0.97 with emphasized easing, no
+ *    chroma change so the cover art stays readable
  */
 @Composable
 fun GameCard(
@@ -56,15 +64,28 @@ fun GameCard(
         }
     }
 
-    val cardShape = RoundedCornerShape(16.dp)
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.97f else 1f,
+        animationSpec = Motion.emphasized(durationMillis = Motion.DurationShort4),
+        label = "cardScale"
+    )
+
+    val cardShape = RoundedCornerShape(20.dp)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(3f / 4f)
+            .scale(scale)
             .clip(cardShape)
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            .clickable(onClick = onClick),
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),
+                onClick = onClick
+            ),
         contentAlignment = Alignment.Center
     ) {
         // Cover art / icon placeholder
@@ -76,18 +97,23 @@ fun GameCard(
                 contentScale = ContentScale.Crop
             )
         } else {
-            // Centered gamepad icon, scaled up to feel like cover art
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
+                                MaterialTheme.colorScheme.surfaceContainerHigh
+                            )
+                        )
+                    )
+            )
             Icon(
                 imageVector = Icons.Default.SportsEsports,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.85f)
-            )
-            // Subtle background tint behind the icon
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+                tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
             )
         }
 
@@ -97,12 +123,10 @@ fun GameCard(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Transparent,
-                            MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f)
-                        ),
-                        startY = 200f
+                        colorStops = arrayOf(
+                            0.55f to Color.Transparent,
+                            1.0f to MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f)
+                        )
                     )
                 )
         ) {
@@ -110,7 +134,7 @@ fun GameCard(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(14.dp),
                 verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(2.dp)
             ) {
                 Text(
@@ -124,7 +148,7 @@ fun GameCard(
                 Text(
                     text = game.uri.substringAfterLast('/').ifEmpty { game.uri },
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

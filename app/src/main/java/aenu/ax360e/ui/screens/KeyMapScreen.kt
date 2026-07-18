@@ -10,14 +10,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Gamepad
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,10 +41,12 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.preference.PreferenceManager
 import aenu.ax360e.KeyMapConfig
 import aenu.ax360e.R
+import aenu.ax360e.ui.components.preference.PreferenceGroupCard
 import aenu.ax360e.ui.components.preference.PreferenceHeader
 import aenu.ax360e.ui.components.preference.SwitchPreference
 import aenu.ax360e.ui.components.preference.ValuePreference
@@ -53,23 +56,36 @@ private data class KeyMapEntry(
     val defaultKeyCode: Int
 )
 
-private val KEY_MAP_ENTRIES = listOf(
-    KeyMapEntry(R.string.left, KeyEvent.KEYCODE_DPAD_LEFT),
-    KeyMapEntry(R.string.up, KeyEvent.KEYCODE_DPAD_UP),
-    KeyMapEntry(R.string.right, KeyEvent.KEYCODE_DPAD_RIGHT),
-    KeyMapEntry(R.string.down, KeyEvent.KEYCODE_DPAD_DOWN),
-    KeyMapEntry(R.string.a, 96),
-    KeyMapEntry(R.string.b, 97),
-    KeyMapEntry(R.string.x, 99),
-    KeyMapEntry(R.string.y, 100),
-    KeyMapEntry(R.string.back, 109),
-    KeyMapEntry(R.string.start, 108),
-    KeyMapEntry(R.string.lshoulder, 102),
-    KeyMapEntry(R.string.rshoulder, 103),
-    KeyMapEntry(R.string.lthumbpress, 104),
-    KeyMapEntry(R.string.rthumbpress, 105),
-    KeyMapEntry(R.string.ltrigger, 0),
-    KeyMapEntry(R.string.rtrigger, 0)
+/** Logical group for the rebinding list — improves scannability. */
+private enum class KeyMapGroup(val title: String) {
+    DPAD("D-pad"),
+    FACE("Face buttons (A / B / X / Y)"),
+    MENU("Menu"),
+    BUMPERS("Bumpers & Triggers"),
+    STICKS("Thumbsticks")
+}
+
+private val KEY_MAP_ENTRIES: List<Pair<KeyMapGroup, KeyMapEntry>> = listOf(
+    KeyMapGroup.DPAD to KeyMapEntry(R.string.left, KeyEvent.KEYCODE_DPAD_LEFT),
+    KeyMapGroup.DPAD to KeyMapEntry(R.string.up, KeyEvent.KEYCODE_DPAD_UP),
+    KeyMapGroup.DPAD to KeyMapEntry(R.string.right, KeyEvent.KEYCODE_DPAD_RIGHT),
+    KeyMapGroup.DPAD to KeyMapEntry(R.string.down, KeyEvent.KEYCODE_DPAD_DOWN),
+
+    KeyMapGroup.FACE to KeyMapEntry(R.string.a, 96),
+    KeyMapGroup.FACE to KeyMapEntry(R.string.b, 97),
+    KeyMapGroup.FACE to KeyMapEntry(R.string.x, 99),
+    KeyMapGroup.FACE to KeyMapEntry(R.string.y, 100),
+
+    KeyMapGroup.MENU to KeyMapEntry(R.string.back, 109),
+    KeyMapGroup.MENU to KeyMapEntry(R.string.start, 108),
+
+    KeyMapGroup.BUMPERS to KeyMapEntry(R.string.lshoulder, 102),
+    KeyMapGroup.BUMPERS to KeyMapEntry(R.string.rshoulder, 103),
+    KeyMapGroup.BUMPERS to KeyMapEntry(R.string.ltrigger, 0),
+    KeyMapGroup.BUMPERS to KeyMapEntry(R.string.rtrigger, 0),
+
+    KeyMapGroup.STICKS to KeyMapEntry(R.string.lthumbpress, 104),
+    KeyMapGroup.STICKS to KeyMapEntry(R.string.rthumbpress, 105)
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,14 +104,19 @@ fun KeyMapScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.key_mappers)) },
+                title = {
+                    Text(
+                        stringResource(R.string.key_mappers),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -113,28 +134,51 @@ fun KeyMapScreen(
                 item {
                     PreferenceHeader(text = stringResource(R.string.key_mappers))
                 }
-                itemsIndexed(KEY_MAP_ENTRIES) { index, entry ->
-                    val keyCode = keyValues[index]
-                    ValuePreference(
-                        title = stringResource(entry.nameResId),
-                        value = if (keyCode == 0) "—" else keyCode.toString(),
-                        onClick = { waitingForKeyIndex = index },
-                        subtitle = "Tap to rebind"
-                    )
+
+                // Grouped cards per category
+                KeyMapGroup.entries.forEach { group ->
+                    val groupEntries = KEY_MAP_ENTRIES.mapIndexedNotNull { idx, pair ->
+                        if (pair.first == group) idx to pair.second else null
+                    }
+                    if (groupEntries.isEmpty()) return@forEach
+
+                    item {
+                        PreferenceGroupCard {
+                            groupEntries.forEachIndexed { pos, (idx, entry) ->
+                                val keyCode = keyValues[idx]
+                                ValuePreference(
+                                    title = stringResource(entry.nameResId),
+                                    value = if (keyCode == 0) "—" else keyCode.toString(),
+                                    onClick = { waitingForKeyIndex = idx },
+                                    subtitle = "Tap to rebind",
+                                    icon = Icons.Default.Gamepad
+                                )
+                                if (pos < groupEntries.lastIndex) {
+                                    HorizontalDivider(
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
+
                 item {
                     PreferenceHeader(text = "Feedback")
                 }
                 item {
-                    SwitchPreference(
-                        title = stringResource(R.string.enable_vibrator),
-                        checked = vibratorEnabled,
-                        onCheckedChange = {
-                            vibratorEnabled = it
-                            prefs.edit().putBoolean("enable_vibrator", it).apply()
-                        },
-                        icon = Icons.Default.Vibration
-                    )
+                    PreferenceGroupCard {
+                        SwitchPreference(
+                            title = stringResource(R.string.enable_vibrator),
+                            checked = vibratorEnabled,
+                            onCheckedChange = {
+                                vibratorEnabled = it
+                                prefs.edit().putBoolean("enable_vibrator", it).apply()
+                            },
+                            icon = Icons.Default.Vibration
+                        )
+                    }
                 }
             }
 
@@ -142,7 +186,7 @@ fun KeyMapScreen(
                 onClick = {
                     val editor = prefs.edit()
                     KEY_MAP_ENTRIES.forEachIndexed { i, e ->
-                        editor.putInt(KeyMapConfig.KEY_NAMEIDS[i].toString(), e.defaultKeyCode)
+                        editor.putInt(KeyMapConfig.KEY_NAMEIDS[i].toString(), e.second.defaultKeyCode)
                     }
                     editor.apply()
                     keyValues = loadKeyValues(prefs)

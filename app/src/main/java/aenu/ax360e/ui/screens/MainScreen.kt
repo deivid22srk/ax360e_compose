@@ -4,6 +4,9 @@ import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,12 +33,14 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,7 +56,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,6 +64,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -86,23 +91,22 @@ private data class DrawerDestination(
     val onClick: () -> Unit
 )
 
+private data class DrawerSection(
+    val title: String,
+    val items: List<DrawerDestination>
+)
+
 /**
- * v2 redesign main screen.
+ * Material You main screen.
  *
- * Layout reference: pastebin kSG9hRBW (game library) + WPDn4NM8 (drawer open).
- *
- * Structure:
- *  - CenterAlignedTopAppBar with semi-transparent surface + blur (scrolledContainerColor)
- *  - ModalNavigationDrawer with avatar header (Player 1 / Xbox Live Gold) +
- *    version footer, items use the rounded-pill selected style from the mock
- *  - LazyVerticalGrid with adaptive columns (min 150.dp) so we get 2 cols on
- *    phones, 3-4 on tablets, 5-6 on landscape tablets
- *  - FAB bottom-right with rounded-square shape (matches mockup, not the
- *    default circular FAB)
- *
- * All existing functionality is preserved: drawer destinations, refresh,
- * pull-to-refresh, FAB sets game dir, empty state with secondary action,
- * error display.
+ * Layout:
+ *  • CenterAlignedTopAppBar (semi-transparent + scrolledContainerColor)
+ *  • ModalNavigationDrawer with gradient header (Xenon360 / Xbox 360 · M3),
+ *    grouped destinations (Library / Configuration / System), and a
+ *    version footer.
+ *  • LazyVerticalGrid adaptive columns (min 150.dp): 2 cols phones,
+ *    3-4 tablets, 5-6 landscape tablets.
+ *  • ExtendedFloatingActionButton so the action label is always visible.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,7 +120,7 @@ fun MainScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val pullRefreshState = rememberPullToRefreshState()
+    val pullRefreshState = androidx.compose.material3.pulltorefresh.rememberPullToRefreshState()
 
     val openDirLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -159,79 +163,101 @@ fun MainScreen() {
         scope.launch { drawerState.close() }
     }
 
-    val destinations = listOf(
-        DrawerDestination(
-            label = stringResource(R.string.set_game_dir),
-            icon = Icons.Default.FolderOpen,
-            onClick = { closeDrawerThen { openDirLauncher.launch(null) } }
-        ),
-        DrawerDestination(
-            label = stringResource(R.string.settings),
-            icon = Icons.Default.Settings,
-            onClick = {
-                closeDrawerThen {
-                    context.startActivity(Intent(context, EmulatorSettings::class.java))
-                }
-            }
-        ),
-        DrawerDestination(
-            label = stringResource(R.string.key_mappers),
-            icon = Icons.Default.Gamepad,
-            onClick = {
-                closeDrawerThen {
-                    context.startActivity(Intent(context, KeyMapActivity::class.java))
-                }
-            }
-        ),
-        DrawerDestination(
-            label = stringResource(R.string.virtual_pad_edit),
-            icon = Icons.Default.Create,
-            onClick = {
-                closeDrawerThen {
-                    context.startActivity(Intent(context, VirtualControlEdit::class.java))
-                }
-            }
-        ),
-        DrawerDestination(
-            label = stringResource(R.string.open_file_manager),
-            icon = Icons.Default.FolderOpen,
-            onClick = { closeDrawerThen { openFileManager() } }
-        ),
-        DrawerDestination(
-            label = "Emulator Logs",
-            icon = Icons.Default.Description,
-            onClick = {
-                closeDrawerThen {
-                    context.startActivity(Intent(context, LogViewerActivity::class.java))
-                }
-            }
-        ),
-        DrawerDestination(
-            label = "AI Remote Control",
-            icon = Icons.Default.Settings,
-            onClick = {
-                closeDrawerThen {
-                    context.startActivity(Intent(context, AiRemoteControlActivity::class.java))
-                }
-            }
-        ),
-        DrawerDestination(
-            label = stringResource(R.string.about),
-            icon = Icons.Default.Info,
-            onClick = {
-                closeDrawerThen {
-                    context.startActivity(Intent(context, AboutActivity::class.java))
-                }
-            }
+    val sections = remember(context) {
+        listOf(
+            DrawerSection(
+                title = "Library",
+                items = listOf(
+                    DrawerDestination(
+                        label = context.getString(R.string.set_game_dir),
+                        icon = Icons.Default.FolderOpen,
+                        onClick = { closeDrawerThen { openDirLauncher.launch(null) } }
+                    ),
+                    DrawerDestination(
+                        label = context.getString(R.string.open_file_manager),
+                        icon = Icons.Default.Storage,
+                        onClick = { closeDrawerThen { openFileManager() } }
+                    ),
+                    DrawerDestination(
+                        label = context.getString(R.string.refresh_list),
+                        icon = Icons.Default.Refresh,
+                        onClick = { closeDrawerThen { viewModel.refresh() } }
+                    )
+                )
+            ),
+            DrawerSection(
+                title = "Configuration",
+                items = listOf(
+                    DrawerDestination(
+                        label = context.getString(R.string.settings),
+                        icon = Icons.Default.Settings,
+                        onClick = {
+                            closeDrawerThen {
+                                context.startActivity(Intent(context, EmulatorSettings::class.java))
+                            }
+                        }
+                    ),
+                    DrawerDestination(
+                        label = context.getString(R.string.key_mappers),
+                        icon = Icons.Default.Gamepad,
+                        onClick = {
+                            closeDrawerThen {
+                                context.startActivity(Intent(context, KeyMapActivity::class.java))
+                            }
+                        }
+                    ),
+                    DrawerDestination(
+                        label = context.getString(R.string.virtual_pad_edit),
+                        icon = Icons.Default.Create,
+                        onClick = {
+                            closeDrawerThen {
+                                context.startActivity(Intent(context, VirtualControlEdit::class.java))
+                            }
+                        }
+                    )
+                )
+            ),
+            DrawerSection(
+                title = "System",
+                items = listOf(
+                    DrawerDestination(
+                        label = "Emulator Logs",
+                        icon = Icons.Default.Description,
+                        onClick = {
+                            closeDrawerThen {
+                                context.startActivity(Intent(context, LogViewerActivity::class.java))
+                            }
+                        }
+                    ),
+                    DrawerDestination(
+                        label = "AI Remote Control",
+                        icon = Icons.Default.SmartToy,
+                        onClick = {
+                            closeDrawerThen {
+                                context.startActivity(Intent(context, AiRemoteControlActivity::class.java))
+                            }
+                        }
+                    ),
+                    DrawerDestination(
+                        label = context.getString(R.string.about),
+                        icon = Icons.Default.Info,
+                        onClick = {
+                            closeDrawerThen {
+                                context.startActivity(Intent(context, AboutActivity::class.java))
+                            }
+                        }
+                    )
+                )
+            )
         )
-    )
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
                 drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                drawerShape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)
+                drawerShape = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -239,85 +265,107 @@ fun MainScreen() {
                         .verticalScroll(rememberScrollState())
                         .padding(bottom = 24.dp)
                 ) {
-                    // Avatar header — matches the mockup's "Player 1 / Xbox Live Gold"
+                    // Gradient hero header — Xenon360 brand mark with halo
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        MaterialTheme.colorScheme.primaryContainer,
+                                        MaterialTheme.colorScheme.surfaceContainerLow
+                                    )
+                                )
+                            )
                             .padding(horizontal = 24.dp, vertical = 28.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(48.dp)
-                                .clip(RoundedCornerShape(24.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                .size(56.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(MaterialTheme.colorScheme.primary),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.SportsEsports,
                                 contentDescription = null,
-                                modifier = Modifier.size(28.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                modifier = Modifier.size(32.dp),
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         Spacer(Modifier.height(16.dp))
                         Text(
                             text = "Xenon360",
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
                             text = "Xbox 360 · Material You",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         )
                     }
 
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-                    )
-
-                    destinations.forEach { dest ->
-                        NavigationDrawerItem(
-                            label = {
-                                Text(
-                                    text = dest.label,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            },
-                            selected = false,
-                            onClick = dest.onClick,
-                            icon = {
-                                Icon(
-                                    dest.icon,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            },
-                            modifier = Modifier
-                                .padding(NavigationDrawerItemDefaults.ItemPadding)
-                                .padding(vertical = 2.dp),
-                            shape = RoundedCornerShape(28.dp),
-                            colors = NavigationDrawerItemDefaults.colors(
-                                unselectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                                unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurface,
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    sections.forEachIndexed { index, section ->
+                        Text(
+                            text = section.title.uppercase(),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(
+                                start = 24.dp,
+                                top = if (index == 0) 16.dp else 20.dp,
+                                end = 24.dp,
+                                bottom = 8.dp
                             )
                         )
+                        section.items.forEach { dest ->
+                            NavigationDrawerItem(
+                                label = {
+                                    Text(
+                                        text = dest.label,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
+                                selected = false,
+                                onClick = dest.onClick,
+                                icon = {
+                                    Icon(
+                                        dest.icon,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                },
+                                modifier = Modifier
+                                    .padding(NavigationDrawerItemDefaults.ItemPadding)
+                                    .padding(vertical = 2.dp),
+                                shape = RoundedCornerShape(28.dp),
+                                colors = NavigationDrawerItemDefaults.colors(
+                                    unselectedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            )
+                        }
+                        if (index < sections.lastIndex) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                            )
+                        }
                     }
 
                     Spacer(Modifier.weight(1f))
                     Text(
-                        text = "v${stringResource(R.string.app_version)}",
+                        text = "v${context.getString(R.string.app_version)}",
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                        modifier = Modifier
-                            .padding(24.dp)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(24.dp)
                     )
                 }
             }
@@ -330,8 +378,9 @@ fun MainScreen() {
                     title = {
                         Text(
                             text = "Xenon360",
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     },
                     navigationIcon = {
@@ -370,17 +419,13 @@ fun MainScreen() {
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(
+                ExtendedFloatingActionButton(
                     onClick = { openDirLauncher.launch(null) },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Icon(
-                        Icons.Default.FolderOpen,
-                        contentDescription = stringResource(R.string.set_game_dir)
-                    )
-                }
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    icon = { Icon(Icons.Default.FolderOpen, contentDescription = null) },
+                    text = { Text(stringResource(R.string.set_game_dir)) }
+                )
             }
         ) { padding ->
             PullToRefreshBox(
@@ -467,21 +512,29 @@ fun MainScreen() {
                     }
                 }
 
-                state.error?.let { err ->
+                AnimatedVisibility(
+                    visible = state.error != null,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
-                        Text(
-                            text = err,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        state.error?.let { err ->
+                            Text(
+                                text = err,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+

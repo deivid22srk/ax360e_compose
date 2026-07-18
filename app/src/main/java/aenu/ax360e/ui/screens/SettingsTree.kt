@@ -302,6 +302,120 @@ object SettingsTree {
         return current
     }
 
+    /**
+     * Keys that are surfaced by default in the simplified settings view.
+     *
+     * Everything NOT in this set is considered "Advanced" and is hidden behind
+     * the Advanced toggle. The selection reflects what a typical user would
+     * want to tune: audio backend, mute, GPU renderer, vsync, anti-aliasing,
+     * upscaling shader, custom driver, etc. Debug flags, trace dumps, memory
+     * protection overrides and CPU disassembly toggles are intentionally
+     * omitted from the essential set.
+     */
+    private val ESSENTIAL_KEYS: Set<String> = setOf(
+        // APU
+        "APU|apu",
+        "APU|mute",
+        "APU|enable_xmp",
+        "APU|xma_decoder",
+        "APU|xmp_default_volume",
+        // CPU
+        "CPU|cpu",
+        // Display
+        "Display|fullscreen",
+        "Display|postprocess_antialiasing",
+        "Display|postprocess_scaling_and_sharpening",
+        "Display|postprocess_dither",
+        // GPU
+        "GPU|gpu",
+        "GPU|vsync",
+        "GPU|async_shader_compilation",
+        "GPU|readback_resolve",
+        "GPU|render_target_path_vulkan",
+        "GPU|native_2x_msaa",
+        // General
+        "General|apply_patches",
+        "General|controller_hotkeys",
+        "General|disable_doubleclick_fullscreen",
+        // HID
+        "HID|guide_button",
+        "HID|hid",
+        // Kernel
+        "Kernel|apply_title_update",
+        "Kernel|ignore_thread_priorities",
+        "Kernel|pin_guest_threads_to_performance_cores",
+        // Storage
+        "Storage|mount_memory_unit",
+        // Video
+        "Video|avpack",
+        "Video|widescreen",
+        "Video|internal_display_resolution",
+        "Video|video_standard",
+        // Vulkan
+        "Vulkan|vulkan_lib_path",
+        "Vulkan|adrenotools_force_max_clocks",
+        "Vulkan|vulkan_pipeline_creation_threads"
+    )
+
+    fun isEssential(key: String): Boolean = key in ESSENTIAL_KEYS
+
+    /**
+     * Returns the entries for the given path, filtered by the user's "show
+     * advanced" preference. When `advancedMode` is false, leaf entries whose
+     * key is not in [ESSENTIAL_KEYS] are dropped. Sections are always kept as
+     * long as they have at least one visible entry (so navigation still works).
+     */
+    fun getEntriesFiltered(
+        path: List<String>,
+        advancedMode: Boolean,
+        query: String? = null
+    ): List<SettingsEntry> {
+        val raw = getEntries(path)
+        val q = query?.trim()?.lowercase()?.ifEmpty { null }
+        return raw.mapNotNull { entry ->
+            when (entry) {
+                is SettingsEntry.Section -> {
+                    val visibleChildren = entry.children.filter { child ->
+                        (advancedMode || isEssential(child.key)) &&
+                            (q == null || matchesQuery(child.title, child.key, q))
+                    }
+                    if (visibleChildren.isEmpty() && q == null) null
+                    else entry.copy(children = visibleChildren)
+                }
+                else -> {
+                    val matchesAdvanced = advancedMode || isEssential(entry.key)
+                    val matchesQuery = q == null || matchesQuery(entry.title, entry.key, q)
+                    if (matchesAdvanced && matchesQuery) entry else null
+                }
+            }
+        }
+    }
+
+    /**
+     * Flat search across every section. Returns a list of (section, entry)
+     * pairs for entries whose title or key contains the (lower-cased) query.
+     * Used by the settings search box.
+     */
+    fun search(query: String): List<Pair<SettingsEntry.Section, SettingsEntry>> {
+        val ctx = cachedContext ?: return emptyList()
+        val root = cachedRoot ?: buildRoot(ctx).also { cachedRoot = it }
+        val q = query.trim().lowercase().ifEmpty { return emptyList() }
+        val out = mutableListOf<Pair<SettingsEntry.Section, SettingsEntry>>()
+        for (section in root) {
+            if (section !is SettingsEntry.Section) continue
+            for (child in section.children) {
+                if (matchesQuery(child.title, child.key, q)) {
+                    out += section to child
+                }
+            }
+        }
+        return out
+    }
+
+    private fun matchesQuery(title: String, key: String, q: String): Boolean {
+        return title.lowercase().contains(q) || key.lowercase().contains(q)
+    }
+
     @Volatile private var cachedRoot: List<SettingsEntry>? = null
     @Volatile private var cachedContext: Context? = null
 

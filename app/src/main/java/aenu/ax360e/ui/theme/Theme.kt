@@ -16,19 +16,21 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
 
 /**
- * Material 3 Expressive color palette aligned with the v2 redesign reference.
+ * Material You (M3) theme for Xenon360.
  *
- * The dark scheme uses a deep purple/violet primary (with the
- * `#e9ddff / #d0bcff` family from the design mock) instead of the original
- * Xbox green. The light scheme mirrors the same hue family with the
- * corresponding M3 light tonal palette.
- *
- * Surface containers follow the M3 2024 spec (surfaceDim < surfaceContainerLow
- * < surfaceContainer < surfaceContainerHigh < surfaceContainerHighest) so the
- * card backgrounds in the new layouts render with the correct elevation tint.
+ * Design goals
+ * ------------
+ *  • Honour the system wallpaper on Android 12+ (dynamicColor = true) so the
+ *    app feels native and personalised — a core Material You principle.
+ *  • Fall back to a refined violet palette on pre-Android 12 devices that
+ *    matches the v2 redesign reference mockups.
+ *  • Keep tonal surface containers following the M3 2024 spec so elevation
+ *    tints render correctly inside cards, drawers and bars.
+ *  • Make the system bars transparent and let Compose own the contrast via
+ *    WindowInsetsControllerCompat (light/dark icons follow the theme).
  */
 object Ax360eColors {
-    // ---- Light scheme (purple family) ----
+    // ---- Light scheme (violet family, refined) ----
     val primaryLight = Color(0xFF6B4EA2)
     val onPrimaryLight = Color(0xFFFFFFFF)
     val primaryContainerLight = Color(0xFFEBDCFF)
@@ -65,7 +67,7 @@ object Ax360eColors {
     val surfaceContainerHighLight = Color(0xFFEEE5EE)
     val surfaceContainerHighestLight = Color(0xFFE9E0E9)
 
-    // ---- Dark scheme (matches the redesign reference exactly) ----
+    // ---- Dark scheme (matches the redesign reference) ----
     val primaryDark = Color(0xFFE9DDFF)
     val onPrimaryDark = Color(0xFF37265E)
     val primaryContainerDark = Color(0xFF594983)
@@ -182,10 +184,10 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun Ax360eTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // [REDESIGN] Force the custom purple palette (matches the v2 mockups).
-    // The previous default (true) made Android 12+ override the palette with
-    // the user's wallpaper, hiding the intended violet identity.
-    dynamicColor: Boolean = false,
+    // [M3] Material You: honour the user's wallpaper on Android 12+. This is
+    // the headline feature of M3 dynamic color and is what makes the app feel
+    // truly native. Pre-Android 12 falls back to the refined violet palette.
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current

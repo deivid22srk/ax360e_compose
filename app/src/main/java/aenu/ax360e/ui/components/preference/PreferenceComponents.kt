@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -20,14 +20,16 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 private const val DisabledAlpha = 0.38f
-private const val MediumAlpha = 0.67f
+private const val MediumAlpha = 0.70f
 
 val LocalPreferenceState = compositionLocalOf { true }
 
@@ -62,7 +64,7 @@ fun PreferenceSubtitle(
     modifier: Modifier = Modifier,
     enabled: Boolean = LocalPreferenceState.current,
     maxLines: Int = 2,
-    style: TextStyle = MaterialTheme.typography.bodyMedium,
+    style: TextStyle = MaterialTheme.typography.bodySmall,
     color: Color = preferenceSubtitleColor(enabled, LocalContentColor.current)
 ) {
     Text(
@@ -75,34 +77,76 @@ fun PreferenceSubtitle(
     )
 }
 
+/**
+ * Section header used inside grouped preference cards.
+ *
+ * Rendered as a small, primary-tinted label with optional trailing caption
+ * (e.g. "3 items" or an action icon).
+ */
 @Composable
 fun PreferenceHeader(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    trailing: @Composable (() -> Unit)? = null
 ) {
-    Text(
-        text = text,
-        modifier = modifier.padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 8.dp),
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.primary
-    )
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.weight(1f, fill = false)
+        )
+        trailing?.invoke()
+    }
 }
 
 @Composable
 fun PreferenceIcon(
     icon: ImageVector?,
     modifier: Modifier = Modifier,
-    enabled: Boolean = LocalPreferenceState.current
+    enabled: Boolean = LocalPreferenceState.current,
+    tint: Color? = null
 ) {
     if (icon == null) return
-    Icon(
-        imageVector = icon,
-        contentDescription = null,
-        modifier = modifier.size(24.dp),
-        tint = preferenceColor(enabled, MaterialTheme.colorScheme.onSurfaceVariant)
-    )
+    val resolved = tint ?: MaterialTheme.colorScheme.onSurfaceVariant
+    Surface(
+        modifier = modifier.size(40.dp),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(
+            alpha = if (enabled) 1f else DisabledAlpha
+        )
+    ) {
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(22.dp),
+                tint = preferenceColor(enabled, resolved)
+            )
+        }
+    }
 }
 
+/**
+ * Container for a single preference row.
+ *
+ * Visual pattern (M3 settings):
+ *   [leading icon in a circular surface]   title             [trailing value/chevron]
+ *                                          subtitle (muted)
+ *
+ * The row is fully clickable (ripple covers the whole row), but the trailing
+ * content can intercept clicks (e.g. for a Switch) by using its own clickable.
+ */
 @Composable
 fun BasePreference(
     title: @Composable () -> Unit,
@@ -127,16 +171,13 @@ fun BasePreference(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .heightIn(min = 64.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 leadingIcon?.invoke()
                 Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     title()
@@ -191,7 +232,7 @@ fun SwitchPreference(
             )
         },
         enabled = enabled,
-        onClick = { onCheckedChange(!checked) },
+        onClick = { if (enabled) onCheckedChange(!checked) },
         modifier = modifier
     )
 }
@@ -220,14 +261,46 @@ fun ValuePreference(
         trailingContent = {
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = if (highlightValue) MaterialTheme.colorScheme.tertiary
+                else MaterialTheme.colorScheme.primary,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 8.dp)
             )
         },
         enabled = enabled,
         onClick = onClick,
         modifier = modifier
     )
+}
+
+/**
+ * A rounded surface that visually groups a list of preference rows into a
+ * single card. M3 recommends grouping related settings into one container
+ * instead of leaving them as separate cards — this matches the latest
+ * Android system settings look (Android 14+).
+ *
+ * Usage:
+ *   PreferenceGroupCard {
+ *       item { SwitchPreference(...) }
+ *       item { RegularPreference(...) }
+ *   }
+ */
+@Composable
+fun PreferenceGroupCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        tonalElevation = 0.dp
+    ) {
+        Column { content() }
+    }
 }

@@ -17,15 +17,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.SystemUpdateAlt
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,6 +71,7 @@ import kotlinx.coroutines.delay
 import aenu.ax360e.Emulator
 import aenu.ax360e.R
 import aenu.ax360e.Utils
+import aenu.ax360e.ui.components.preference.PreferenceGroupCard
 import aenu.ax360e.ui.components.preference.PreferenceHeader
 import aenu.ax360e.ui.components.preference.RegularPreference
 import aenu.ax360e.ui.components.preference.SwitchPreference
@@ -65,6 +80,26 @@ import aenu.emulator.Emulator as NativeEmulator
 import java.io.File
 
 private const val VULKAN_LIB_PATH_KEY = "Vulkan|vulkan_lib_path"
+
+/** Icon per top-level section, used inside the simplified settings cards. */
+private fun sectionIcon(sectionKey: String) = when (sectionKey) {
+    "APU" -> Icons.Default.VolumeUp
+    "CPU" -> Icons.Default.Memory
+    "GPU" -> Icons.Default.GraphicEq
+    "Display" -> Icons.Default.Visibility
+    "Video" -> Icons.Default.SportsEsports
+    "Vulkan" -> Icons.Default.SystemUpdateAlt
+    "General" -> Icons.Default.Settings
+    "HID" -> Icons.Default.SportsEsports
+    "Kernel" -> Icons.Default.Memory
+    "Storage" -> Icons.Default.Storage
+    "Memory" -> Icons.Default.Memory
+    "Content" -> Icons.Default.PrivacyTip
+    "Logging" -> Icons.Default.Tune
+    "UI" -> Icons.Default.Tune
+    "XConfig" -> Icons.Default.Tune
+    else -> Icons.Default.Folder
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,12 +111,6 @@ fun EmulatorSettingsScreen(
     val activity = context as? Activity
     LaunchedEffect(Unit) { SettingsTree.init(context) }
 
-    // ax360e fix: use mutable state for libraryReady so we can retry loading
-    // the native library if the first attempt fails (e.g., still initializing
-    // when the Settings screen is opened immediately after app launch).
-    // Previously this was `remember { Emulator.ensure_library_loaded() }`
-    // which evaluated once and never retried, causing a permanent "Native
-    // library not loaded" error until the user manually clicked Retry.
     var libraryReady by remember { mutableStateOf(Emulator.ensure_library_loaded()) }
 
     val effectivePath = remember(configPath) {
@@ -93,8 +122,6 @@ fun EmulatorSettingsScreen(
     }
     val isGlobal = configPath == null
 
-    // Holder keeps the latest native handle for dispose even if composition
-    // snapshots are stale (DisposableEffect(Unit) only captures once).
     val session = remember(effectivePath) {
         SettingsSession(openConfigOrNull(effectivePath, libraryReady))
     }
@@ -110,6 +137,8 @@ fun EmulatorSettingsScreen(
 
     var currentScreen by remember { mutableStateOf<List<String>>(emptyList()) }
     var refreshToken by remember { mutableStateOf(0) }
+    var advancedMode by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
     var loadError by remember {
         mutableStateOf(
             if (!libraryReady) "Native library not loaded"
@@ -118,13 +147,6 @@ fun EmulatorSettingsScreen(
         )
     }
 
-    // ax360e fix: auto-retry loading the native library and opening the config
-    // if the first attempt failed. This fixes the bug where the Settings screen
-    // showed an empty "Config file not available" state on first open, forcing
-    // the user to go back and re-enter Settings. The retry runs once 500ms
-    // after composition; if the library loads successfully by then, the config
-    // is opened automatically and the settings tree appears without user
-    // intervention.
     LaunchedEffect(libraryReady, config) {
         if (config == null) {
             delay(500)
@@ -154,11 +176,6 @@ fun EmulatorSettingsScreen(
             }
         session.config = null
         session.dirty = false
-        // ax360e fix: do NOT null out `config` here. Setting config = null
-        // triggers a recomposition that shows the "Config file not available"
-        // error briefly before onBack() finishes the activity. The
-        // DisposableEffect.onDispose below already handles cleanup when the
-        // composition is destroyed by finish().
     }
 
     fun markDirtyAndRefresh(block: (NativeEmulator.Config) -> Unit) {
@@ -183,11 +200,13 @@ fun EmulatorSettingsScreen(
         }
     }
 
+    val isSearching = searchQuery.trim().isNotEmpty()
+
     BackHandler {
-        if (currentScreen.isNotEmpty()) {
-            currentScreen = currentScreen.dropLast(1)
-        } else {
-            leaveSettings()
+        when {
+            isSearching -> searchQuery = ""
+            currentScreen.isNotEmpty() -> currentScreen = currentScreen.dropLast(1)
+            else -> leaveSettings()
         }
     }
 
@@ -215,27 +234,47 @@ fun EmulatorSettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (currentScreen.isEmpty())
+                        text = if (isSearching) ""
+                        else if (currentScreen.isEmpty())
                             stringResource(R.string.settings)
                         else currentScreen.last(),
-                        color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (currentScreen.isEmpty()) leaveSettings()
-                        else currentScreen = currentScreen.dropLast(1)
+                        when {
+                            isSearching -> searchQuery = ""
+                            currentScreen.isEmpty() -> leaveSettings()
+                            else -> currentScreen = currentScreen.dropLast(1)
+                        }
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                },
+                actions = {
+                    if (currentScreen.isEmpty() && !isSearching) {
+                        FilterChip(
+                            selected = advancedMode,
+                            onClick = { advancedMode = !advancedMode },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Tune,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 4.dp)
+                                )
+                            },
+                            label = { Text("Advanced") },
+                            modifier = Modifier.padding(end = 8.dp)
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -255,7 +294,6 @@ fun EmulatorSettingsScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     OutlinedButton(onClick = {
-                        // Retry seed + open after a failed first attempt.
                         Emulator.ensure_library_loaded()
                         if (isGlobal) Application.ensure_global_config_file()
                         val reopened = openConfigOrNull(effectivePath, true)
@@ -272,10 +310,8 @@ fun EmulatorSettingsScreen(
             return@Scaffold
         }
 
-        val entries = remember(currentScreen, refreshToken) {
-            SettingsTree.getEntries(currentScreen)
-        }
-
+        // Search bar shown on the root level (and inside sections when advancedMode is on).
+        val showSearchBar = currentScreen.isEmpty() || isSearching
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -283,25 +319,126 @@ fun EmulatorSettingsScreen(
             contentPadding = PaddingValues(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            if (currentScreen.isEmpty()) {
+            if (showSearchBar) {
                 item {
-                    PreferenceHeader(text = stringResource(R.string.settings))
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        placeholder = { Text("Search settings…") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Default.Clear, contentDescription = null)
+                                }
+                            }
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(28.dp)
+                    )
                 }
             }
 
-            // [REFRESH FIX] Add refreshToken to the items() key so the LazyColumn
-            // recomposes every entry whenever a setting is changed. Previously
-            // only `it.key` was the key, which meant the per-item content lambdas
-            // were cached and never recomputed when refreshToken incremented —
-            // so the Switch/Slider/TextField visually stayed in the old state
-            // until the user left the screen and came back.
-            items(entries, key = { "${it.key}::$refreshToken" }) { entry ->
-                when (entry) {
-                    is SettingsEntry.Section -> {
+            val q = if (isSearching) searchQuery else null
+            val entries = remember(currentScreen, refreshToken, advancedMode, q) {
+                SettingsTree.getEntriesFiltered(currentScreen, advancedMode, q)
+            }
+
+            if (isSearching) {
+                // Flat search results across all sections
+                val searchResults = remember(searchQuery, refreshToken) {
+                    SettingsTree.search(searchQuery)
+                }
+                if (searchResults.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "No settings match \"$searchQuery\"",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                } else {
+                    item {
+                        Text(
+                            text = "${searchResults.size} result${if (searchResults.size == 1) "" else "s"}",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(start = 24.dp, top = 8.dp, bottom = 4.dp)
+                        )
+                    }
+                    items(searchResults, key = { "${it.first.key}|${it.second.key}::$refreshToken" }) { (section, entry) ->
+                        Column {
+                            Text(
+                                text = section.title,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                            )
+                            SearchEntryRow(
+                                section = section,
+                                entry = entry,
+                                config = config,
+                                originalConfig = originalConfig,
+                                onMarkDirty = { block -> markDirtyAndRefresh(block) },
+                                onImportDriver = { importDriverLauncher.launch("application/zip") }
+                            )
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                            )
+                        }
+                    }
+                }
+            } else if (currentScreen.isEmpty()) {
+                // Root: show sections as grouped cards
+                item {
+                    PreferenceHeader(
+                        text = stringResource(R.string.settings),
+                        trailing = {
+                            Text(
+                                text = if (advancedMode) "Advanced" else "Essential",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    )
+                }
+                if (!advancedMode) {
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                            ),
+                            shape = MaterialTheme.shapes.large
+                        ) {
+                            Text(
+                                text = "Showing the most useful settings. Turn on Advanced to see every option (CPU debug flags, GPU trace dumps, memory protection overrides, etc.).",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
+                items(entries, key = { "${it.key}::$refreshToken" }) { entry ->
+                    if (entry is SettingsEntry.Section) {
                         RegularPreference(
                             title = entry.title,
-                            subtitle = null,
-                            icon = Icons.Default.Folder,
+                            subtitle = "${entry.children.size} item${if (entry.children.size == 1) "" else "s"}",
+                            icon = sectionIcon(entry.key),
                             trailing = {
                                 Icon(
                                     Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -312,144 +449,88 @@ fun EmulatorSettingsScreen(
                             onClick = { currentScreen = currentScreen + entry.title }
                         )
                     }
-                    is SettingsEntry.Bool -> {
-                        val stored = config?.load_config_entry(entry.key)
-                        val value = stored?.toBooleanStrictOrNull()
-                        val defaultVal = originalConfig?.load_config_entry(entry.key)
-                        val modified = defaultVal != value?.toString()
-                        SwitchPreference(
-                            title = entry.title,
-                            checked = value == true,
-                            onCheckedChange = { newVal ->
-                                markDirtyAndRefresh {
-                                    it.save_config_entry(entry.key, newVal.toString())
-                                }
-                            },
-                            subtitle = if (modified) "Modified" else null,
-                            icon = Icons.Default.Tune,
-                            enabled = value != null || stored == null
-                        )
-                    }
-                    is SettingsEntry.Int -> {
-                        val value = config?.load_config_entry(entry.key)?.toIntOrNull()
-                        val defaultVal = originalConfig?.load_config_entry(entry.key)
-                        val modified = defaultVal != value?.toString()
-                        IntPreferenceRow(
-                            title = entry.title,
-                            value = value,
-                            min = entry.min,
-                            max = entry.max,
-                            modified = modified,
-                            onValueChange = { newVal ->
-                                markDirtyAndRefresh {
-                                    it.save_config_entry(entry.key, newVal.toString())
-                                }
-                            }
-                        )
-                    }
-                    is SettingsEntry.StrArr -> {
-                        val value = config?.load_config_entry(entry.key)
-                        val defaultVal = originalConfig?.load_config_entry(entry.key)
-                        val modified = defaultVal != value
-                        StrArrPreferenceRow(
-                            title = entry.title,
-                            value = value,
-                            entries = entry.entries,
-                            values = entry.values,
-                            modified = modified,
-                            onValueChange = { newVal ->
-                                markDirtyAndRefresh {
-                                    it.save_config_entry(entry.key, newVal)
-                                }
-                            }
-                        )
-                    }
-                    is SettingsEntry.StrLeaf -> {
-                        val value = config?.load_config_entry(entry.key)
-                        if (entry.key == VULKAN_LIB_PATH_KEY) {
-                            DriverPathPreferenceRow(
-                                title = entry.title,
-                                value = value,
-                                onImportClick = {
-                                    importDriverLauncher.launch("application/zip")
-                                },
-                                onValueChange = { newVal ->
-                                    markDirtyAndRefresh {
-                                        it.save_config_entry(entry.key, newVal)
-                                    }
-                                },
-                                onClear = {
-                                    markDirtyAndRefresh {
-                                        it.save_config_entry(entry.key, "")
-                                    }
-                                }
+                }
+            } else {
+                // Inside a section: group leaves into a single card for the M3 look
+                val sectionName = currentScreen.last()
+                item {
+                    PreferenceHeader(text = sectionName)
+                }
+                item {
+                    PreferenceGroupCard {
+                        entries.forEachIndexed { idx, entry ->
+                            SettingsEntryRow(
+                                entry = entry,
+                                config = config,
+                                originalConfig = originalConfig,
+                                onMarkDirty = { block -> markDirtyAndRefresh(block) },
+                                onImportDriver = { importDriverLauncher.launch("application/zip") }
                             )
-                        } else {
-                            StrLeafPreferenceRow(
-                                title = entry.title,
-                                value = value,
-                                onValueChange = { newVal ->
-                                    markDirtyAndRefresh {
-                                        it.save_config_entry(entry.key, newVal)
-                                    }
-                                }
-                            )
+                            if (idx < entries.lastIndex) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            item {
-                Spacer(Modifier.height(12.dp))
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                Spacer(Modifier.height(12.dp))
-                OutlinedButton(
-                    onClick = {
-                        runCatching { session.config?.close_config_file() }
-                        session.config = null
-                        Utils.copy_file(
-                            Application.get_default_config_file(),
-                            File(effectivePath)
-                        )
-                        val reopened = openConfigOrNull(effectivePath, libraryReady)
-                        session.config = reopened
-                        session.dirty = false
-                        config = reopened
-                        refreshToken++
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.reset_as_default),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                ) {
-                    Icon(
-                        Icons.Default.RestartAlt,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text(stringResource(R.string.reset_as_default))
-                }
-                if (!isGlobal) {
+            // Reset / use global config actions, only at root level
+            if (currentScreen.isEmpty() && !isSearching) {
+                item {
+                    Spacer(Modifier.height(12.dp))
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                    Spacer(Modifier.height(12.dp))
                     OutlinedButton(
                         onClick = {
                             runCatching { session.config?.close_config_file() }
                             session.config = null
+                            Utils.copy_file(
+                                Application.get_default_config_file(),
+                                File(effectivePath)
+                            )
+                            val reopened = openConfigOrNull(effectivePath, libraryReady)
+                            session.config = reopened
                             session.dirty = false
-                            File(effectivePath).delete()
-                            leaveSettings()
+                            config = reopened
+                            refreshToken++
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.reset_as_default),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                     ) {
-                        Text(stringResource(R.string.use_global_config))
+                        Icon(
+                            Icons.Default.RestartAlt,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(stringResource(R.string.reset_as_default))
                     }
+                    if (!isGlobal) {
+                        OutlinedButton(
+                            onClick = {
+                                runCatching { session.config?.close_config_file() }
+                                session.config = null
+                                session.dirty = false
+                                File(effectivePath).delete()
+                                leaveSettings()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                        ) {
+                            Text(stringResource(R.string.use_global_config))
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
                 }
-                Spacer(Modifier.height(16.dp))
             }
         }
     }
@@ -464,7 +545,6 @@ private fun openConfigOrNull(path: String, libraryReady: Boolean): NativeEmulato
     return runCatching {
         val file = File(path)
         if (!file.exists()) {
-            // For per-game configs the path may not exist yet; seed from defaults.
             val parent = file.parentFile
             if (parent != null && !parent.exists()) parent.mkdirs()
             Utils.copy_file(Application.get_default_config_file(), file)
@@ -474,6 +554,121 @@ private fun openConfigOrNull(path: String, libraryReady: Boolean): NativeEmulato
         }
         if (file.exists()) NativeEmulator.Config.open_config_file(path) else null
     }.getOrNull()
+}
+
+@Composable
+private fun SettingsEntryRow(
+    entry: SettingsEntry,
+    config: NativeEmulator.Config?,
+    originalConfig: NativeEmulator.Config?,
+    onMarkDirty: ((NativeEmulator.Config) -> Unit) -> Unit,
+    onImportDriver: () -> Unit
+) {
+    when (entry) {
+        is SettingsEntry.Section -> {
+            RegularPreference(
+                title = entry.title,
+                subtitle = null,
+                icon = sectionIcon(entry.key),
+                trailing = {
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                onClick = {}
+            )
+        }
+        is SettingsEntry.Bool -> {
+            val stored = config?.load_config_entry(entry.key)
+            val value = stored?.toBooleanStrictOrNull()
+            val defaultVal = originalConfig?.load_config_entry(entry.key)
+            val modified = defaultVal != value?.toString()
+            SwitchPreference(
+                title = entry.title,
+                checked = value == true,
+                onCheckedChange = { newVal ->
+                    onMarkDirty { it.save_config_entry(entry.key, newVal.toString()) }
+                },
+                subtitle = if (modified) "Modified" else null,
+                icon = Icons.Default.Tune,
+                enabled = value != null || stored == null
+            )
+        }
+        is SettingsEntry.Int -> {
+            val value = config?.load_config_entry(entry.key)?.toIntOrNull()
+            val defaultVal = originalConfig?.load_config_entry(entry.key)
+            val modified = defaultVal != value?.toString()
+            IntPreferenceRow(
+                title = entry.title,
+                value = value,
+                min = entry.min,
+                max = entry.max,
+                modified = modified,
+                onValueChange = { newVal ->
+                    onMarkDirty { it.save_config_entry(entry.key, newVal.toString()) }
+                }
+            )
+        }
+        is SettingsEntry.StrArr -> {
+            val value = config?.load_config_entry(entry.key)
+            val defaultVal = originalConfig?.load_config_entry(entry.key)
+            val modified = defaultVal != value
+            StrArrPreferenceRow(
+                title = entry.title,
+                value = value,
+                entries = entry.entries,
+                values = entry.values,
+                modified = modified,
+                onValueChange = { newVal ->
+                    onMarkDirty { it.save_config_entry(entry.key, newVal) }
+                }
+            )
+        }
+        is SettingsEntry.StrLeaf -> {
+            val value = config?.load_config_entry(entry.key)
+            if (entry.key == VULKAN_LIB_PATH_KEY) {
+                DriverPathPreferenceRow(
+                    title = entry.title,
+                    value = value,
+                    onImportClick = onImportDriver,
+                    onValueChange = { newVal ->
+                        onMarkDirty { it.save_config_entry(entry.key, newVal) }
+                    },
+                    onClear = {
+                        onMarkDirty { it.save_config_entry(entry.key, "") }
+                    }
+                )
+            } else {
+                StrLeafPreferenceRow(
+                    title = entry.title,
+                    value = value,
+                    onValueChange = { newVal ->
+                        onMarkDirty { it.save_config_entry(entry.key, newVal) }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchEntryRow(
+    section: SettingsEntry.Section,
+    entry: SettingsEntry,
+    config: NativeEmulator.Config?,
+    originalConfig: NativeEmulator.Config?,
+    onMarkDirty: ((NativeEmulator.Config) -> Unit) -> Unit,
+    onImportDriver: () -> Unit
+) {
+    SettingsEntryRow(
+        entry = entry,
+        config = config,
+        originalConfig = originalConfig,
+        onMarkDirty = onMarkDirty,
+        onImportDriver = onImportDriver
+    )
 }
 
 @Composable

@@ -6,7 +6,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Material 3 Expressive Typography
+/**
+ * Material 3 typography.
+ *
+ * Uses the platform default font family (so Android 14+ picks up the system
+ * body font, e.g. Roboto / Google Sans / vendor font), with the M3 baseline
+ * scale and tracking values.
+ *
+ * Headlines lean on FontWeight.Medium/SemiBold for a calmer, more modern
+ * feel compared to the previous all-Normal setup.
+ */
 val Ax360eTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.Default,
@@ -31,28 +40,28 @@ val Ax360eTypography = Typography(
     ),
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 32.sp,
         lineHeight = 40.sp,
         letterSpacing = 0.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 28.sp,
         lineHeight = 36.sp,
         letterSpacing = 0.sp
     ),
     headlineSmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
