@@ -147,6 +147,17 @@ void VulkanCommandProcessor::EnsureZPDQueryResources() {
   // Stub: real implementation would create zpd_host_query_pool_ here.
   // For now, leave it null so IsZPDQueryPoolReady returns false and the
   // shared code falls back to fake mode.
+  //
+  // ax360e fix: Force fallback to fake mode to prevent livelock in games that
+  // poll occlusion query results. Without a real query pool, kFast/kStrict
+  // modes cause infinite polling loops (e.g., Dragon Ball: Raging Blast).
+  if (!zpd_force_fake_fallback_) {
+    zpd_force_fake_fallback_ = true;
+    XELOGGPU(
+        "Vulkan ZPD query pool not implemented - forcing fake occlusion query "
+        "mode to prevent livelock. Games requiring accurate occlusion results "
+        "may exhibit incorrect rendering.");
+  }
 }
 
 bool VulkanCommandProcessor::IsZPDQueryPoolReady() const {

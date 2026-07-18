@@ -112,7 +112,14 @@ void SetReadbackResolveMode(const std::string& mode) {
 }
 
 // ax360e backport: ZPD occlusion query mode (upstream fbd620c2 + 73945c06).
-ZPDMode GetZPDMode() {
+// ax360e fix: respect zpd_force_fake_fallback_ to prevent livelock when backend
+// doesn't have real query pool support (e.g., Vulkan stub implementation).
+ZPDMode GetZPDMode(bool force_fake_fallback = false) {
+  // ax360e: if backend detected no real ZPD support, force fake mode
+  if (force_fake_fallback) {
+    return ZPDMode::kFake;
+  }
+
   const std::string& mode = cvars::occlusion_query;
   if (mode == "fake") {
     return ZPDMode::kFake;
@@ -903,7 +910,7 @@ CommandProcessor::PendingZPDSlot CommandProcessor::GetPendingZPDSlot(
 }
 
 bool CommandProcessor::BeginZPDReport(uint32_t report_address) {
-  if (GetZPDMode() == ZPDMode::kFake) {
+  if (GetZPDMode(zpd_force_fake_fallback_) == ZPDMode::kFake) {
     return false;
   }
 
@@ -941,7 +948,7 @@ bool CommandProcessor::BeginZPDReport(uint32_t report_address) {
     return false;
   }
 
-  if (GetZPDMode() == ZPDMode::kStrict) {
+  if (GetZPDMode(zpd_force_fake_fallback_) == ZPDMode::kStrict) {
     PollCompletedSubmission();
   } else {
     PumpQueryResolves();
@@ -950,7 +957,7 @@ bool CommandProcessor::BeginZPDReport(uint32_t report_address) {
   PendingZPDSlot pending_slot = GetPendingZPDSlot(slot_base, end_record);
 
   if (pending_slot.report_handle != kInvalidReportHandle) {
-    ZPDMode mode = GetZPDMode();
+    ZPDMode mode = GetZPDMode(zpd_force_fake_fallback_);
     if (mode == ZPDMode::kFast || mode == ZPDMode::kFastAlt) {
       if (pending_slot.has_cached_delta) {
         carried_cached_delta = pending_slot.cached_delta;
@@ -989,7 +996,7 @@ bool CommandProcessor::BeginZPDReport(uint32_t report_address) {
 
   // ax360e backport (73945c06): kFastAlt preserves cached zeroes instead of
   // erasing. Original code used cvars::occlusion_query_fast_preserve_cached_zero.
-  if (GetZPDMode() != ZPDMode::kFastAlt) {
+  if (GetZPDMode(zpd_force_fake_fallback_) != ZPDMode::kFastAlt) {
     fast_zpd_report_cached_values_.erase(end_record);
   }
 
@@ -1031,7 +1038,7 @@ bool CommandProcessor::BeginZPDReport(uint32_t report_address) {
 
 bool CommandProcessor::EndZPDReport(uint32_t report_address,
                                     bool guest_forced_end) {
-  if (GetZPDMode() == ZPDMode::kFake) {
+  if (GetZPDMode(zpd_force_fake_fallback_) == ZPDMode::kFake) {
     return false;
   }
 
@@ -1111,7 +1118,7 @@ bool CommandProcessor::EndZPDReport(uint32_t report_address,
     WriteZPDReport(0, stored_end_record, 0, begin_value, false);
   }
 
-  ZPDMode mode = GetZPDMode();
+  ZPDMode mode = GetZPDMode(zpd_force_fake_fallback_);
   if (mode == ZPDMode::kFast || mode == ZPDMode::kFastAlt) {
     bool write_begin = begin_record && report_record_base &&
                        begin_record != report_record_base;
@@ -1143,7 +1150,7 @@ bool CommandProcessor::EndZPDReport(uint32_t report_address,
 }
 
 void CommandProcessor::OpenQuerySegment(bool can_close_submission) {
-  if (GetZPDMode() == ZPDMode::kFake || zpd_force_fake_fallback_ ||
+  if (GetZPDMode(zpd_force_fake_fallback_) == ZPDMode::kFake ||
       !zpd_active_segment_.logical_active ||
       !zpd_active_segment_.segment_pending_begin || !CanOpenZPDQuery()) {
     return;
@@ -1162,7 +1169,7 @@ void CommandProcessor::OpenQuerySegment(bool can_close_submission) {
 
   QueryOpenResult open_result =
       OpenZPDQuery(zpd_active_segment_.report_handle, can_close_submission);
-  ZPDMode mode = GetZPDMode();
+  ZPDMode mode = GetZPDMode(zpd_force_fake_fallback_);
   switch (open_result) {
     case QueryOpenResult::kOpened:
       break;
@@ -1190,7 +1197,7 @@ void CommandProcessor::OpenQuerySegment(bool can_close_submission) {
 }
 
 void CommandProcessor::CloseQuerySegment() {
-  if (GetZPDMode() == ZPDMode::kFake || !zpd_active_segment_.segment_active) {
+  if (GetZPDMode(zpd_force_fake_fallback_) == ZPDMode::kFake || !zpd_active_segment_.segment_active) {
     return;
   }
 

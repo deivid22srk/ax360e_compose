@@ -55,7 +55,7 @@ void SaveGPUSetting(GPUSetting setting, uint64_t value);
 bool GetGPUSetting(GPUSetting setting);
 ReadbackResolveMode GetReadbackResolveMode();
 void SetReadbackResolveMode(const std::string& mode);
-ZPDMode GetZPDMode();
+ZPDMode GetZPDMode(bool force_fake_fallback = false);
 void SetZPDMode(const std::string& mode);
 
 // Shared pool capacity for D3D12 and Vulkan.
