@@ -9,6 +9,7 @@
 
 #include "xenia/ui/vulkan/vulkan_presenter.h"
 
+#include <atomic>
 #include <cstdint>
 
 #include "xenia/base/assert.h"
@@ -1022,6 +1023,29 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
     return VK_NULL_HANDLE;
   }
 
+  // [TURNIP BLACK-SCREEN AUDIT] Log surface capabilities so we can see
+  // what the Android SurfaceFlinger + Turnip combo is reporting. This is
+  // critical for diagnosing VK_SUBOPTIMAL_KHR loops: on Android, the
+  // surface's currentTransform often changes between portrait/landscape
+  // and the swapchain's preTransform MUST match it to avoid suboptimal
+  // presents + black screens.
+  XELOGI(
+      "VulkanPresenter: Surface capabilities: minExtent={}x{}, "
+      "maxExtent={}x{}, currentExtent={}x{}, currentTransform=0x{:X}, "
+      "supportedTransforms=0x{:X}, maxImageArrayLayers={}, "
+      "supportedCompositeAlpha=0x{:X}, supportedUsage=0x{:X}",
+      surface_capabilities.minImageExtent.width,
+      surface_capabilities.minImageExtent.height,
+      surface_capabilities.maxImageExtent.width,
+      surface_capabilities.maxImageExtent.height,
+      surface_capabilities.currentExtent.width,
+      surface_capabilities.currentExtent.height,
+      uint32_t(surface_capabilities.currentTransform),
+      uint32_t(surface_capabilities.supportedTransforms),
+      surface_capabilities.maxImageArrayLayers,
+      uint32_t(surface_capabilities.supportedCompositeAlpha),
+      uint32_t(surface_capabilities.supportedUsage));
+
   // Get the surface format.
   std::vector<VkSurfaceFormatKHR> surface_formats;
   VkResult surface_formats_get_result;
@@ -1188,11 +1212,48 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
     swapchain_create_info.queueFamilyIndexCount = 0;
     swapchain_create_info.pQueueFamilyIndices = nullptr;
   }
-  swapchain_create_info.preTransform =
-      (surface_capabilities.supportedTransforms &
-       VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
-          ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
-          : VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR;
+  // [TURNIP BLACK-SCREEN FIX] Use the surface's currentTransform as the
+  // swapchain's preTransform. This is what the Vulkan spec recommends on
+  // Android (see VK_KHR_swapchain spec, "Surface Transformations"):
+  //
+  //   "If the preTransform does not match the currentTransform value returned
+  //    by vkGetPhysicalDeviceSurfaceCapabilitiesKHR at the time the swapchain
+  //    was created, presentation will be suboptimal."
+  //
+  // The previous code forced IDENTITY whenever supported, which on Android
+  // phones in landscape orientation (where currentTransform is typically
+  // ROTATE_90) caused EVERY vkQueuePresentKHR to return VK_SUBOPTIMAL_KHR.
+  // The Adreno proprietary driver silently absorbs this, but Mesa Turnip
+  // (freedreno) surfaces the suboptimal result to the caller — producing
+  // the "kPresentedSuboptimal every frame + black screen" symptom we saw
+  // in Far Cry 2.
+  //
+  // Using currentTransform lets the platform compositor (SurfaceFlinger)
+  // receive the image already rotated, avoiding the suboptimal path
+  // entirely. The guest output is rendered into the swapchain image with
+  // the swapchain's extent, which on Android is the window's pixel size
+  // (already accounting for orientation), so no extra rotation of the
+  // guest coords is needed.
+  VkSurfaceTransformFlagBitsKHR chosen_pre_transform;
+  if (surface_capabilities.supportedTransforms &
+      surface_capabilities.currentTransform) {
+    // Preferred path: match the current transform.
+    chosen_pre_transform = surface_capabilities.currentTransform;
+  } else if (surface_capabilities.supportedTransforms &
+             VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
+    chosen_pre_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+  } else if (surface_capabilities.supportedTransforms &
+             VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR) {
+    chosen_pre_transform = VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR;
+  } else {
+    // Should not happen — the earlier check rejects surfaces that don't
+    // support either IDENTITY or INHERIT.
+    chosen_pre_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+  }
+  swapchain_create_info.preTransform = chosen_pre_transform;
+  XELOGI("VulkanPresenter: swapchain preTransform = 0x{:X} (currentTransform=0x{:X})",
+         uint32_t(chosen_pre_transform),
+         uint32_t(surface_capabilities.currentTransform));
   // Prefer opaque to avoid blending in the window system, or let that be
   // specified via the window system if it can't be forced. As a last resort,
   // just pick any - guest output will write alpha of 1 anyway.
@@ -2105,6 +2166,19 @@ Presenter::PaintResult VulkanPresenter::PaintAndPresentImpl(
     case VK_SUCCESS:
       return PaintResult::kPresented;
     case VK_SUBOPTIMAL_KHR:
+      // [TURNIP BLACK-SCREEN AUDIT] Log every 60th suboptimal present so we
+      // can track whether the preTransform fix is working. With the fix,
+      // this should never fire (or only on orientation change). Without
+      // the fix, this fires every frame on Android landscape with Turnip.
+      {
+        static std::atomic<uint64_t> suboptimal_counter{0};
+        uint64_t count = suboptimal_counter.fetch_add(1, std::memory_order_relaxed);
+        if (count % 60 == 0) {
+          XELOGW("VulkanPresenter: vkQueuePresentKHR returned VK_SUBOPTIMAL_KHR "
+                 "(#{}) — preTransform likely doesn't match currentTransform",
+                 count);
+        }
+      }
       return PaintResult::kPresentedSuboptimal;
     case VK_ERROR_DEVICE_LOST:
       XELOGE(
