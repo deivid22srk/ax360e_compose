@@ -1530,6 +1530,121 @@ void NetDll_XHttpGetPerfCounters_entry(lpvoid_t counters) {
 }
 DECLARE_XAM_EXPORT1(NetDll_XHttpGetPerfCounters, kNetworking, kStub);
 
+dword_result_t XampXAuthStartup_entry(dword_t unk1, dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XampXAuthStartup, kNetworking, kStub);
+
+void XampXAuthShutdown_entry() {}
+DECLARE_XAM_EXPORT1(XampXAuthShutdown, kNetworking, kStub);
+
+dword_result_t XampXAuthGetTitleBuffer_entry(dword_t unk1, dword_t unk2,
+                                             dword_t unk3) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XampXAuthGetTitleBuffer, kNetworking, kStub);
+
+dword_result_t XamGetToken_entry(dword_t unk1, dword_t unk2, dword_t unk3) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamGetToken, kNetworking, kStub);
+
+void XamFreeToken_entry(dword_t unk1) {}
+DECLARE_XAM_EXPORT1(XamFreeToken, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadSetMode_entry(dword_t mode) { return 0; }
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadSetMode, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadIsEnabled_entry() { return 0; }
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadIsEnabled, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadGetActiveItem_entry(dword_t unk1) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadGetActiveItem, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadGetItems_entry(dword_t unk1, dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadGetItems, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadClearItems_entry() { return 0; }
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadClearItems, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadItemAdd_entry(dword_t unk1, dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemAdd, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadItemRemove_entry(dword_t unk1) { return 0; }
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemRemove, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadItemMakeFirst_entry(dword_t unk1) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemMakeFirst, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadSetForegroundPriority_entry(dword_t unk1) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadSetForegroundPriority, kNetworking,
+                    kStub);
+
+dword_result_t XamBackgroundDownloadGetForegroundPriority_entry() { return 0; }
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadGetForegroundPriority, kNetworking,
+                    kStub);
+
+dword_result_t XamBackgroundDownloadItemToContentData_entry(dword_t unk1,
+                                                            dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemToContentData, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadItemGetStatus_entry(dword_t unk1,
+                                                        dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemGetStatus, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadHistoryGetItem_entry(dword_t unk1,
+                                                         dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadHistoryGetItem, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadItemGetHistoryStatus_entry(dword_t unk1,
+                                                               dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemGetHistoryStatus, kNetworking,
+                    kStub);
+
+dword_result_t XamBackgroundDownloadItemSetHistoryStatus_entry(dword_t unk1,
+                                                               dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemSetHistoryStatus, kNetworking,
+                    kStub);
+
+dword_result_t XamBackgroundDownloadItemGetStatusAsync_entry(dword_t unk1,
+                                                             dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemGetStatusAsync, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadItemGetStatusEx_entry(dword_t unk1,
+                                                          dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemGetStatusEx, kNetworking, kStub);
+
+dword_result_t XamBackgroundDownloadItemGetHistoryStatusEx_entry(dword_t unk1,
+                                                                 dword_t unk2) {
+  return 0;
+}
+DECLARE_XAM_EXPORT1(XamBackgroundDownloadItemGetHistoryStatusEx, kNetworking,
+                    kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

@@ -484,11 +484,18 @@ uint32_t xeMmAllocatePhysicalMemoryEx(uint32_t flags, uint32_t region_size,
       has_range && cvars::ignore_offset_for_ranged_allocations;
 
   auto try_alloc = [&](uint32_t offset_to_use, uint32_t* out_address) -> bool {
-    uint32_t heap_min_addr = xe::sat_sub(min_addr_range, offset_to_use);
-    uint32_t heap_max_addr = xe::sat_sub(max_addr_range, offset_to_use);
     uint32_t heap_size = heap->heap_size();
-    heap_min_addr = heap_base + std::min(heap_min_addr, heap_size - 1);
-    heap_max_addr = heap_base + std::min(heap_max_addr, heap_size - 1);
+    uint32_t heap_min_addr;
+    uint32_t heap_max_addr;
+    if (!min_addr_range && !max_addr_range) {
+      heap_min_addr = heap_base;
+      heap_max_addr = heap_base + (heap_size - 1);
+    } else {
+      heap_min_addr = xe::sat_sub(min_addr_range, offset_to_use);
+      heap_max_addr = xe::sat_sub(max_addr_range, offset_to_use);
+      heap_min_addr = heap_base + std::min(heap_min_addr, heap_size - 1);
+      heap_max_addr = heap_base + std::min(heap_max_addr, heap_size - 1);
+    }
     return heap->AllocRange(heap_min_addr, heap_max_addr, adjusted_size,
                             adjusted_alignment, allocation_type, protect,
                             top_down, out_address);
