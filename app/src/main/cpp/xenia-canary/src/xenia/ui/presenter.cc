@@ -9,6 +9,7 @@
 
 #include "xenia/ui/presenter.h"
 
+#include <atomic>
 #include <chrono>
 
 #include "xenia/base/assert.h"
@@ -355,6 +356,15 @@ bool Presenter::RefreshGuestOutput(
     uint32_t frontbuffer_width, uint32_t frontbuffer_height,
     uint32_t display_aspect_ratio_x, uint32_t display_aspect_ratio_y,
     std::function<bool(GuestOutputRefreshContext& context)> refresher) {
+  // [TURNIP BLACK-SCREEN AUDIT] Log entry into RefreshGuestOutput. If this
+  // fires but PaintAndPresent never logs success, the issue is in the
+  // presenter / swapchain acquisition path.
+  static std::atomic<uint64_t> refresh_call_counter{0};
+  uint64_t call_id = refresh_call_counter.fetch_add(1, std::memory_order_relaxed);
+  XELOGI("[RefreshGuestOutput#{}] {}x{} aspect={}:{}",
+         call_id, frontbuffer_width, frontbuffer_height,
+         display_aspect_ratio_x, display_aspect_ratio_y);
+
   GuestOutputProperties& writable_properties =
       guest_output_properties_[guest_output_mailbox_writable_];
   writable_properties.frontbuffer_width = frontbuffer_width;
@@ -370,16 +380,23 @@ bool Presenter::RefreshGuestOutput(
       // If failed to refresh, don't send the currently writable image to the
       // mailbox as it may be in an undefined state. Don't disable the guest
       // output either though because the failure may be something transient.
+      XELOGW("[RefreshGuestOutput#{}] RefreshGuestOutputImpl FAILED — guest "
+             "output image not published this frame", call_id);
       return false;
     }
     guest_output_active_last_refresh_ = true;
+    XELOGI("[RefreshGuestOutput#{}] RefreshGuestOutputImpl OK, mailbox={}",
+           call_id, guest_output_mailbox_writable_);
   } else {
     // Request presenting a blank image if there was a true image previously,
     // but not now.
     if (!guest_output_active_last_refresh_) {
+      XELOGI("[RefreshGuestOutput#{}] not active, no previous image — skip",
+             call_id);
       return false;
     }
     guest_output_active_last_refresh_ = false;
+    XELOGI("[RefreshGuestOutput#{}] not active, blank image", call_id);
   }
 
   // Make the new image the next to present on the host (the "ready" one),
@@ -441,6 +458,27 @@ bool Presenter::RefreshGuestOutput(
           if (surface_paint_connection_state_ ==
               SurfacePaintConnectionState::kConnectedOutdated) {
             RequestPaintOrConnectionRecoveryViaWindow(true);
+          }
+        } else {
+          // [TURNIP BLACK-SCREEN AUDIT] Guest output thread wants to present
+          // but the surface paint connection isn't in the paintable state.
+          // This is the most common reason for black screens with working
+          // audio: the swapchain/surface is connected but kConnectedPaintable
+          // was never reached (or was downgraded to kConnectedOutdated /
+          // kDisconnected).
+          static std::atomic<uint64_t> skip_counter{0};
+          uint64_t skips = skip_counter.fetch_add(1, std::memory_order_relaxed);
+          if (skips % 60 == 0) {
+            const char* state_str = "Unknown";
+            switch (surface_paint_connection_state_) {
+              case SurfacePaintConnectionState::kConnectedPaintable: state_str = "kConnectedPaintable"; break;
+              case SurfacePaintConnectionState::kConnectedOutdated: state_str = "kConnectedOutdated"; break;
+              case SurfacePaintConnectionState::kUnconnectedRetryAtStateChange: state_str = "kUnconnectedRetryAtStateChange"; break;
+              case SurfacePaintConnectionState::kUnconnectedSurfaceReportedUnusable: state_str = "kUnconnectedSurfaceReportedUnusable"; break;
+            }
+            XELOGW("[RefreshGuestOutput] paint_mode=kGuestOutputThreadImmediately "
+                   "but state={} — frame NOT presented (skip #{})",
+                   state_str, skips);
           }
         }
         break;
@@ -1278,6 +1316,30 @@ Presenter::PaintResult Presenter::PaintAndPresent(bool execute_ui_drawers) {
   assert_true(surface_paint_connection_state_ ==
               SurfacePaintConnectionState::kConnectedPaintable);
   PaintResult result = PaintAndPresentImpl(execute_ui_drawers);
+  // [TURNIP BLACK-SCREEN AUDIT] Log the result of PaintAndPresentImpl so we
+  // can see whether the host present actually happened. kNotPresented /
+  // kNotPresentedConnectionOutdated here means frames are being dropped
+  // (likely swapchain out-of-date or surface lost), while kGpuLostResponsible
+  // means the Vulkan device was lost (Turnip crash).
+  static std::atomic<uint64_t> paint_call_counter{0};
+  uint64_t call_id = paint_call_counter.fetch_add(1, std::memory_order_relaxed);
+  const char* result_str = "Unknown";
+  switch (result) {
+    case PaintResult::kPresented: result_str = "kPresented"; break;
+    case PaintResult::kPresentedSuboptimal: result_str = "kPresentedSuboptimal"; break;
+    case PaintResult::kNotPresented: result_str = "kNotPresented"; break;
+    case PaintResult::kNotPresentedConnectionOutdated: result_str = "kNotPresentedConnectionOutdated"; break;
+    case PaintResult::kGpuLostResponsible: result_str = "kGpuLostResponsible"; break;
+    case PaintResult::kGpuLostExternally: result_str = "kGpuLostExternally"; break;
+  }
+  // Only log every 30th successful present to avoid spam, but always log
+  // non-successful results.
+  if (result != PaintResult::kPresented && result != PaintResult::kPresentedSuboptimal) {
+    XELOGW("[PaintAndPresent#{}] result={} (frames NOT being presented)",
+           call_id, result_str);
+  } else if (call_id % 30 == 0) {
+    XELOGI("[PaintAndPresent#{}] result={} (periodic heartbeat)", call_id, result_str);
+  }
   switch (result) {
     case PaintResult::kPresented:
       surface_paint_connection_was_optimal_at_successful_paint_ = true;

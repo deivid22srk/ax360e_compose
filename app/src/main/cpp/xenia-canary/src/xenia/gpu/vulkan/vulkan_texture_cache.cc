@@ -887,21 +887,43 @@ VkImageView VulkanTextureCache::RequestSwapTexture(
   BindingInfoFromFetchConstant(fetch, key, nullptr);
   if (!key.is_valid || key.base_page == 0 ||
       key.dimension != xenos::DataDimension::k2DOrStacked) {
+    // [TURNIP BLACK-SCREEN AUDIT] The fetch constant in register slot 0
+    // doesn't describe a usable 2D texture. This happens when VdSwap hasn't
+    // been preceded by a SetTexture fetch-constant write, OR when the
+    // frontbuffer_ptr translation in VdSwap produced a bad fetch dword
+    // (e.g. base_page == 0 because the physical address couldn't be
+    // resolved).
+    XELOGW("[RequestSwapTexture] rejecting fetch: is_valid={} base_page=0x{:X} "
+           "dimension={} (fetch dwords: {:08X} {:08X} {:08X} {:08X} {:08X} {:08X})",
+           key.is_valid ? 1 : 0, key.base_page,
+           static_cast<uint32_t>(key.dimension),
+           fetch.dword_0, fetch.dword_1, fetch.dword_2,
+           fetch.dword_3, fetch.dword_4, fetch.dword_5);
     return nullptr;
   }
   VulkanTexture* texture =
       static_cast<VulkanTexture*>(FindOrCreateTexture(key));
   if (!texture) {
+    XELOGW("[RequestSwapTexture] FindOrCreateTexture returned nullptr for "
+           "base_page=0x{:X} format={}",
+           key.base_page, static_cast<uint32_t>(key.format));
     return VK_NULL_HANDLE;
   }
   VkImageView texture_view = texture->GetView(
       false, GuestToHostSwizzle(fetch.swizzle, GetHostFormatSwizzle(key)),
       false);
   if (texture_view == VK_NULL_HANDLE) {
+    XELOGW("[RequestSwapTexture] texture->GetView returned VK_NULL_HANDLE for "
+           "base_page=0x{:X} format={}",
+           key.base_page, static_cast<uint32_t>(key.format));
     return VK_NULL_HANDLE;
   }
   if (!LoadTextureData(*texture)) {
-    XELOGE("Failed to load texture data for swap texture");
+    XELOGE("[RequestSwapTexture] LoadTextureData failed for swap texture "
+           "(base_page=0x{:X} format={} size={}x{}) — this typically means "
+           "the frontbuffer was never resolved to shared memory before VdSwap",
+           key.base_page, static_cast<uint32_t>(key.format),
+           key.GetWidth(), key.GetHeight());
     return VK_NULL_HANDLE;
   }
   texture->MarkAsUsed();
@@ -928,6 +950,11 @@ VkImageView VulkanTextureCache::RequestSwapTexture(
   height_scaled_out =
       key.GetHeight() * (key.scaled_resolve ? draw_resolution_scale_y() : 1);
   format_out = key.format;
+  XELOGI("[RequestSwapTexture] OK base_page=0x{:X} format={} size={}x{} "
+         "(scaled {}x{})",
+         key.base_page, static_cast<uint32_t>(key.format),
+         key.GetWidth(), key.GetHeight(),
+         width_scaled_out, height_scaled_out);
   return texture_view;
 }
 

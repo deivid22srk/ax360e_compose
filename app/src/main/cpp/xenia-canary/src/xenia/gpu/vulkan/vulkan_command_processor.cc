@@ -1287,13 +1287,23 @@ void VulkanCommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
                                        uint32_t frontbuffer_height) {
   SCOPE_profile_cpu_f("gpu");
 
+  // [TURNIP BLACK-SCREEN AUDIT] Log every IssueSwap invocation with the
+  // guest-side frontbuffer address. If this fires but no subsequent
+  // "RefreshGuestOutput succeeded" log appears, the problem is between
+  // IssueSwap and RefreshGuestOutput (likely RequestSwapTexture returning
+  // VK_NULL_HANDLE because the frontbuffer texture failed to load).
+  XELOGI("[IssueSwap] frontbuffer_ptr=0x{:08X} width={} height={}",
+         frontbuffer_ptr, frontbuffer_width, frontbuffer_height);
+
   ui::Presenter* presenter = graphics_system_->presenter();
   if (!presenter) {
+    XELOGW("[IssueSwap] aborting: no presenter");
     return;
   }
 
   // In case the swap command is the only one in the frame.
   if (!BeginSubmission(true)) {
+    XELOGW("[IssueSwap] aborting: BeginSubmission failed");
     return;
   }
 
@@ -1304,8 +1314,28 @@ void VulkanCommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
   VkImageView swap_texture_view = texture_cache_->RequestSwapTexture(
       frontbuffer_width_scaled, frontbuffer_height_scaled, frontbuffer_format);
   if (swap_texture_view == VK_NULL_HANDLE) {
+    // [TURNIP BLACK-SCREEN AUDIT] This is the most common silent failure
+    // point for black-screen bugs. RequestSwapTexture returns VK_NULL_HANDLE
+    // when:
+    //   - BindingInfoFromFetchConstant produces !key.is_valid (bad fetch
+    //     constant)
+    //   - key.base_page == 0 (frontbuffer_ptr not page-aligned or zero)
+    //   - FindOrCreateTexture fails (host GPU memory allocation failure)
+    //   - GetView fails (view creation rejected by driver)
+    //   - LoadTextureData fails (most commonly: shared memory range not
+    //     valid, i.e. the frontbuffer was never resolved by the GPU before
+    //     the guest called VdSwap)
+    XELOGW("[IssueSwap] RequestSwapTexture returned VK_NULL_HANDLE for "
+           "frontbuffer_ptr=0x{:08X} — frontbuffer may not have been "
+           "resolved yet, or texture creation/view failed",
+           frontbuffer_ptr);
     return;
   }
+
+  XELOGI("[IssueSwap] swap_texture_view OK, calling RefreshGuestOutput "
+         "({}x{}, format={})",
+         frontbuffer_width_scaled, frontbuffer_height_scaled,
+         static_cast<uint32_t>(frontbuffer_format));
 
   auto aspect = graphics_system_->GetScaledAspectRatio();
 
