@@ -1592,10 +1592,13 @@ dword_result_t KeInsertQueueDpc_entry(pointer_t<XDPC> dpc, dword_t arg1,
   auto global_lock = xe::global_critical_region::AcquireDirect();
   auto dpc_list = kernel_state()->dpc_list();
 
-  // If already in a queue, abort.
-  if (dpc_list->IsQueued(list_entry_ptr)) {
-    return 0;
-  }
+  // [UPSTREAM cdb88d0] Removed IsQueued check for DPC. Some titles re-insert
+  // the same DPC with new arguments expecting them to be updated in-place;
+  // the previous early-abort prevented this and broke DPC dispatch loops in
+  // games like Forza Motorsport 4 (audio thread DPC re-arming). The list
+  // itself is idempotent for an already-queued entry, so removing the check
+  // is safe — worst case the entry's arg1/arg2 get overwritten with the new
+  // values, which matches the observed hardware behavior.
 
   // Prep DPC.
   dpc->arg1 = (uint32_t)arg1;

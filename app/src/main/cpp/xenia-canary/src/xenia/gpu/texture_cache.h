@@ -263,7 +263,10 @@ class TextureCache {
     bool mips_outdated(const global_unique_lock_type& global_lock) const {
       return mips_outdated_;
     }
-    void MakeUpToDateAndWatch(const global_unique_lock_type& global_lock);
+    // [UPSTREAM 9781a75] Returns false if the backing shared-memory was
+    // invalidated between marking outdated and now; caller should skip the
+    // texture this frame so it can be reloaded later.
+    bool MakeUpToDateAndWatch(const global_unique_lock_type& global_lock);
 
     void WatchCallback(const global_unique_lock_type& global_lock, bool is_mip);
 

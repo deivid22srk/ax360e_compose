@@ -197,7 +197,10 @@ uint32_t XamUserReadProfileSettingsEx(uint32_t title_id, uint32_t user_index,
                                       be<uint32_t>* buffer_size_ptr,
                                       uint8_t* buffer,
                                       lpvoid_t overlapped_ptr) {
-  assert_zero(unk);  // probably flags
+  // [UPSTREAM 2c68a2f] `unk` was originally believed to be a flags dword,
+  // but is actually the second buffer-size pointer that the wrapper above
+  // already resolved. The wrapper now always passes 0 here.
+  assert_zero(unk);
 
   // must have at least 1 to 32 settings
   if (setting_count < 1 || setting_count > 32) {
@@ -339,10 +342,21 @@ DECLARE_XAM_EXPORT1(XamUserReadProfileSettings, kUserProfiles, kImplemented);
 dword_result_t XamUserReadProfileSettingsEx_entry(
     dword_t title_id, dword_t user_index, dword_t xuid_count, lpqword_t xuids,
     dword_t setting_count, lpdword_t setting_ids, lpdword_t buffer_size_ptr,
-    dword_t unk_2, lpvoid_t buffer_ptr, lpvoid_t overlapped) {
-  return XamUserReadProfileSettingsEx(title_id, user_index, xuid_count, xuids,
-                                      setting_count, setting_ids, unk_2,
-                                      buffer_size_ptr, buffer_ptr, overlapped);
+    lpdword_t unkn_buffer_size_ptr, lpvoid_t buffer_ptr, lpvoid_t overlapped) {
+  // [UPSTREAM 2c68a2f] The 8th parameter of XamUserReadProfileSettingsEx is
+  // a SECOND buffer-size pointer (not a "flags" dword as the previous
+  // signature claimed). Different titles fill in one or the other
+  // depending on which SDK header they were built against, and the
+  // previous implementation passed it through as `unk` (assert_zero(unk)
+  // in the inner helper). The Kinect Dashboard hits this path when the
+  // user selects "Switch Profiles" — the assert fired, the call returned
+  // X_ERROR_INVALID_PARAMETER, and the dashboard crashed. Now we pass 0
+  // for the inner "unused" parameter and pick whichever buffer-size
+  // pointer was supplied by the caller.
+  return XamUserReadProfileSettingsEx(
+      title_id, user_index, xuid_count, xuids, setting_count, setting_ids, 0,
+      buffer_size_ptr ? buffer_size_ptr : unkn_buffer_size_ptr, buffer_ptr,
+      overlapped);
 }
 DECLARE_XAM_EXPORT1(XamUserReadProfileSettingsEx, kUserProfiles, kImplemented);
 

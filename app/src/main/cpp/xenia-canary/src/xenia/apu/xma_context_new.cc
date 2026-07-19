@@ -138,6 +138,13 @@ bool XmaContextNew::Work() {
     Consume(&output_rb, &data);
     data.output_buffer_write_offset =
         output_rb.write_offset() / kOutputBytesPerBlock;
+    // [UPSTREAM 7e98ae6] Invalidate output buffer if there is nothing to
+    // process — fixes 565507E4 hardlock on boot where the consume-only
+    // path left output_buffer_valid=true with an empty ring buffer, so
+    // the guest kept polling for data that would never arrive.
+    if (output_rb.empty()) {
+      data.output_buffer_valid = false;
+    }
     StoreContextMerged(data, initial_data, context_ptr);
     return true;
   }
@@ -205,20 +212,49 @@ bool XmaContextNew::Work() {
     }
   }
 
-  data.output_buffer_write_offset =
-      output_rb.write_offset() / kOutputBytesPerBlock;
+  // [UPSTREAM 09dbe2c + 505697f + 7e98ae6] Refined output buffer invalidation
+  // for XmaContextNew — fixes audio hardlocks and stalls observed in:
+  //  - 565507E4 (hardlock on boot, 7e98ae6)
+  //  - NFS: Carbon / NFS: Most Wanted (write_offset used as stall detector,
+  //    09dbe2c — when input is starved we must pin write_offset == read_offset
+  //    and clear output_buffer_valid so the game's stall check exits instead
+  //    of spinning forever)
+  //  - Generic "output buffer is full" path (505697f — only invalidate when
+  //    BOTH the remaining_subframe_blocks counter hits zero AND the ring
+  //    buffer is empty, preventing premature invalidation while there's
+  //    still pending data being consumed by the guest)
+  if (initial_data.IsAnyInputBufferValid()) {
+    data.output_buffer_write_offset =
+        output_rb.write_offset() / kOutputBytesPerBlock;
+  } else {
+    // NFS: Carbon and NFS: MW use write_offset as a stall detector — make
+    // sure that they are equal if we're starved on input.
+    if (data.output_buffer_write_offset != data.output_buffer_read_offset) {
+      data.output_buffer_write_offset = data.output_buffer_read_offset;
+      data.output_buffer_valid = 0;
+    }
+  }
 
-  XELOGAPU("XmaContext {}: Read Output: {} Write Output: {}", id(),
-           data.output_buffer_read_offset, data.output_buffer_write_offset);
-
-  // That's a bit misleading due to nature of ringbuffer
-  // when write and read offset matches it might mean that we wrote nothing
-  // or we fully saturated allocated space.
-  if (output_rb.empty()) {
-    XELOGAPU("XmaContext {}: Output ring buffer empty, invalidating output",
+  // Signal the game that the output buffer is full. 505697f narrowed the
+  // condition from "remaining == 0" to "remaining == 0 AND ring buffer
+  // empty" — the original broader condition prematurely invalidated the
+  // buffer while there was still pending output being consumed.
+  if (remaining_subframe_blocks_in_output_buffer_ == 0 && output_rb.empty()) {
+    XELOGAPU("XmaContext {}: Output ring buffer is full, invalidating output",
              id());
     data.output_buffer_valid = 0;
   }
+
+  // 7e98ae6: if we consumed everything and the ring buffer is empty, the
+  // output is no longer valid — surfaces the "nothing more to play" state
+  // to the guest so it can queue the next packet instead of reading
+  // silence indefinitely.
+  if (output_rb.empty()) {
+    data.output_buffer_valid = false;
+  }
+
+  XELOGAPU("XmaContext {}: Read Output: {} Write Output: {}", id(),
+           data.output_buffer_read_offset, data.output_buffer_write_offset);
 
   StoreContextMerged(data, initial_data, context_ptr);
   return true;

@@ -50,9 +50,12 @@ AudioSystem::AudioSystem(cpu::Processor* processor)
       processor_(processor),
       worker_running_(false) {
   std::memset(clients_, 0, sizeof(clients_));
-  queued_frames_ = std::min(
-      static_cast<uint32_t>(kMaximumQueuedFrames),
-      std::max(cvars::apu_max_queued_frames, static_cast<uint32_t>(4)));
+  // [UPSTREAM 29311dd] Replaced manual min/max nesting with std::clamp for
+  // readability. Behavior is identical (clamped to [kMinimumQueuedFrames=4,
+  // kMaximumQueuedFrames=64]).
+  queued_frames_ = std::clamp(cvars::apu_max_queued_frames,
+                              static_cast<uint32_t>(kMinimumQueuedFrames),
+                              static_cast<uint32_t>(kMaximumQueuedFrames));
 
   for (size_t i = 0; i < kMaximumClientCount; ++i) {
     client_semaphores_[i] = xe::threading::Semaphore::Create(0, queued_frames_);
@@ -93,6 +96,20 @@ X_STATUS AudioSystem::Setup(kernel::KernelState* kernel_state) {
   worker_thread_->set_can_debugger_suspend(true);
   worker_thread_->set_name("Audio Worker");
   worker_thread_->Create();
+
+  // [UPSTREAM 6e5b832] Pace audio subsystem — set high priority for the
+  // worker thread so audio callbacks fire on a stable 5.33 ms cadence
+  // instead of being preempted by the CPU/GPU threads. Without this,
+  // audio glitches and buffer underruns show up in titles with tight
+  // XAudio2 deadlines (Forza, Halo: Reach cutscenes). The full upstream
+  // patch also replaces the semaphore-driven WaitAny loop with a
+  // deadline-driven pacer; we keep the existing loop here because the
+  // ax360e audio driver integration already enforces back-pressure via
+  // the per-client semaphores, and a wholesale swap would risk
+  // regressing the Android-specific aaudio/opensles drivers.
+  if (worker_thread_->thread()) {
+    worker_thread_->thread()->set_priority(24);
+  }
 
   return X_STATUS_SUCCESS;
 }

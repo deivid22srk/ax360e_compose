@@ -829,6 +829,14 @@ dword_result_t KeGetImagePageTableEntry_entry(dword_t address,
 
   if (image_heap->page_size() < 65536) {
     returned_value |= 0x40000000;
+
+    // [UPSTREAM 331ddf7] Dashboard 14xxx+ requires bit 0 set in the page
+    // table entry returned by KeGetImagePageTableEntry. Without this, newer
+    // dashboards fail their page-table sanity check at boot and refuse to
+    // proceed past the initial logo. TODO(Gliniak, upstream): verify if bit
+    // 0 should only be set when the page is read-only — for now always-on
+    // matches the observed hardware behavior on dashboards 14xxx-19xxx.
+    returned_value |= 1;
   }
 
   return returned_value & 0x400FFFFF;  // this is actually the mask it applies

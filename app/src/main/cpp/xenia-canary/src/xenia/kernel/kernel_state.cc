@@ -118,6 +118,15 @@ uint32_t KernelState::title_id() const {
   return 0;
 }
 
+// [UPSTREAM 9478cda] is_title_open helper — title_id() returns 0 in two
+// distinct cases: (a) no title is open at all, (b) the title's XEX header
+// simply lacks a title_id field. The frame-limiter worker and other
+// background threads need to distinguish "no title" from "title with id 0"
+// so they can sleep instead of spinning when nothing is running. Without
+// this, titles without a title_id in their XEX header fail to boot because
+// the frame limiter keeps spinning waiting for a non-zero id.
+bool KernelState::is_title_open() const { return emulator_->is_title_open(); }
+
 const std::unique_ptr<xam::SpaInfo> KernelState::title_xdbf() const {
   return module_xdbf(executable_module_);
 }

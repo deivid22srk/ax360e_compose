@@ -1156,18 +1156,6 @@ int InstrEmit_dcbtst(PPCHIRBuilder& f, const InstrData& i) {
   return 0;
 }
 
-int InstrEmit_dcbz(PPCHIRBuilder& f, const InstrData& i) {
-  // EA <- (RA) + (RB)
-  // memset(EA & ~31, 0, 32)
-  Value* ea = CalculateEA_0(f, i.X.RA, i.X.RB);
-  // dcbz - 32 byte set
-  int block_size = 32;
-  int address_mask = ~31;
-  f.Memset(f.And(ea, f.LoadConstantInt64(address_mask)), f.LoadZeroInt8(),
-           f.LoadConstantInt64(block_size));
-  return 0;
-}
-
 int InstrEmit_dcbz128(PPCHIRBuilder& f, const InstrData& i) {
   // EA <- (RA) + (RB)
   // memset(EA & ~31, 0, 32)
@@ -1178,6 +1166,19 @@ int InstrEmit_dcbz128(PPCHIRBuilder& f, const InstrData& i) {
   f.Memset(f.And(ea, f.LoadConstantInt64(address_mask)), f.LoadZeroInt8(),
            f.LoadConstantInt64(block_size));
   return 0;
+}
+
+int InstrEmit_dcbz(PPCHIRBuilder& f, const InstrData& i) {
+  // EA <- (RA) + (RB)
+  // memset(EA & ~31, 0, 32)
+  // [UPSTREAM 72ce130] Xbox360 cache line is always 128 bytes — on real
+  // hardware there is no short cache line, so the regular dcbz instruction
+  // clears the same 128-byte line as dcbz128. The previous 32-byte
+  // implementation left the rest of the cache line untouched, causing
+  // stale data to be observed by the guest after a dcbz — which broke
+  // 4E4D07E0 and 4E4D083D (cache-line-aware code paths that expected the
+  // full line to be zeroed).
+  return InstrEmit_dcbz128(f, i);
 }
 
 int InstrEmit_icbi(PPCHIRBuilder& f, const InstrData& i) {

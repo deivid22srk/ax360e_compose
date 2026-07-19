@@ -182,6 +182,11 @@ class KernelState {
   vfs::VirtualFileSystem* file_system() const { return file_system_; }
 
   uint32_t title_id() const;
+  // [UPSTREAM 9478cda] Distinguishes "no title is currently running" from
+  // "title is running but its XEX header doesn't contain a title_id" — both
+  // surface as title_id() == 0. Used by the frame limiter and other
+  // background threads to decide whether to sleep or keep ticking.
+  bool is_title_open() const;
   const std::unique_ptr<xam::SpaInfo> title_xdbf() const;
   const std::unique_ptr<xam::SpaInfo> module_xdbf(
       object_ref<UserModule> exec_module) const;

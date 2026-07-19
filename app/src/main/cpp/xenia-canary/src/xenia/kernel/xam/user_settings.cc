@@ -53,10 +53,21 @@ std::optional<UserSetting> UserSetting::GetDefaultSetting(uint32_t setting_id) {
 
   switch (type) {
     case X_USER_DATA_TYPE::CONTEXT:
+      // [UPSTREAM 35c513b] CONTEXT settings are uint32_t (not int32_t) —
+      // a separate UserSetting constructor overload exists for uint32_t
+      // that stores the value as the context's enum, not as a signed int.
+      // The previous fallthrough silently produced an int32_t UserSetting
+      // for CONTEXT-typed IDs (e.g. X_USER_PROFILE_GAMER_PICTURE,
+      // X_USER_PROFILE_GAMERCARD_*), which then failed to match when the
+      // title queried them via XamUserReadProfileSettingsEx — the returned
+      // variant had the wrong type tag and the title either ignored the
+      // value or crashed reading it.
+      return std::make_optional<UserSetting>(
+          static_cast<UserSettingId>(setting_id), static_cast<uint32_t>(0));
     case X_USER_DATA_TYPE::INT32:
     case X_USER_DATA_TYPE::UNSET:
       return std::make_optional<UserSetting>(
-          static_cast<UserSettingId>(setting_id), 0);
+          static_cast<UserSettingId>(setting_id), static_cast<int32_t>(0));
     case X_USER_DATA_TYPE::INT64:
     case X_USER_DATA_TYPE::DATETIME:
       return std::make_optional<UserSetting>(
