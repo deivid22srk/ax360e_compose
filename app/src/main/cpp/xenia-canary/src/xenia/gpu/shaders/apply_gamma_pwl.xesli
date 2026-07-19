@@ -82,13 +82,13 @@ xesl_entry_inputs_end_code_begin
     pixel_index = xe_apply_gamma_frag;
   } else if (xe_rot == 90u) {
     pixel_index = xesl_uint2(xe_apply_gamma_frag.y,
-                             int(xe_src_h) - 1 - int(xe_apply_gamma_frag.x));
+                             xe_src_h - 1u - xe_apply_gamma_frag.x);
   } else if (xe_rot == 180u) {
-    pixel_index = xesl_uint2(int(xe_src_w) - 1 - int(xe_apply_gamma_frag.x),
-                             int(xe_src_h) - 1 - int(xe_apply_gamma_frag.y));
+    pixel_index = xesl_uint2(xe_src_w - 1u - xe_apply_gamma_frag.x,
+                             xe_src_h - 1u - xe_apply_gamma_frag.y);
   } else {
     // 270
-    pixel_index = xesl_uint2(int(xe_src_w) - 1 - int(xe_apply_gamma_frag.y),
+    pixel_index = xesl_uint2(xe_src_w - 1u - xe_apply_gamma_frag.y,
                              xe_apply_gamma_frag.x);
   }
 #endif  // XE_APPLY_GAMMA_COMPUTE
