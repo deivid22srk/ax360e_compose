@@ -576,7 +576,8 @@ VulkanPresenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
         vulkan_device_, paint_context_.vulkan_surface, new_surface_width,
         new_surface_height, old_swapchain, paint_context_.present_queue_family,
         new_swapchain_format, paint_context_.swapchain_extent,
-        paint_context_.swapchain_is_fifo, surface_unusable);
+        paint_context_.swapchain_is_fifo, surface_unusable,
+        paint_context_.swapchain_rotation_degrees);
     // Destroy the old swapchain that may be retired now.
     if (old_swapchain != VK_NULL_HANDLE) {
       dfn.vkDestroySwapchainKHR(device, old_swapchain, nullptr);
@@ -667,7 +668,8 @@ VulkanPresenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
         vulkan_device_, paint_context_.vulkan_surface, new_surface_width,
         new_surface_height, VK_NULL_HANDLE, paint_context_.present_queue_family,
         new_swapchain_format, paint_context_.swapchain_extent,
-        paint_context_.swapchain_is_fifo, surface_unusable);
+        paint_context_.swapchain_is_fifo, surface_unusable,
+        paint_context_.swapchain_rotation_degrees);
     if (paint_context_.swapchain == VK_NULL_HANDLE) {
       // Failed to create the swapchain for the new Vulkan surface - destroy the
       // Vulkan surface.
@@ -928,8 +930,10 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
     uint32_t height, VkSwapchainKHR old_swapchain,
     uint32_t& present_queue_family_out, VkFormat& image_format_out,
     VkExtent2D& image_extent_out, bool& is_fifo_out,
-    bool& ui_surface_unusable_out) {
+    bool& ui_surface_unusable_out,
+    uint32_t& rotation_degrees_out) {
   ui_surface_unusable_out = false;
+  rotation_degrees_out = 0;
 
   const VulkanInstance::Functions& ifn =
       vulkan_device->vulkan_instance()->functions();
@@ -973,6 +977,42 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
       image_extent.width > max_framebuffer_extent.width ||
       image_extent.height > max_framebuffer_extent.height) {
     return VK_NULL_HANDLE;
+  }
+
+  // [ANDROID ROTATION FIX] When the surface's currentTransform is 90° or
+  // 270°, the swapchain images must have their dimensions swapped relative
+  // to the window's reported extent. The application is then responsible
+  // for rendering the guest output rotated into these swapped-dimension
+  // images, so that when the compositor applies the inverse transform the
+  // image appears upright.
+  //
+  // Without this swap, on Android phones in landscape orientation (where
+  // currentTransform is typically ROTATE_90), the swapchain is created
+  // 1600x720 but the SurfaceFlinger expects a pre-rotated image of 720x1600
+  // — the unrotated 1600x720 image we present ends up either sideways
+  // (Adreno proprietary) or fully black (Turnip, which presents the
+  // unrotated image into a window whose physical orientation differs and
+  // most pixels fall outside the visible viewport).
+  const bool surface_swap_dims =
+      (surface_capabilities.currentTransform &
+       (VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR |
+        VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)) != 0;
+  if (surface_swap_dims) {
+    std::swap(image_extent.width, image_extent.height);
+    // Re-clamp to surface caps after swap (the swapped values must still fit).
+    image_extent.width =
+        std::min(std::max(image_extent.width,
+                          surface_capabilities.minImageExtent.width),
+                 surface_capabilities.maxImageExtent.width);
+    image_extent.height =
+        std::min(std::max(image_extent.height,
+                          surface_capabilities.minImageExtent.height),
+                 surface_capabilities.maxImageExtent.height);
+    XELOGI(
+        "VulkanPresenter: surface transform=0x{:X} requires swapping "
+        "swapchain dims — final swapchain extent={}x{}",
+        uint32_t(surface_capabilities.currentTransform),
+        image_extent.width, image_extent.height);
   }
 
   // Get the queue family for presentation.
@@ -1251,9 +1291,27 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
     chosen_pre_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
   }
   swapchain_create_info.preTransform = chosen_pre_transform;
-  XELOGI("VulkanPresenter: swapchain preTransform = 0x{:X} (currentTransform=0x{:X})",
+  // [ANDROID ROTATION FIX] Convert the chosen preTransform bit to a
+  // rotation in degrees for the apply_gamma pixel shader. The shader uses
+  // this to map swapchain-space FragCoord back to source-space pixel_index.
+  switch (chosen_pre_transform) {
+    case VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR:
+      rotation_degrees_out = 90;
+      break;
+    case VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR:
+      rotation_degrees_out = 180;
+      break;
+    case VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR:
+      rotation_degrees_out = 270;
+      break;
+    default:
+      rotation_degrees_out = 0;
+      break;
+  }
+  XELOGI("VulkanPresenter: swapchain preTransform = 0x{:X} (currentTransform=0x{:X}) rotation={}°",
          uint32_t(chosen_pre_transform),
-         uint32_t(surface_capabilities.currentTransform));
+         uint32_t(surface_capabilities.currentTransform),
+         rotation_degrees_out);
   // Prefer opaque to avoid blending in the window system, or let that be
   // specified via the window system if it can't be forced. As a last resort,
   // just pick any - guest output will write alpha of 1 anyway.

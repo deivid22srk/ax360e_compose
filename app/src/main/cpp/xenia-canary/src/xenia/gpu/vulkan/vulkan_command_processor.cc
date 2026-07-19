@@ -765,8 +765,23 @@ bool VulkanCommandProcessor::SetupContext() {
       uint32_t(swap_apply_gamma_descriptor_set_layouts.size());
   swap_apply_gamma_pipeline_layout_create_info.pSetLayouts =
       swap_apply_gamma_descriptor_set_layouts.data();
-  swap_apply_gamma_pipeline_layout_create_info.pushConstantRangeCount = 0;
-  swap_apply_gamma_pipeline_layout_create_info.pPushConstantRanges = nullptr;
+  // [ANDROID ROTATION FIX] The apply_gamma pixel shaders now use
+  // push-constants for the source guest output dimensions (xe_apply_gamma_size)
+  // and the rotation angle (xe_apply_gamma_rotation). Without these ranges
+  // declared here, vkCreateGraphicsPipelines would fail because the shader
+  // references push-constant variables that aren't backed by the layout.
+  //
+  // Layout: struct { uvec2 xe_apply_gamma_size; uint xe_apply_gamma_rotation; }
+  //           = 12 bytes (3 * uint32)
+  // Stage: fragment only (the compute variant is a separate pipeline).
+  VkPushConstantRange swap_apply_gamma_push_constant_range;
+  swap_apply_gamma_push_constant_range.stageFlags =
+      VK_SHADER_STAGE_FRAGMENT_BIT;
+  swap_apply_gamma_push_constant_range.offset = 0;
+  swap_apply_gamma_push_constant_range.size = 12;  // uvec2 + uint
+  swap_apply_gamma_pipeline_layout_create_info.pushConstantRangeCount = 1;
+  swap_apply_gamma_pipeline_layout_create_info.pPushConstantRanges =
+      &swap_apply_gamma_push_constant_range;
   if (dfn.vkCreatePipelineLayout(
           device, &swap_apply_gamma_pipeline_layout_create_info, nullptr,
           &swap_apply_gamma_pipeline_layout_) != VK_SUCCESS) {
@@ -1624,6 +1639,28 @@ void VulkanCommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
             VK_PIPELINE_BIND_POINT_GRAPHICS, swap_apply_gamma_pipeline_layout_,
             0, uint32_t(swap_descriptor_sets.size()),
             swap_descriptor_sets.data(), 0, nullptr);
+
+        // [ANDROID ROTATION FIX] Push the source guest output dimensions
+        // (unrotated) and the rotation angle to the apply_gamma pixel
+        // shader so it can map swapchain-space FragCoord back to
+        // source-space pixel_index. The rotation is derived from the
+        // presenter's swapchain_surface_transform.
+        uint32_t swap_rotation_degrees = 0;
+        if (auto* vulkan_presenter = static_cast<ui::vulkan::VulkanPresenter*>(
+                graphics_system_->presenter())) {
+          swap_rotation_degrees =
+              vulkan_presenter->GetSwapchainRotationDegrees();
+        }
+        struct SwapApplyGammaPushConstants {
+          uint32_t size[2];       // xe_apply_gamma_size (source dims)
+          uint32_t rotation;      // xe_apply_gamma_rotation (0/90/180/270)
+        } swap_apply_gamma_pc;
+        swap_apply_gamma_pc.size[0] = frontbuffer_width_scaled;
+        swap_apply_gamma_pc.size[1] = frontbuffer_height_scaled;
+        swap_apply_gamma_pc.rotation = swap_rotation_degrees;
+        deferred_command_buffer_.CmdVkPushConstants(
+            swap_apply_gamma_pipeline_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            0, sizeof(swap_apply_gamma_pc), &swap_apply_gamma_pc);
 
         deferred_command_buffer_.CmdVkDraw(3, 1, 0, 0);
 

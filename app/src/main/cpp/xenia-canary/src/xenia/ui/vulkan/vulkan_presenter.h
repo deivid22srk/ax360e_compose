@@ -138,6 +138,16 @@ class VulkanPresenter final : public Presenter {
 
   const VulkanDevice* vulkan_device() const { return vulkan_device_; }
 
+  // [ANDROID ROTATION FIX] Returns the rotation in degrees (0/90/180/270)
+  // that the guest output must be rotated by before presenting, derived
+  // from the swapchain's preTransform (which matches currentTransform).
+  // 0 = no rotation (identity), 90 = 90° CW, etc. Used by the
+  // apply_gamma pixel shader to map swapchain-space FragCoord back to
+  // source-space pixel_index.
+  uint32_t GetSwapchainRotationDegrees() const {
+    return paint_context_.swapchain_rotation_degrees;
+  }
+
   static Surface::TypeFlags GetSurfaceTypesSupportedByInstance(
       const VulkanInstance::Extensions& instance_extensions);
   Surface::TypeFlags GetSupportedSurfaceTypes() const override;
@@ -375,7 +385,8 @@ class VulkanPresenter final : public Presenter {
         uint32_t height, VkSwapchainKHR old_swapchain,
         uint32_t& present_queue_family_out, VkFormat& image_format_out,
         VkExtent2D& image_extent_out, bool& is_fifo_out,
-        bool& ui_surface_unusable_out);
+        bool& ui_surface_unusable_out,
+        uint32_t& rotation_degrees_out);
 
     // Destroys the swapchain and its derivatives, nulls `swapchain` and returns
     // the original swapchain object, if it existed, for use as oldSwapchain if
@@ -440,6 +451,14 @@ class VulkanPresenter final : public Presenter {
     VkSwapchainKHR swapchain = VK_NULL_HANDLE;
     VkExtent2D swapchain_extent = {};
     bool swapchain_is_fifo = false;
+    // [ANDROID ROTATION FIX] The surface's currentTransform at swapchain
+    // creation time. The guest output must be rotated by this angle before
+    // presenting, because preTransform == currentTransform means we promised
+    // the compositor the image is already in the rotated orientation.
+    // 0 = IDENTITY, 1 = ROTATE_90, 2 = ROTATE_180, 3 = ROTATE_270
+    // (values match VkSurfaceTransformFlagBitsKHR bits 0x1, 0x2, 0x4, 0x8
+    //  but we store the rotation degrees for convenience: 0/90/180/270).
+    uint32_t swapchain_rotation_degrees = 0;
     std::vector<VkImage> swapchain_images;
     std::vector<SwapchainFramebuffer> swapchain_framebuffers;
   };

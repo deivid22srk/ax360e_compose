@@ -17,6 +17,7 @@
 #endif
 xesl_pushConstants_begin(b0, space0)
   xesl_uint2 xe_apply_gamma_size;
+  xesl_uint xe_apply_gamma_rotation;
 xesl_pushConstants_end
 #define xesl_localSize_x 16
 #define xesl_localSize_y 8
@@ -54,7 +55,36 @@ xesl_entry_stageInputs_end_bindings_begin_pixel
 xesl_entry_bindings_end_inputs_begin
   xesl_entry_input_fragCoord
 xesl_entry_inputs_end_code_begin
-  xesl_uint2 pixel_index = xesl_uint2(xesl_FragCoord.xy);
+  // [ANDROID ROTATION FIX] When the swapchain preTransform is 90/180/270,
+  // the swapchain image dimensions are swapped relative to the source guest
+  // output image. We need to map the swapchain-space FragCoord back to the
+  // source-space pixel_index by applying the inverse rotation.
+  //
+  // xe_apply_gamma_size holds the SOURCE (unrotated) guest output dimensions.
+  // xe_apply_gamma_rotation is 0/90/180/270 (degrees CW) — the rotation that
+  // was applied to bring the source into swapchain orientation.
+  //
+  // For a 90° CW rotation: swapchain(x,y) corresponds to source(y, srcH-1-x).
+  // For 180°: swapchain(x,y) -> source(srcW-1-x, srcH-1-y).
+  // For 270°: swapchain(x,y) -> source(srcW-1-y, x).
+  xesl_uint2 xe_apply_gamma_frag = xesl_uint2(xesl_FragCoord.xy);
+  xesl_uint2 pixel_index;
+  xesl_uint xe_src_w = xesl_pushConstant(xe_apply_gamma_size).x;
+  xesl_uint xe_src_h = xesl_pushConstant(xe_apply_gamma_size).y;
+  xesl_uint xe_rot = xesl_pushConstant(xe_apply_gamma_rotation);
+  if (xe_rot == 0u) {
+    pixel_index = xe_apply_gamma_frag;
+  } else if (xe_rot == 90u) {
+    pixel_index = xesl_uint2(xe_apply_gamma_frag.y,
+                             int(xe_src_h) - 1 - int(xe_apply_gamma_frag.x));
+  } else if (xe_rot == 180u) {
+    pixel_index = xesl_uint2(int(xe_src_w) - 1 - int(xe_apply_gamma_frag.x),
+                             int(xe_src_h) - 1 - int(xe_apply_gamma_frag.y));
+  } else {
+    // 270
+    pixel_index = xesl_uint2(int(xe_src_w) - 1 - int(xe_apply_gamma_frag.y),
+                             xe_apply_gamma_frag.x);
+  }
 #endif  // XE_APPLY_GAMMA_COMPUTE
   // UNORM conversion according to the Direct3D 10+ rules.
   xesl_uint3 apply_gamma_input = xesl_uint3(
