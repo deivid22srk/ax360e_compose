@@ -15,10 +15,18 @@
 #else
   #define XE_APPLY_GAMMA_DEST_FORMAT xesl_imageFormat_rgb10_a2
 #endif
+#endif  // XE_APPLY_GAMMA_COMPUTE
+
+// [ANDROID ROTATION FIX] Push-constants are needed by BOTH the compute and
+// the pixel shader paths (the pixel path uses them for rotation). Move the
+// declaration outside the XE_APPLY_GAMMA_COMPUTE ifdef so both variants
+// have access to xesl_pushConstants.
 xesl_pushConstants_begin(b0, space0)
   xesl_uint2 xe_apply_gamma_size;
   xesl_uint xe_apply_gamma_rotation;
 xesl_pushConstants_end
+
+#ifdef XE_APPLY_GAMMA_COMPUTE
 #define xesl_localSize_x 16
 #define xesl_localSize_y 8
 #define xesl_localSize_z 1
