@@ -458,7 +458,7 @@ fun EmulatorSettingsScreen(
                 item {
                     PreferenceHeader(text = sectionName)
                 }
-                item {
+                item(key = "section_detail_$refreshToken") {
                     PreferenceGroupCard {
                         entries.forEachIndexed { idx, entry ->
                             SettingsEntryRow(
