@@ -1044,7 +1044,7 @@ VkSwapchainKHR VulkanPresenter::PaintContext::CreateSwapchainForVulkanSurface(
       uint32_t(surface_capabilities.supportedTransforms),
       surface_capabilities.maxImageArrayLayers,
       uint32_t(surface_capabilities.supportedCompositeAlpha),
-      uint32_t(surface_capabilities.supportedUsage));
+      uint32_t(surface_capabilities.supportedUsageFlags));
 
   // Get the surface format.
   std::vector<VkSurfaceFormatKHR> surface_formats;
