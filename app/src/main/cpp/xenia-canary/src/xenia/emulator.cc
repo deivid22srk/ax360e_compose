@@ -1835,9 +1835,8 @@ X_STATUS Emulator::CompleteLaunch(const std::filesystem::path& path,
   if (graphics_system_) {
     on_shader_storage_initialization(true);
     graphics_system_->InitializeShaderStorage(
-        cache_root_, title_id_.value(), false/*,
-        [this]() { on_shader_storage_initialization(false); }*/);
-      on_shader_storage_initialization(false);
+        cache_root_, title_id_.value(), false,
+        [this]() { on_shader_storage_initialization(false); });
   }
 
   auto main_thread = kernel_state_->LaunchModule(module);
@@ -1857,6 +1856,8 @@ X_STATUS Emulator::CompleteLaunch(const std::filesystem::path& path,
                                        module->hash().value());
     }
   }
+
+  main_thread_->Resume();
 
   return X_STATUS_SUCCESS;
 }

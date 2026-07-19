@@ -26,17 +26,33 @@ DECLARE_bool(non_seamless_cube_map);
 
 DECLARE_bool(half_pixel_offset);
 
+DECLARE_string(occlusion_query);
+
+DECLARE_int32(occlusion_query_fake_lower_threshold);
+
+DECLARE_int32(occlusion_query_fake_upper_threshold);
+
+DECLARE_int32(occlusion_query_querybatch_range);
+
+DECLARE_double(occlusion_query_saturation);
+
+DECLARE_int32(anisotropic_override);
+
 DECLARE_int32(query_occlusion_sample_lower_threshold);
 
 DECLARE_int32(query_occlusion_sample_upper_threshold);
 
 DECLARE_bool(disassemble_pm4);
 
-// ax360e backport: async shader compilation (upstream 5845f343).
+DECLARE_bool(no_discard_stencil_in_transfer_pipelines);
+
 DECLARE_bool(async_shader_compilation);
 
-// ax360e backport: thread pool for shader compilation (upstream ccf8fb66).
 DECLARE_int32(vulkan_pipeline_creation_threads);
+
+DECLARE_bool(gpu_3d_to_2d_texture);
+
+DECLARE_bool(ac6_ground_fix);
 
 #define XE_GPU_FINE_GRAINED_DRAW_SCOPES 1
 
