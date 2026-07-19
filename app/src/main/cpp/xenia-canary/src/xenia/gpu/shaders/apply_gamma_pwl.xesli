@@ -73,24 +73,28 @@ xesl_entry_inputs_end_code_begin
   // [ANDROID ROTATION FIX] See apply_gamma_table.xesli for the rotation
   // math explanation. xe_apply_gamma_size holds the SOURCE (unrotated)
   // guest output dimensions; xe_apply_gamma_rotation is 0/90/180/270.
-  xesl_uint2 xe_apply_gamma_frag = xesl_uint2(xesl_FragCoord.xy);
-  xesl_uint2 pixel_index;
+  xesl_uint xe_frag_x = xesl_uint(xesl_FragCoord.x);
+  xesl_uint xe_frag_y = xesl_uint(xesl_FragCoord.y);
   xesl_uint xe_src_w = xesl_pushConstant(xe_apply_gamma_size).x;
   xesl_uint xe_src_h = xesl_pushConstant(xe_apply_gamma_size).y;
   xesl_uint xe_rot = xesl_pushConstant(xe_apply_gamma_rotation);
+  xesl_uint xe_px_x;
+  xesl_uint xe_px_y;
   if (xe_rot == 0u) {
-    pixel_index = xe_apply_gamma_frag;
+    xe_px_x = xe_frag_x;
+    xe_px_y = xe_frag_y;
   } else if (xe_rot == 90u) {
-    pixel_index = xesl_uint2(xe_apply_gamma_frag.y,
-                             xe_src_h - 1u - xe_apply_gamma_frag.x);
+    xe_px_x = xe_frag_y;
+    xe_px_y = xe_src_h - 1u - xe_frag_x;
   } else if (xe_rot == 180u) {
-    pixel_index = xesl_uint2(xe_src_w - 1u - xe_apply_gamma_frag.x,
-                             xe_src_h - 1u - xe_apply_gamma_frag.y);
+    xe_px_x = xe_src_w - 1u - xe_frag_x;
+    xe_px_y = xe_src_h - 1u - xe_frag_y;
   } else {
     // 270
-    pixel_index = xesl_uint2(xe_src_w - 1u - xe_apply_gamma_frag.y,
-                             xe_apply_gamma_frag.x);
+    xe_px_x = xe_src_w - 1u - xe_frag_y;
+    xe_px_y = xe_frag_x;
   }
+  xesl_uint2 pixel_index = xesl_uint2(xe_px_x, xe_px_y);
 #endif  // XE_APPLY_GAMMA_COMPUTE
   // UNORM conversion according to the Direct3D 10+ rules.
   xesl_uint3 apply_gamma_input = xesl_uint3(

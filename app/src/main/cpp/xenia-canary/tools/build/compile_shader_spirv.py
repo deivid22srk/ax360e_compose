@@ -103,11 +103,11 @@ def main():
 
         stdin_data = (XESL_WRAPPER % src_name) if src_is_xesl else None
         result = subprocess.run(glslang_args, input=stdin_data, text=True,
-                                stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:
             print(f"ERROR: glslangValidator failed for {src_name}", file=sys.stderr)
-            if result.stderr:
-                sys.stderr.write(result.stderr)
+            if result.stdout:
+                sys.stderr.write(result.stdout)
             return 1
 
         # Step 2: spirv-opt
