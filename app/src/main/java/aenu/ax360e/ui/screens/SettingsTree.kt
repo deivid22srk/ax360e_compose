@@ -322,6 +322,7 @@ object SettingsTree {
         "APU|xmp_default_volume",
         // CPU
         "CPU|cpu",
+        "CPU|enable_early_precompilation",
         // Display
         "Display|fullscreen",
         "Display|postprocess_antialiasing",
