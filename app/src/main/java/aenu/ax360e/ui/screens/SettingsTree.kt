@@ -119,6 +119,8 @@ object SettingsTree {
                     SettingsEntry.Bool(key = "GPU|depth_transfer_not_equal_test", title = context.getString(R.string.es_gpu_depth_transfer_not_equal_test)),
                     SettingsEntry.Bool(key = "GPU|disassemble_pm4", title = context.getString(R.string.es_gpu_disassemble_pm4)),
                     SettingsEntry.Bool(key = "GPU|draw_resolution_scaled_texture_offsets", title = context.getString(R.string.es_gpu_draw_resolution_scaled_texture_offsets)),
+                    SettingsEntry.Int(key = "GPU|draw_resolution_scale_x", title = context.getString(R.string.es_gpu_draw_resolution_scale_x), min = 1, max = 7),
+                    SettingsEntry.Int(key = "GPU|draw_resolution_scale_y", title = context.getString(R.string.es_gpu_draw_resolution_scale_y), min = 1, max = 7),
                     SettingsEntry.Bool(key = "GPU|execute_unclipped_draw_vs_on_cpu", title = context.getString(R.string.es_gpu_execute_unclipped_draw_vs_on_cpu)),
                     SettingsEntry.Bool(key = "GPU|execute_unclipped_draw_vs_on_cpu_for_psi_render_backend", title = context.getString(R.string.es_gpu_execute_unclipped_draw_vs_on_cpu_for_psi_render_backend)),
                     SettingsEntry.Bool(key = "GPU|execute_unclipped_draw_vs_on_cpu_with_scissor", title = context.getString(R.string.es_gpu_execute_unclipped_draw_vs_on_cpu_with_scissor)),
@@ -150,6 +152,7 @@ object SettingsTree {
                     SettingsEntry.StrLeaf(key = "GPU|trace_dump_path", title = context.getString(R.string.es_gpu_trace_dump_path)),
                     SettingsEntry.Bool(key = "GPU|trace_gpu_stream", title = context.getString(R.string.es_gpu_trace_gpu_stream)),
                     SettingsEntry.Bool(key = "GPU|vsync", title = context.getString(R.string.es_gpu_vsync)),
+                    SettingsEntry.Int(key = "GPU|framerate_limit", title = context.getString(R.string.es_gpu_framerate_limit), min = 0, max = 240),
                 )
             ),
             SettingsEntry.Section(
@@ -332,10 +335,13 @@ object SettingsTree {
         // GPU
         "GPU|gpu",
         "GPU|vsync",
+        "GPU|framerate_limit",
         "GPU|async_shader_compilation",
         "GPU|readback_resolve",
         "GPU|render_target_path_vulkan",
         "GPU|native_2x_msaa",
+        "GPU|draw_resolution_scale_x",
+        "GPU|draw_resolution_scale_y",
         // General
         "General|apply_patches",
         "General|controller_hotkeys",

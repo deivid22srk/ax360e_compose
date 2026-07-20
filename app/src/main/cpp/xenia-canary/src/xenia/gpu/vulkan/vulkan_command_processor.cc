@@ -292,6 +292,18 @@ bool VulkanCommandProcessor::SetupContext() {
   uint32_t draw_resolution_scale_x, draw_resolution_scale_y;
   TextureCache::GetConfigDrawResolutionScale(draw_resolution_scale_x,
                                              draw_resolution_scale_y);
+
+  if ((draw_resolution_scale_x > 1 || draw_resolution_scale_y > 1) &&
+      !device_properties.sparseResidencyBuffer) {
+    XELOGGPU(
+        "draw_resolution_scale {}x{} requested but sparseResidencyBuffer is "
+        "not supported by this device — clamping to 1x1. Resolution scaling "
+        "requires sparse binding for the shared memory buffer.",
+        draw_resolution_scale_x, draw_resolution_scale_y);
+    draw_resolution_scale_x = 1;
+    draw_resolution_scale_y = 1;
+  }
+
   render_target_cache_ = std::make_unique<VulkanRenderTargetCache>(
       *register_file_, *memory_, trace_writer_, draw_resolution_scale_x,
       draw_resolution_scale_y, *this);
