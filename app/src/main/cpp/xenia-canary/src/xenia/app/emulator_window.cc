@@ -240,10 +240,22 @@ void EmulatorWindow::SetupGraphicsSystemPresenterPainting() {
                                                   immediate_drawer_.get());
     Profiler::SetUserIO(kZOrderProfiler, window_.get(), presenter,
                         immediate_drawer_.get());
+
+    // [XENIA NATIVE FPS OVERLAY] Create and register the GPU-drawn FPS
+    // counter. It draws directly into the Vulkan render target (below the
+    // Android View hierarchy, so the virtual gamepad doesn't interfere
+    // with it). Gated at Draw() time by cvars::show_xenia_fps_overlay.
+    presenter_fps_overlay_ = std::make_unique<ui::PresenterFPSOverlay>(
+        presenter, immediate_drawer_.get());
   }
 }
 
 void EmulatorWindow::ShutdownGraphicsSystemPresenterPainting() {
+  // [XENIA NATIVE FPS OVERLAY] Tear down the FPS overlay BEFORE the
+  // immediate drawer — the overlay's MicroprofileDrawer holds a font
+  // texture that belongs to the immediate drawer, so destroying them in
+  // the wrong order would leave a dangling GPU resource reference.
+  presenter_fps_overlay_.reset();
   Profiler::SetUserIO(kZOrderProfiler, window_.get(), nullptr, nullptr);
   imgui_drawer_->SetPresenterAndImmediateDrawer(nullptr, nullptr);
   immediate_drawer_.reset();

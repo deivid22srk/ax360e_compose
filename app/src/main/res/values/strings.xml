@@ -163,6 +163,8 @@
     <string name="es_display_present_render_pass_clear">Clear Render Pass</string>
     <string name="es_display_present_safe_area_x">Safe Area X</string>
     <string name="es_display_present_safe_area_y">Safe Area Y</string>
+    <string name="es_display_show_xenia_fps_overlay">Xenia Native FPS Counter</string>
+    <!-- [XENIA NATIVE FPS OVERLAY] Xenia's own FPS counter, drawn by the GPU into the guest output render target. Distinct from the on-screen Compose FPS overlay that sits above the virtual gamepad. -->
 
     <string name="es_gpu">GPU</string>
     <string name="es_gpu_clear_memory_page_state">Clear Memory Page State</string>

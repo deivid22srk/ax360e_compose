@@ -105,11 +105,35 @@ namespace ae{
     extern std::unique_ptr<xe::ui::WindowedApp> g_windowed_app;
 }
 void AndroidWindowedAppContext::NotifyUILoopOfPendingFunctions() {
+    // [ANDROID SURFACE ROBUSTNESS]
+    //
+    // This is a SYNCHRONOUS call: the caller thread blocks until the UI
+    // thread has executed the pending functions. If the UI thread is stuck
+    // (e.g. waiting on a vkWaitForFences that timed out, or stuck in a
+    // Paint() that never returns), this would deadlock the caller too.
+    //
+    // To avoid an infinite hang, we wait with a 5-second timeout. If the
+    // timeout expires, we log a critical error and return — the pending
+    // functions will eventually be processed by the UI thread when it
+    // unblocks, OR they will be lost if the process exits first. Either
+    // way, we don't propagate the hang to the caller thread (which is
+    // usually the emulator thread — hanging it would freeze the entire
+    // game, not just the UI).
+    //
+    // The 5-second timeout matches the vkWaitForFences timeout in
+    // vulkan_submission_tracker.cc, so if the UI thread is stuck on a
+    // fence wait, we'll time out around the same time the GPU does.
     std::unique_lock<std::mutex> lock(mutex);
     bool completed = false;
     events.push({EVENT_EXECUTE_PENDING_FUNCTIONS, &completed});
     cv.notify_one();
-    cv.wait(lock, [&completed] { return completed; });
+    if (!cv.wait_for(lock, std::chrono::seconds(5),
+                     [&completed] { return completed; })) {
+        XELOGE("[AndroidWindowedAppContext] NotifyUILoopOfPendingFunctions "
+               "TIMED OUT after 5s — UI thread may be stuck. Returning "
+               "without executing pending functions. This is a serious "
+               "error and may indicate a GPU hang or deadlock.");
+    }
 }
 
 void AndroidWindowedAppContext::PlatformQuitFromUIThread() {
@@ -156,12 +180,29 @@ void AndroidWindowedAppContext::setup_ui_thr_id(std::thread::id id){
 
 void AndroidWindowedAppContext::main_loop(){
     assert(WindowedAppContext::ui_thread_id_==std::this_thread::get_id());
+
+    // [ANDROID SURFACE ROBUSTNESS]
+    //
+    // Wait with a timeout instead of an indefinite cv.wait. If for any reason
+    // a notify_one() is lost (race between request_paint() checking
+    // paint_pending_ and the producer enqueueing the event), the loop will
+    // still wake up periodically and re-evaluate HasQuitFromUIThread(). The
+    // 250ms cadence is fast enough to recover from a missed signal without
+    // perceptible latency, and slow enough to be invisible to the user
+    // during normal operation (where notify_one() always fires).
+    static constexpr auto kLoopWaitTimeout = std::chrono::milliseconds(250);
+
     while(!WindowedAppContext::HasQuitFromUIThread()){
         EventItem item;
         {
             std::unique_lock<std::mutex> lock(mutex);
-            cv.wait(lock, [this] { return !events.empty() || WindowedAppContext::HasQuitFromUIThread(); });
+            cv.wait_for(lock, kLoopWaitTimeout, [this] {
+                return !events.empty() || WindowedAppContext::HasQuitFromUIThread();
+            });
             if(events.empty()) {
+                // Spurious wake or timeout — re-check the quit flag at the
+                // top of the loop. This is the safety net for a missed
+                // notify_one().
                 continue;
             }
             item = events.front();
@@ -179,7 +220,20 @@ void AndroidWindowedAppContext::main_loop(){
         else if(item.type==EVENT_PAINT){
             paint_pending_.store(false, std::memory_order_release);
             EmulatorApp* app=static_cast<EmulatorApp*>(ae::g_windowed_app.get());
+            // [ANDROID SURFACE ROBUSTNESS] Guard against the app being torn
+            // down between the event being queued and processed. If
+            // g_windowed_app has been reset (rare — happens during process
+            // shutdown), drop the event instead of dereferencing null.
+            if (!app || !app->emu_window) {
+                XELOGW("[main_loop] EVENT_PAINT dropped: app/window is null "
+                       "(emulator shutting down?)");
+                continue;
+            }
             AndroidWindow* win=static_cast<AndroidWindow*>(app->emu_window->window());
+            if (!win) {
+                XELOGW("[main_loop] EVENT_PAINT dropped: AndroidWindow is null");
+                continue;
+            }
 
             // [ANDROID SURFACE RECOVERY v2]
             //
@@ -233,6 +287,16 @@ void AndroidWindowedAppContext::main_loop(){
                                "outdated surface — forcing UpdateSurface() "
                                "before paint (ae::window is valid)");
                         win->UpdateSurface();
+                    } else {
+                        // [ANDROID SURFACE ROBUSTNESS] Cooldown active —
+                        // skip this forced recovery but still fall through to
+                        // Paint() so the presenter's normal recovery path
+                        // (which doesn't force UpdateSurface) gets a chance
+                        // to handle the outdated surface gracefully.
+                        XELOGI("[SURFACE RECOVERY] Cooldown active "
+                               "(last recovery <500ms ago) — deferring "
+                               "forced UpdateSurface(), falling through to "
+                               "normal Paint()");
                     }
                 }
             }
@@ -241,7 +305,18 @@ void AndroidWindowedAppContext::main_loop(){
         }
         else if(item.type==EVENT_SURFACE_CHANGED){
             EmulatorApp* app=static_cast<EmulatorApp*>(ae::g_windowed_app.get());
+            // [ANDROID SURFACE ROBUSTNESS] Same null-guard as EVENT_PAINT.
+            if (!app || !app->emu_window) {
+                XELOGW("[main_loop] EVENT_SURFACE_CHANGED dropped: "
+                       "app/window is null");
+                continue;
+            }
             AndroidWindow* win=static_cast<AndroidWindow*>(app->emu_window->window());
+            if (!win) {
+                XELOGW("[main_loop] EVENT_SURFACE_CHANGED dropped: "
+                       "AndroidWindow is null");
+                continue;
+            }
             win->UpdateSurface();
         }
         else if(item.type==EVENT_QUIT){
@@ -265,6 +340,23 @@ AndroidWindow::AndroidWindow(xe::ui::WindowedAppContext& app_context, const std:
 bool AndroidWindow::OpenImpl() {
     XELOGI("Opening Android window...");
 
+    // [ANDROID SURFACE ROBUSTNESS]
+    //
+    // During the very first surfaceCreated, ae::window MAY still be null if
+    // OpenImpl() races ahead of j_setup_surface(). The previous code only
+    // checked for null, but didn't handle the case where ANativeWindow_getWidth
+    // returns a transient negative value (BAD_VALUE = -22) which happens
+    // briefly during surface transitions.
+    //
+    // Now we:
+    //   1. Skip size initialization if ae::window is null (will be set on a
+    //      later EVENT_SURFACE_CHANGED).
+    //   2. Skip size initialization if width/height are <= 0 (transient
+    //      BAD_VALUE). Log a warning so the user can see it in the log if
+    //      this becomes a recurring problem.
+    //   3. Return true regardless — the window is "open" even if the surface
+    //      isn't ready yet. The presenter's normal recovery path will handle
+    //      the connection once EVENT_SURFACE_CHANGED delivers a valid size.
     if (ae::window) {
         int w = ANativeWindow_getWidth(ae::window);
         int h = ANativeWindow_getHeight(ae::window);
@@ -273,8 +365,16 @@ bool AndroidWindow::OpenImpl() {
             WindowDestructionReceiver destruction_receiver(this);
             OnActualSizeUpdate(uint32_t(w), uint32_t(h), destruction_receiver);
         } else {
-            XELOGW("Android window has invalid size: {}x{}", w, h);
+            // [ANDROID SURFACE ROBUSTNESS] Don't fail OpenImpl — just defer
+            // the size update. EVENT_SURFACE_CHANGED will fire when the
+            // surface transitions to a valid size.
+            XELOGW("Android window has invalid size at OpenImpl: {}x{} — "
+                   "deferring size initialization to EVENT_SURFACE_CHANGED",
+                   w, h);
         }
+    } else {
+        XELOGI("ae::window is null at OpenImpl — deferring size "
+               "initialization until surfaceCreated");
     }
 
     return true;
@@ -299,6 +399,25 @@ void AndroidWindow::RequestPaintImpl() {
 }
 
 void AndroidWindow::UpdateSurface(){
+    // [ANDROID SURFACE ROBUSTNESS]
+    //
+    // UpdateSurface() is called from main_loop in response to either
+    // EVENT_SURFACE_CHANGED (Java side gave us a new ANativeWindow) or
+    // EVENT_PAINT with from_guest=true (GPU detected an outdated swapchain).
+    //
+    // We must handle three cases gracefully:
+    //   1. ae::window is null — surface destroyed. Skip the size update and
+    //      just call OnSurfaceChanged(true) so the presenter can disconnect
+    //      cleanly. The next surfaceCreated will deliver a new ANativeWindow.
+    //   2. ae::window is non-null but ANativeWindow_getWidth/Height returns
+    //      <= 0 (transient BAD_VALUE during surface transitions). Same as
+    //      case 1 — defer to the next EVENT_SURFACE_CHANGED.
+    //   3. ae::window is non-null with a valid size. Update the logical and
+    //      physical size, then notify the presenter of the surface change.
+    //
+    // In all cases, OnSurfaceChanged(true) is called last so the presenter
+    // gets a chance to reconnect — even if we couldn't update the size, the
+    // presenter may have stale state that needs to be invalidated.
     if (ae::window) {
         int w = ANativeWindow_getWidth(ae::window);
         int h = ANativeWindow_getHeight(ae::window);
@@ -307,9 +426,24 @@ void AndroidWindow::UpdateSurface(){
             WindowDestructionReceiver destruction_receiver(this);
             OnActualSizeUpdate(uint32_t(w), uint32_t(h), destruction_receiver);
             if (destruction_receiver.IsWindowDestroyedOrClosed()) {
+                // The window was destroyed as a side effect of OnActualSizeUpdate
+                // (rare — happens if a listener calls RequestClose). Bail out
+                // without notifying the presenter; the destruction path will
+                // handle the disconnection.
                 return;
             }
+        } else {
+            // [ANDROID SURFACE ROBUSTNESS] Transient invalid size. Don't
+            // propagate a stale size to the presenter. Still call
+            // OnSurfaceChanged(true) below so the presenter knows something
+            // has changed and can decide to wait or recover.
+            XELOGW("[AndroidWindow::UpdateSurface] ae::window has transient "
+                   "invalid size {}x{} — keeping previous size, notifying "
+                   "presenter of surface change anyway", w, h);
         }
+    } else {
+        XELOGI("[AndroidWindow::UpdateSurface] ae::window is null "
+               "(surface destroyed) — notifying presenter of disconnection");
     }
     OnSurfaceChanged(true);
 }

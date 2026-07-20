@@ -121,6 +121,7 @@ present_letterbox = true                          	# Maintain aspect ratio when 
 present_render_pass_clear = true                  	# On graphics backends where this is supported, use the clear render pass load operation in presentation instead of clear commands clearing only the letterbox area.
 present_safe_area_x = 100                         	# Percentage of the image width that can be kept when presenting to maintain aspect ratio without letterboxing or stretching.
 present_safe_area_y = 100                         	# Percentage of the image height that can be kept when presenting to maintain aspect ratio without letterboxing or stretching.
+show_xenia_fps_overlay = false                    	# Draw a small FPS counter directly into the guest output render target via the Xenia presenter (ImmediateDrawer + MicroprofileDrawer font). This is Xenia's OWN FPS counter (rendered by the GPU), distinct from the on-screen Compose FPS overlay that sits above the virtual gamepad.
 
 
 [GPU]

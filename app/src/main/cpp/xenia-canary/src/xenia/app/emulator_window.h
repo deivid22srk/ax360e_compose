@@ -21,6 +21,7 @@
 #include "xenia/ui/immediate_drawer.h"
 #include "xenia/ui/menu_item.h"
 #include "xenia/ui/presenter.h"
+#include "xenia/ui/presenter_fps_overlay.h"
 #include "xenia/ui/window.h"
 #include "xenia/ui/window_listener.h"
 #include "xenia/ui/windowed_app_context.h"
@@ -305,6 +306,12 @@ class EmulatorWindow {
       display_config_game_config_load_callback_;
   // Creation may fail, in this case immediate drawer UI must not be drawn.
   std::unique_ptr<ui::ImmediateDrawer> immediate_drawer_;
+  // [XENIA NATIVE FPS OVERLAY] Owns the GPU-drawn FPS counter. Created
+  // alongside the immediate drawer in SetupGraphicsSystemPresenterPainting
+  // and torn down in ShutdownGraphicsSystemPresenterPainting. The overlay
+  // gates itself on cvars::show_xenia_fps_overlay at Draw() time, so it
+  // stays registered across toggles.
+  std::unique_ptr<ui::PresenterFPSOverlay> presenter_fps_overlay_;
 
   bool emulator_initialized_ = false;
   std::atomic<bool> disable_hotkeys_ = false;
