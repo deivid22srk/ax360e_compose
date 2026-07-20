@@ -55,6 +55,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -90,7 +91,6 @@ import aenu.ax360e.LogViewerActivity
 import aenu.ax360e.R
 import aenu.ax360e.VirtualControlEdit
 import aenu.ax360e.ui.components.EmptyState
-import aenu.ax360e.ui.components.GameCard
 import aenu.ax360e.ui.model.GameListLoader
 import kotlinx.coroutines.launch
 
@@ -562,7 +562,7 @@ fun MainScreen() {
                     Spacer(Modifier.height(12.dp))
                     groupEntries.forEachIndexed { index, entry ->
                         val isSelected = index == selectedGroup
-                        androidx.compose.material3.Surface(
+                        Surface(
                             onClick = { selectedGroup = index },
                             color = if (isSelected)
                                 MaterialTheme.colorScheme.secondaryContainer
