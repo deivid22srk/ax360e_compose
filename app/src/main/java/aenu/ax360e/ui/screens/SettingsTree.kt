@@ -106,6 +106,7 @@ object SettingsTree {
                     SettingsEntry.StrArr(key = "Display|postprocess_scaling_and_sharpening", title = context.getString(R.string.es_display_postprocess_scaling_and_sharpening), entries = listOf("bilinear", "cas", "fsr"), values = listOf("bilinear", "cas", "fsr")),
                     SettingsEntry.Bool(key = "Display|present_letterbox", title = context.getString(R.string.es_display_present_letterbox)),
                     SettingsEntry.Bool(key = "Display|present_render_pass_clear", title = context.getString(R.string.es_display_present_render_pass_clear)),
+                    SettingsEntry.Bool(key = "Display|show_fps_overlay", title = context.getString(R.string.es_display_show_fps_overlay)),
                 )
             ),
             SettingsEntry.Section(
@@ -326,6 +327,7 @@ object SettingsTree {
         "Display|postprocess_antialiasing",
         "Display|postprocess_scaling_and_sharpening",
         "Display|postprocess_dither",
+        "Display|show_fps_overlay",
         // GPU
         "GPU|gpu",
         "GPU|vsync",

@@ -161,6 +161,7 @@
     <string name="es_display_postprocess_scaling_and_sharpening">Scaling and Sharpening</string>
     <string name="es_display_present_letterbox">Letterbox Presentation</string>
     <string name="es_display_present_render_pass_clear">Clear Render Pass</string>
+    <string name="es_display_show_fps_overlay">Native FPS Overlay (Xenia)</string>
     <string name="es_display_present_safe_area_x">Safe Area X</string>
     <string name="es_display_present_safe_area_y">Safe Area Y</string>
 

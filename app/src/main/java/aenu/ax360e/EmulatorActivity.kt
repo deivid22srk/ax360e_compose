@@ -54,6 +54,14 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
     companion object {
         const val EXTRA_GAME_URI = "game_uri"
         private const val DELAY_ON_CREATE: Int = 0xaeae0001.toInt()
+        private const val SURFACE_RETRY_DELAY_MS = 100L
+        private const val SURFACE_MAX_RETRIES = 3
+    }
+
+    private enum class SurfaceState {
+        DESTROYED,
+        CREATED,
+        ACTIVE
     }
 
     private var surfaceView: SurfaceView? = null
@@ -63,6 +71,9 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
     private var vibrationEffect: VibrationEffect? = null
     private var started = false
     private var delayDialog: Dialog? = null
+    @Volatile private var surfaceState = SurfaceState.DESTROYED
+    private var lastSurfaceWidth = 0
+    private var lastSurfaceHeight = 0
 
     // [LOG CRASH RECOVERY] Session info for periodic log capture + crash recovery
     private var sessionGameName: String = "unknown"
@@ -309,46 +320,68 @@ class EmulatorActivity : ComponentActivity(), SurfaceHolder.Callback, View.OnGen
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
+        if (!holder.surface.isValid) return
+        surfaceState = SurfaceState.CREATED
         if (!started) {
             started = true
-            Emulator.get.setup_surface(holder.surface)
-            try {
-                Emulator.get.boot()
-            } catch (e: aenu.emulator.Emulator.BootException) {
-                throw RuntimeException(e)
+            var retries = 0
+            var bootSuccess = false
+            while (retries < SURFACE_MAX_RETRIES && !bootSuccess) {
+                try {
+                    Emulator.get.setup_surface(holder.surface)
+                    Emulator.get.boot()
+                    bootSuccess = true
+                    surfaceState = SurfaceState.ACTIVE
+                } catch (e: aenu.emulator.Emulator.BootException) {
+                    retries++
+                    if (retries >= SURFACE_MAX_RETRIES) {
+                        throw RuntimeException(e)
+                    }
+                    Thread.sleep(SURFACE_RETRY_DELAY_MS)
+                } catch (e: Exception) {
+                    retries++
+                    if (retries >= SURFACE_MAX_RETRIES) {
+                        throw RuntimeException(e)
+                    }
+                    Thread.sleep(SURFACE_RETRY_DELAY_MS)
+                }
             }
         } else {
-            Emulator.get.setup_surface(holder.surface)
-            Emulator.get.surface_changed()
-            if (Emulator.get.is_paused) Emulator.get.resume()
+            try {
+                Emulator.get.setup_surface(holder.surface)
+                Emulator.get.surface_changed()
+                surfaceState = SurfaceState.ACTIVE
+                if (Emulator.get.is_paused) Emulator.get.resume()
+            } catch (_: Exception) {
+                surfaceState = SurfaceState.CREATED
+            }
         }
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         if (!started) return
         if (width == 0 || height == 0) return
-        Emulator.get.change_surface(width, height)
+        if (!holder.surface.isValid) return
+        if (width == lastSurfaceWidth && height == lastSurfaceHeight) return
+        lastSurfaceWidth = width
+        lastSurfaceHeight = height
+        try {
+            Emulator.get.change_surface(width, height)
+            surfaceState = SurfaceState.ACTIVE
+        } catch (_: Exception) {
+        }
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         if (!started) return
-        // [ANDROID SURFACE RECOVERY v2]
-        //
-        // Clear ae::window immediately so the native side knows the ANativeWindow
-        // is gone. This prevents the guest output thread from trying to recover
-        // using a stale ANativeWindow (which can hang vkCreateSwapchainKHR).
-        //
-        // ALSO call surface_changed() to push EVENT_SURFACE_CHANGED. This
-        // notifies the native UI thread to disconnect the presenter
-        // (OnSurfaceChanged(false) path) proactively, rather than waiting for
-        // the guest output thread to detect VK_ERROR_OUT_OF_DATE_KHR and
-        // trigger the recovery path — by which point the GPU may have pending
-        // work referencing the old swapchain, and the forced recovery can hang.
-        //
-        // When surfaceCreated provides a new ANativeWindow, it calls
-        // surface_changed() again, which reconnects the presenter cleanly.
-        Emulator.get.setup_surface(null)
-        Emulator.get.surface_changed()
+        surfaceState = SurfaceState.DESTROYED
+        lastSurfaceWidth = 0
+        lastSurfaceHeight = 0
+        try {
+            Emulator.get.setup_surface(null)
+            Emulator.get.surface_changed()
+        } catch (_: Exception) {
+        }
     }
 
     private fun handleDpad(event: InputEvent): Boolean {

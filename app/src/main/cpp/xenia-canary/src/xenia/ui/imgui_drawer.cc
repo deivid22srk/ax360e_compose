@@ -16,13 +16,17 @@
 #include "third_party/imgui/imgui.h"
 #include "xenia/base/assert.h"
 #include "xenia/base/clock.h"
+#include "xenia/base/cvar.h"
 #include "xenia/base/logging.h"
 #include "xenia/base/math.h"
 #include "xenia/ui/imgui_dialog.h"
 #include "xenia/ui/imgui_notification.h"
+#include "xenia/ui/presenter.h"
 #include "xenia/ui/resources.h"
 #include "xenia/ui/ui_event.h"
 #include "xenia/ui/window.h"
+
+DECLARE_bool(show_fps_overlay);
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "third_party/stb/stb_image.h"
@@ -537,16 +541,12 @@ void ImGuiDrawer::SetPresenter(Presenter* new_presenter) {
     if (presenter_ == new_presenter) {
       return;
     }
-    if (!dialogs_.empty()) {
-      presenter_->RemoveUIDrawerFromUIThread(this);
-    }
+    presenter_->RemoveUIDrawerFromUIThread(this);
     ImGuiIO& io = GetIO();
   }
   presenter_ = new_presenter;
   if (presenter_) {
-    if (!dialogs_.empty()) {
-      presenter_->AddUIDrawerFromUIThread(this, z_order_);
-    }
+    presenter_->AddUIDrawerFromUIThread(this, z_order_);
   }
 }
 
@@ -588,7 +588,9 @@ void ImGuiDrawer::Draw(UIDrawContext& ui_draw_context) {
     return;
   }
 
-  if (dialogs_.empty() && notifications_.empty()) {
+  const bool fps_overlay_active = cvars::show_fps_overlay;
+
+  if (dialogs_.empty() && notifications_.empty() && !fps_overlay_active) {
     return;
   }
 
@@ -650,6 +652,20 @@ void ImGuiDrawer::Draw(UIDrawContext& ui_draw_context) {
     }
   }
 
+  if (fps_overlay_active && presenter_) {
+    uint32_t fps = presenter_->GetFPS();
+    ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.55f);
+    ImGui::Begin("##fps_overlay", nullptr,
+                 ImGuiWindowFlags_NoDecoration |
+                     ImGuiWindowFlags_NoInputs |
+                     ImGuiWindowFlags_NoNav |
+                     ImGuiWindowFlags_NoSavedSettings |
+                     ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.4f, 1.0f), "%u FPS", fps);
+    ImGui::End();
+  }
+
   ImGui::Render();
   ImDrawData* draw_data = ImGui::GetDrawData();
   if (draw_data) {
@@ -665,7 +681,7 @@ void ImGuiDrawer::Draw(UIDrawContext& ui_draw_context) {
   // it now if needed.
   DetachIfLastWindowRemoved();
 
-  if (!dialogs_.empty() || !notifications_.empty()) {
+  if (!dialogs_.empty() || !notifications_.empty() || fps_overlay_active) {
     // Repaint (and handle input) continuously if still active.
     presenter_->RequestUIPaintFromUIThread();
   }
@@ -905,14 +921,15 @@ void ImGuiDrawer::DetachIfLastWindowRemoved() {
   if (!dialogs_.empty() || !notifications_.empty() || IsDrawingDialogs()) {
     return;
   }
+  if (cvars::show_fps_overlay) {
+    window_->RemoveInputListener(this);
+    ClearInput();
+    return;
+  }
   if (presenter_) {
     presenter_->RemoveUIDrawerFromUIThread(this);
   }
   window_->RemoveInputListener(this);
-  // Clear all input since no input will be received anymore, and when the
-  // drawer becomes active again, it'd have an outdated input state otherwise
-  // which will be persistent until new events actualize individual input
-  // properties.
   ClearInput();
 }
 

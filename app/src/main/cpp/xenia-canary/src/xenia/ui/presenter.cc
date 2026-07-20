@@ -51,6 +51,13 @@ DEFINE_bool(
     "Maintain aspect ratio when stretching by displaying bars around the image "
     "when there's no more overscan area to crop out.",
     "Display");
+
+DEFINE_bool(
+    show_fps_overlay, false,
+    "Display the native FPS counter overlay rendered via ImGui in the "
+    "presentation pipeline. Shows the current presentation frame rate "
+    "computed over a ~500ms sliding window.",
+    "Display");
 // https://github.com/MonoGame/MonoGame/issues/4697#issuecomment-217779403
 // Using the value from DirectXTK (5% cropped out from each side, thus 90%),
 // which is not exactly the Xbox One title-safe area, but close, and within the

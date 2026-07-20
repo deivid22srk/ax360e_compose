@@ -119,6 +119,7 @@ postprocess_scaling_and_sharpening = ""           	# Post-processing effect to u
 
 present_letterbox = true                          	# Maintain aspect ratio when stretching by displaying bars around the image when there's no more overscan area to crop out.
 present_render_pass_clear = true                  	# On graphics backends where this is supported, use the clear render pass load operation in presentation instead of clear commands clearing only the letterbox area.
+show_fps_overlay = false                           	# Display the native FPS counter overlay rendered via ImGui in the presentation pipeline.
 present_safe_area_x = 100                         	# Percentage of the image width that can be kept when presenting to maintain aspect ratio without letterboxing or stretching.
 present_safe_area_y = 100                         	# Percentage of the image height that can be kept when presenting to maintain aspect ratio without letterboxing or stretching.
 
