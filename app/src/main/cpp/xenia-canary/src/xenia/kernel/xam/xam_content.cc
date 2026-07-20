@@ -10,6 +10,7 @@
 #include "xenia/base/logging.h"
 #include "xenia/base/math.h"
 #include "xenia/base/string_util.h"
+#include "xenia/emulator.h"
 #include "xenia/kernel/kernel_state.h"
 #include "xenia/kernel/smc.h"
 #include "xenia/kernel/user_module.h"
@@ -24,6 +25,26 @@
 #include "xenia/ui/imgui_drawer.h"
 #include "xenia/vfs/devices/stfs_xbox.h"
 #include "xenia/xbox.h"
+
+// [MULTI-DISC SUPPORT] ax360e/xenon360 port.
+//
+// On Android, the desktop Emulator::GetNewDiscPath() implementation uses
+// xe::ui::FilePicker, which is a stub on Android (file_picker_android.cc's
+// AndroidFilePicker::Show() always returns false). Without this override,
+// multi-disc games that call XamSwapDisc would silently fail because the
+// returned path is empty and MountPath(std::filesystem::path, ...) (the
+// desktop overload) cannot open SAF URIs.
+//
+// Instead, we use MultiDiscManager — a registry that pre-scans sibling ISO
+// files at game launch time, parses each one's embedded default.xex, and
+// extracts (media_id, disc_number) from the xex2_opt_execution_info header.
+// When the game requests a disc swap, we look up the matching DocumentFile
+// and call the SAF-aware MountPath overload (the one that takes
+// std::unique_ptr<DocumentFile>), which works with SAF URIs.
+#if XE_PLATFORM_AX360E
+#include "xe_multi_disc.h"
+#include "document_file.h"
+#endif  // XE_PLATFORM_AX360E
 
 DEFINE_int32(
     license_mask, 0,
@@ -665,6 +686,74 @@ dword_result_t XamSwapDisc_entry(
 
   std::u16string text_message = xe::load_and_swap<std::u16string>(
       kernel_state()->memory()->TranslateVirtual(error_message->stringTextPtr));
+
+#if XE_PLATFORM_AX360E
+  // [MULTI-DISC SUPPORT]
+  //
+  // On Android, the desktop path below (GetNewDiscPath + MountPath) cannot
+  // work because AndroidFilePicker::Show() is a stub that always returns
+  // false, and even if it returned a path, the desktop MountPath overload
+  // cannot open SAF content URIs. Instead, we use MultiDiscManager which
+  // was pre-populated at game launch time by ax360e_emu.cpp's on_launch
+  // listener.
+  //
+  // The manager returns a fresh DocumentFile clone that we move into the
+  // SAF-aware MountPath overload. We infer the FileSignatureType from the
+  // file extension so both .iso (XISO) and .zar (ZAR) multi-disc releases
+  // are supported.
+  uint32_t media_id = static_cast<uint32_t>(info->media_id);
+  auto disc_file = xe::MultiDiscManager::Instance().FindDisc(
+      media_id, static_cast<uint32_t>(disc_number));
+  if (disc_file) {
+    std::string disc_name = disc_file->getName();
+    XELOGI("MultiDisc: swapping to disc #{} (media_id={:08X}) file '{}'",
+           static_cast<uint32_t>(disc_number), media_id, disc_name);
+
+    // Case-insensitive extension check to determine the file type.
+    auto ieq = [](const std::string& s, std::string_view ext) {
+      return s.size() >= ext.size() &&
+             std::equal(s.end() - ext.size(), s.end(), ext.begin(),
+                        ext.end(),
+                        [](char a, char b) {
+                          return std::tolower(static_cast<unsigned char>(a)) ==
+                                 std::tolower(static_cast<unsigned char>(b));
+                        });
+    };
+
+    xe::Emulator::FileSignatureType type =
+        xe::Emulator::FileSignatureType::Unknown;
+    if (ieq(disc_name, ".iso")) {
+      type = xe::Emulator::FileSignatureType::XISO;
+    } else if (ieq(disc_name, ".zar")) {
+      type = xe::Emulator::FileSignatureType::ZAR;
+    } else if (ieq(disc_name, ".xex")) {
+      type = xe::Emulator::FileSignatureType::XEX2;
+    }
+
+    if (type == xe::Emulator::FileSignatureType::Unknown) {
+      XELOGE("MultiDisc: unknown file extension for '{}'", disc_name);
+    } else {
+      X_STATUS result = kernel_state()->emulator()->MountPath(
+          std::move(disc_file), nullptr, type, mount_path);
+      if (XSUCCEEDED(result)) {
+        XELOGI("MultiDisc: disc swap to #{} succeeded",
+               static_cast<uint32_t>(disc_number));
+        completion_event();
+        return X_ERROR_SUCCESS;
+      }
+      XELOGE("MultiDisc: MountPath failed for disc #{} (status={:08X})",
+             static_cast<uint32_t>(disc_number),
+             static_cast<uint32_t>(result));
+    }
+  } else {
+    XELOGW("MultiDisc: no pre-registered DocumentFile found for disc #{} "
+           "(media_id={:08X}); falling back to desktop path",
+           static_cast<uint32_t>(disc_number), media_id);
+  }
+  // Fall through to the desktop path as a last resort. On Android this
+  // will fail (FilePicker is a stub), but at least we'll get a clear
+  // error in the log instead of silently doing nothing.
+#endif  // XE_PLATFORM_AX360E
 
   const std::filesystem::path new_disc_path =
       kernel_state()->emulator()->GetNewDiscPath(xe::to_utf8(text_message));

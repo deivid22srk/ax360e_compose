@@ -63,6 +63,7 @@ target_sources(emu
         xe_saf_xex_device.cpp
         xe_saf_xex_entry.cpp
         xe_saf_xex_file.cpp
+        xe_multi_disc.cpp
         xe_system_ax360e.cpp
         xenia-canary/src/xenia/app/emulator_window.cc
         xenia-canary/src/xenia/app/profile_dialogs.cc

@@ -39,6 +39,8 @@
 #include "xenia/gpu/null/null_graphics_system.h"
 #include "xenia/gpu/vulkan/vulkan_graphics_system.h"
 #include "xenia/hid/nop/nop_hid.h"
+#include "xenia/kernel/user_module.h"
+#include "xenia/kernel/util/xex2_info.h"
 #include "xenia/kernel/xam/xam_module.h"
 #include "xenia/vfs/devices/host_path_device.h"
 
@@ -50,6 +52,7 @@
 #include "xe_opensles_audio_system.h"
 #include "xe_aaudio_audio_system.h"
 #include "document_file.h"
+#include "xe_multi_disc.h"
 
 #include "ax360e_emu.h"
 //#include "nlohmann/json.hpp"
@@ -723,6 +726,90 @@ void EmulatorApp::emu_thr_main() {
         XELOGI("on_launch {}",
                game_title.empty() ? "Unknown Title" : std::string(game_title));
         app_context().CallInUIThread([this]() { emu_window->UpdateTitle(); });
+
+        // [MULTI-DISC SUPPORT]
+        //
+        // At this point the executable module is loaded and we can read its
+        // xex2_opt_execution_info to obtain media_id and disc_number. We
+        // then register the launched disc with MultiDiscManager, which
+        // triggers a scan of sibling ISO files in the parent SAF directory.
+        // The scan runs synchronously on this (emulator) thread — it can
+        // take a few seconds for directories with many ISOs, but it does
+        // not block the game thread (which is the PPC guest thread, not
+        // this one).
+        //
+        // We use `ae::boot_game_uri` (a global set by j_setup_game_path
+        // before OnInitialize runs) to re-create a DocumentFile clone.
+        // The original DocumentFile was moved into LaunchDiscImage earlier
+        // and is no longer accessible.
+        try {
+            auto exec_module = emu->kernel_state()->GetExecutableModule();
+            if (exec_module) {
+                xex2_opt_execution_info* info = nullptr;
+                exec_module->GetOptHeader(XEX_HEADER_EXECUTION_INFO, &info);
+                if (info) {
+                    uint32_t media_id =
+                            static_cast<uint32_t>(info->media_id);
+                    uint32_t disc_number =
+                            static_cast<uint32_t>(info->disc_number);
+                    uint32_t disc_count =
+                            static_cast<uint32_t>(info->disc_count);
+
+                    XELOGI("MultiDisc: launched title media_id={:08X} "
+                           "disc_number={} disc_count={}",
+                           media_id, disc_number, disc_count);
+
+                    // Re-create a DocumentFile clone from the URI stored
+                    // in ae::boot_game_uri. If empty (e.g. booting from a
+                    // path-based source rather than SAF), skip multi-disc
+                    // registration — it only works for SAF-launched ISO
+                    // files.
+                    const std::string& boot_uri = ae::boot_game_uri;
+                    if (!boot_uri.empty() && g_jvm) {
+                        JNIEnv* env = nullptr;
+                        if (g_jvm->GetEnv(reinterpret_cast<void**>(&env),
+                                         JNI_VERSION_1_6) == JNI_EDETACHED) {
+                            g_jvm->AttachCurrentThread(&env, nullptr);
+                        }
+                        if (env) {
+                            jclass uri_class = env->FindClass("android/net/Uri");
+                            jmethodID parse_method = env->GetStaticMethodID(
+                                    uri_class, "parse",
+                                    "(Ljava/lang/String;)Landroid/net/Uri;");
+                            jstring uri_string =
+                                    env->NewStringUTF(boot_uri.c_str());
+                            jobject uri = env->CallStaticObjectMethod(
+                                    uri_class, parse_method, uri_string);
+                            std::unique_ptr<DocumentFile> game_file_clone =
+                                    DocumentFile::find(g_jvm, uri);
+                            env->DeleteLocalRef(uri_string);
+                            env->DeleteLocalRef(uri);
+                            if (game_file_clone) {
+                                xe::MultiDiscManager::Instance()
+                                        .RegisterLaunchedGame(
+                                                std::move(game_file_clone),
+                                                media_id, disc_number);
+                            } else {
+                                XELOGW("MultiDisc: DocumentFile::find returned "
+                                       "null for launched URI '{}'",
+                                       boot_uri);
+                            }
+                        }
+                    } else {
+                        XELOGW("MultiDisc: no boot URI available — "
+                               "skipping sibling scan (boot_type={})",
+                               ae::boot_type);
+                    }
+                } else {
+                    XELOGW("MultiDisc: launched module has no execution info");
+                }
+            }
+        } catch (const std::exception& e) {
+            XELOGW("MultiDisc: RegisterLaunchedGame threw: {}", e.what());
+        } catch (...) {
+            XELOGW("MultiDisc: RegisterLaunchedGame threw unknown exception");
+        }
+
         emu_thr_event->Set();
     });
 #else
@@ -762,6 +849,11 @@ void EmulatorApp::emu_thr_main() {
 
     emu->on_terminate.AddListener([]() {
         XELOGI("Emulator terminated");
+        // [MULTI-DISC SUPPORT] Clear the disc registry so the next game
+        // starts with a clean slate. Without this, a stale disc map from
+        // a previous game could be returned by FindDisc if the new game
+        // happens to share a media_id (extremely unlikely, but possible).
+        xe::MultiDiscManager::Instance().Clear();
     });
 
     // Enable emulator input now that the emulator is properly loaded.
