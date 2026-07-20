@@ -745,8 +745,8 @@ void EmulatorApp::emu_thr_main() {
         try {
             auto exec_module = emu->kernel_state()->GetExecutableModule();
             if (exec_module) {
-                xex2_opt_execution_info* info = nullptr;
-                exec_module->GetOptHeader(XEX_HEADER_EXECUTION_INFO, &info);
+                xe::xex2_opt_execution_info* info = nullptr;
+                exec_module->GetOptHeader(xe::XEX_HEADER_EXECUTION_INFO, &info);
                 if (info) {
                     uint32_t media_id =
                             static_cast<uint32_t>(info->media_id);
