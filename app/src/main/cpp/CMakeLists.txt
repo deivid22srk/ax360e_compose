@@ -89,6 +89,15 @@ if(TARGET xenia-ui-vulkan AND TARGET adrenotools)
     ${CMAKE_CURRENT_SOURCE_DIR}/libadrenotools/include)
 endif()
 
+# [MULTI-DISC SUPPORT] xenia-kernel needs access to ax360e's headers
+# (xe_multi_disc.h, document_file.h) because xam_content.cc includes them
+# inside an #if XE_PLATFORM_AX360E block. Without this, the build fails
+# with "fatal error: 'xe_multi_disc.h' file not found".
+if(TARGET xenia-kernel)
+  target_include_directories(xenia-kernel PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
+
 target_include_directories(emu PRIVATE
         xenia-canary
         xenia-canary/src
