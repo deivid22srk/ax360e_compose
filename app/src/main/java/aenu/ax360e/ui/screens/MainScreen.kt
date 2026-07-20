@@ -82,7 +82,8 @@ import aenu.ax360e.R
 import aenu.ax360e.VirtualControlEdit
 import aenu.ax360e.ui.components.EmptyState
 import aenu.ax360e.ui.components.GameCard
-import aenu.ax360e.ui.model.GameListLoader
+import aenu.ax360e.ui.model.ZarBuilder
+import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
 private data class DrawerDestination(
@@ -535,6 +536,99 @@ fun MainScreen() {
                 }
             }
         }
+    }
+
+    if (showZarDialog && multiDiscGroups.isNotEmpty()) {
+        val groupEntries = multiDiscGroups.entries.toList()
+        var selectedGroup by remember { mutableStateOf(0) }
+
+        AlertDialog(
+            onDismissRequest = { showZarDialog = false },
+            title = { Text("Create Multi-Disc Archive") },
+            text = {
+                Column {
+                    Text(
+                        text = "Detected ${multiDiscGroups.size} multi-disc game(s). Select one to create a .zar archive:",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    groupEntries.forEachIndexed { index, entry ->
+                        val isSelected = index == selectedGroup
+                        androidx.compose.material3.Surface(
+                            onClick = { selectedGroup = index },
+                            color = if (isSelected)
+                                MaterialTheme.colorScheme.secondaryContainer
+                            else MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "${entry.key} (${entry.value.size} discs)",
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                            )
+                        }
+                    }
+                    if (zarBuildInProgress) {
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = "Building ZAR archive...",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (!zarBuildInProgress) {
+                            zarBuildInProgress = true
+                            val selected = groupEntries[selectedGroup]
+                            val gameDirUri = GameListLoader.getGameDirUri(context)
+                            if (gameDirUri != null) {
+                                coroutineScope.launch {
+                                    val result = ZarBuilder.buildZar(
+                                        context = context,
+                                        discUris = selected.value,
+                                        titleId = "00000000",
+                                        titleName = selected.key,
+                                        outputDir = gameDirUri
+                                    )
+                                    zarBuildInProgress = false
+                                    showZarDialog = false
+                                    val msg = if (result.success) {
+                                        "Created ${result.outputPath} (${result.discCount} discs)"
+                                    } else {
+                                        "Failed: ${result.error}"
+                                    }
+                                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                                    val entries = GameListLoader.loadGames(context)
+                                    games.clear()
+                                    games.addAll(entries.map { entry ->
+                                        GameItem(
+                                            title = entry.name.removeSuffix(".iso")
+                                                .removeSuffix(".xex")
+                                                .removeSuffix(".zar"),
+                                            uri = entry.uri,
+                                            isDirectory = entry.isDirectory
+                                        )
+                                    })
+                                    multiDiscGroups = ZarBuilder.detectMultiDiscGames(context, gameDirUri)
+                                }
+                            }
+                        }
+                    },
+                    enabled = !zarBuildInProgress
+                ) { Text("Create ZAR") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showZarDialog = false }) {
+                    Text(android.R.string.cancel.let { context.getString(it) })
+                }
+            }
+        )
     }
 }
 
