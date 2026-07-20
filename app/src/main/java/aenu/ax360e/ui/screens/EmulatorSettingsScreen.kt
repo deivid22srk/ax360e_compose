@@ -109,7 +109,7 @@ fun EmulatorSettingsScreen(
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
-    LaunchedEffect(Unit) { SettingsTree.init(context) }
+    remember { SettingsTree.init(context) }
 
     var libraryReady by remember { mutableStateOf(Emulator.ensure_library_loaded()) }
 
