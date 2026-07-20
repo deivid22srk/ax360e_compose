@@ -1420,13 +1420,41 @@ Presenter::PaintResult VulkanPresenter::PaintAndPresentImpl(
 
   VkSemaphore acquire_semaphore = paint_submission.acquire_semaphore();
   uint32_t swapchain_image_index;
+  // [RANGO BLACK SCREEN FIX] Use a finite timeout (1 second) instead of
+  // UINT64_MAX. In MAILBOX present mode, if the guest never calls VdSwap
+  // (which is the case for some games during long initialization sequences
+  // such as Rango), all swapchain images can become "acquired" without
+  // ever being released by vkQueuePresentKHR. With UINT64_MAX, this
+  // blocks the calling thread indefinitely — on the UI thread this means
+  // the main_loop stops processing events (including surface recovery),
+  // causing a permanent black screen.
+  //
+  // With a 1-second timeout, VK_TIMEOUT is returned and we treat it as
+  // kNotPresented (no paint this tick). The caller (PaintFromUIThread or
+  // RefreshGuestOutput) will simply retry later, giving the guest time to
+  // eventually produce a frame and the surface recovery path time to
+  // run if needed.
+  //
+  // The timeout must be long enough to not cause frame drops in normal
+  // operation (where images are usually immediately available), but
+  // short enough to not freeze the UI. 1 second is a safe middle ground
+  // — a single frame at 60fps is ~16ms, so 1s gives ample headroom.
+  constexpr uint64_t kAcquireTimeoutNs = 1'000'000'000ULL;  // 1 second
   VkResult acquire_result = dfn.vkAcquireNextImageKHR(
-      device, paint_context_.swapchain, UINT64_MAX, acquire_semaphore,
+      device, paint_context_.swapchain, kAcquireTimeoutNs, acquire_semaphore,
       VK_NULL_HANDLE, &swapchain_image_index);
   switch (acquire_result) {
     case VK_SUCCESS:
     case VK_SUBOPTIMAL_KHR:
       break;
+    case VK_TIMEOUT:
+      // No swapchain image became available within the timeout. This
+      // happens in MAILBOX mode when the guest has not produced any
+      // frames yet (all images are still queued). Treat as a soft skip
+      // — the guest output thread or UI thread will retry shortly.
+      // Do NOT log here to avoid spamming the log (this is a common
+      // condition during game initialization).
+      return PaintResult::kNotPresented;
     case VK_ERROR_DEVICE_LOST:
       XELOGE(
           "VulkanPresenter: Failed to acquire the swapchain image as the "

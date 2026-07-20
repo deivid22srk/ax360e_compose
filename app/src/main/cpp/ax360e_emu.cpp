@@ -297,7 +297,18 @@ std::unique_ptr<xe::ui::Surface> AndroidWindow::CreateSurfaceImpl(xe::ui::Surfac
 }
 
 void AndroidWindow::RequestPaintImpl() {
-    XELOGI("Requesting Android window paint...");
+    // [RANGO BLACK SCREEN FIX] Remove the unconditional XELOGI here.
+    //
+    // Previously, this function logged "Requesting Android window paint..."
+    // every time it was called. In normal operation, this is called many
+    // times per second by the presenter (RequestPaintOrConnectionRecoveryViaWindow
+    // in presenter.cc, RequestUIPaintFromUIThread, etc.). For games like
+    // Rango that don't call VdSwap during long initialization sequences,
+    // this generated >130,000 log lines in a single session — completely
+    // drowning out useful diagnostic information.
+    //
+    // If paint request logging is needed for debugging, set the log level
+    // to Trace and re-enable this — but for normal use, it's pure noise.
     static_cast<AndroidWindowedAppContext&>(app_context()).request_paint();
 }
 
@@ -356,6 +367,33 @@ void AndroidWindow::Paint(){
         }
         return;
     }
+    // [RANGO BLACK SCREEN FIX] Throttle Paint() to ~60fps maximum.
+    //
+    // In normal operation, the main_loop processes EVENT_PAINT as fast as
+    // events are pushed. With the new finite vkAcquireNextImageKHR timeout
+    // (1 second), each Paint() call can take up to 1 second when the guest
+    // hasn't produced a frame yet — without throttling, this means the UI
+    // thread would still spend most of its time in vkAcquireNextImageKHR,
+    // even if not blocked forever.
+    //
+    // By enforcing a minimum 16ms (60fps) interval between Paint() calls,
+    // we ensure the UI thread is responsive to other events (surface
+    // recovery, quit, etc.) even when the guest output is not producing
+    // frames. This is especially important for games like Rango that have
+    // long initialization sequences without any VdSwap calls.
+    //
+    // The throttling uses steady_clock (monotonic) so it's not affected by
+    // system clock changes. If the previous Paint() was less than 16ms ago,
+    // we skip this one — the next EVENT_PAINT will be pushed by the
+    // presenter if needed.
+    static std::chrono::steady_clock::time_point last_paint_time;
+    constexpr auto kMinPaintInterval = std::chrono::milliseconds(16);
+    auto now = std::chrono::steady_clock::now();
+    if (now - last_paint_time < kMinPaintInterval) {
+        return;
+    }
+    last_paint_time = now;
+
     OnPaint(false);
 }
 
